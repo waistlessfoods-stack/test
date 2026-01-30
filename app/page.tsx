@@ -7,78 +7,136 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Menu, ShoppingCart } from "lucide-react";
 
 export default function Home() {
   return (
     <div className="flex flex-col w-full">
       {/* Header Navigation */}
-      <header className="flex justify-between items-start px-12 py-5 w-full bg-white">
-        {/* Logo */}
-        <div className="relative w-28 h-28">
-          <Image
-            src="/logo.png"
-            alt="Waist Less Food Logo"
-            width={119}
-            height={119}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-          />
-        </div>
-
-        {/* Navigation Container */}
-        <div className="flex flex-col justify-center items-end gap-8">
-          {/* Top Bar: CTA + Social Icons */}
-          <div className="flex items-center gap-6">
-            {/* CTA Button */}
-            <Button variant="default" size="sm" className="px-2 py-2 text-xs rounded-sm">
-              Complimentary Chef Consultation
-            </Button>
-
-            {/* Divider */}
-            <div className="w-8 h-0 border border-[#19767C] rotate-90" />
-
-            {/* Social Icons */}
-            <div className="flex items-center gap-1.5">
-              <a href="#" className="w-5 h-5 text-[#00676E]" aria-label="Instagram">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153a4.908 4.908 0 0 1 1.153 1.772c.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 0 1-1.153 1.772 4.915 4.915 0 0 1-1.772 1.153c-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 0 1-1.772-1.153 4.904 4.904 0 0 1-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.066.217-1.79.465-2.428a4.88 4.88 0 0 1 1.153-1.772A4.897 4.897 0 0 1 5.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.25a1.25 1.25 0 0 0-2.5 0 1.25 1.25 0 0 0 2.5 0zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/>
-                </svg>
-              </a>
-              <a href="#" className="w-5 h-5 text-[#00676E]" aria-label="Facebook">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/>
-                </svg>
-              </a>
-              <a href="#" className="w-5 h-5 text-[#00676E]" aria-label="Yelp">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12.271 17.652c.276.342.616.496 1.03.496.413 0 .77-.154 1.03-.496l4.02-4.98c.275-.342.413-.703.413-1.084 0-.38-.138-.741-.413-1.083a1.484 1.484 0 0 0-1.03-.496h-8.04c-.414 0-.77.154-1.03.496-.276.342-.414.703-.414 1.083 0 .38.138.742.413 1.084l4.02 4.98z"/>
-                </svg>
-              </a>
-            </div>
+      <header className="w-full bg-white">
+        <div className="hidden lg:grid grid-cols-3 items-start px-12 py-5 w-full bg-white">
+          <div className="relative w-28 h-28 justify-self-start">
+            <Image
+              src="/logo.png"
+              alt="Waist Less Food Logo"
+              width={119}
+              height={119}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            />
           </div>
 
-          {/* Main Navigation */}
-          <nav className="flex items-center gap-10">
-            <a href="#" className="px-0 py-2 border-b border-[#09686E] text-[#09686E] font-semibold text-base uppercase">
+          <nav className="flex items-center gap-10 justify-self-center self-end">
+            <a
+              href="#"
+              className="px-0 py-2 border-b border-[#09686E] text-[#09686E] font-semibold text-base uppercase"
+            >
               Home
             </a>
-            <a href="#" className="text-[#464646] font-semibold text-base uppercase">
+            <a
+              href="#"
+              className="text-[#464646] font-semibold text-base uppercase"
+            >
               About
             </a>
-            <div className="flex justify-center items-center gap-1">
+            <div className="flex items-center gap-1 cursor-pointer">
               <span className="text-[#464646] font-semibold text-base uppercase">
-                CHEF SERVICES
+                Chef Services
               </span>
-              <svg className="w-6 h-6 rotate-180" viewBox="0 0 24 24" fill="none">
-                <path d="M7 10l5 5 5-5" stroke="#464646" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                className="w-6 h-6 rotate-180"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M7 10l5 5 5-5"
+                  stroke="#464646"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </div>
-            <a href="#" className="text-[#464646] font-semibold text-base uppercase">
+            <a
+              href="#"
+              className="text-[#464646] font-semibold text-base uppercase"
+            >
               Recipes
             </a>
-            <a href="#" className="text-[#464646] font-semibold text-base uppercase">
+            <a
+              href="#"
+              className="text-[#464646] font-semibold text-base uppercase"
+            >
               Gallery
             </a>
           </nav>
+
+          <div className="flex flex-col items-end justify-between">
+            <div className="flex items-center gap-6">
+              <Button
+                variant="default"
+                size="sm"
+                className="px-2 py-2 text-xs rounded-sm"
+              >
+                Complimentary Chef Consultation
+              </Button>
+              <div className="w-8 h-0 border border-[#19767C] rotate-90" />
+              <div className="flex items-center gap-1.5">
+                <a
+                  href="#"
+                  className="w-5 h-5 text-[#00676E]"
+                  aria-label="Instagram"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153a4.908 4.908 0 0 1 1.153 1.772c.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 0 1-1.153 1.772 4.915 4.915 0 0 1-1.772 1.153c-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 0 1-1.772-1.153 4.904 4.904 0 0 1-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.066.217-1.79.465-2.428a4.88 4.88 0 0 1 1.153-1.772A4.897 4.897 0 0 1 5.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.25a1.25 1.25 0 0 0-2.5 0 1.25 1.25 0 0 0 2.5 0zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
+                  </svg>
+                </a>
+                <a
+                  href="#"
+                  className="w-5 h-5 text-[#00676E]"
+                  aria-label="Facebook"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z" />
+                  </svg>
+                </a>
+                <a
+                  href="#"
+                  className="w-5 h-5 text-[#00676E]"
+                  aria-label="Yelp"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.271 17.652c.276.342.616.496 1.03.496.413 0 .77-.154 1.03-.496l4.02-4.98c.275-.342.413-.703.413-1.084 0-.38-.138-.741-.413-1.083a1.484 1.484 0 0 0-1.03-.496h-8.04c-.414 0-.77.154-1.03.496-.276.342-.414.703-.414 1.083 0 .38.138.742.413 1.084l4.02 4.98z" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            <div className="mt-7">
+              <Button
+                variant="outline"
+                className="w-[117px] h-12 px-5 py-3 flex items-center justify-center gap-2 rounded-lg border bg-[#F9F8F8] text-[#464646] text-base font-semibold uppercase leading-none"
+              >
+                CART
+                <ShoppingCart className="w-6 h-6" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="lg:hidden flex items-center justify-between px-4 py-3">
+          <div className="relative w-16 h-16">
+            <Image src="/logo.png" alt="Logo" fill className="object-contain" />
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="icon">
+              <ShoppingCart className="w-5 h-5" />
+            </Button>
+
+            <Button aria-label="Menu">
+              <Menu />
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -90,7 +148,7 @@ export default function Home() {
           fill
           className="object-cover"
         />
-        
+
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="flex flex-col items-center gap-12 max-w-[562px] px-4">
             <div className="flex flex-col items-center gap-6">
@@ -98,7 +156,9 @@ export default function Home() {
                 Waste Less. Taste More.
               </h1>
               <p className="text-2xl md:text-[26px] leading-relaxed text-white text-center">
-                Private Chef Amber curates fresh, flavorful meals, from pescatarian feasts to hearty family dinners, with an eco-conscious touch.
+                Private Chef Amber curates fresh, flavorful meals, from
+                pescatarian feasts to hearty family dinners, with an
+                eco-conscious touch.
               </p>
             </div>
 
@@ -106,7 +166,11 @@ export default function Home() {
               <Button size="lg" className="px-6 py-4 text-xl h-auto">
                 Book a Private Experience
               </Button>
-              <Button variant="outline" size="lg" className="px-6 py-4 border-2 border-white bg-transparent text-white text-xl h-auto hover:bg-white/10">
+              <Button
+                variant="outline"
+                size="lg"
+                className="px-6 py-4 border-2 border-white bg-transparent text-white text-xl h-auto hover:bg-white/10"
+              >
                 View Services
               </Button>
             </div>
@@ -115,118 +179,151 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="px-6 md:px-28 py-20 bg-white">
-        <div className="flex flex-col items-center gap-6 mb-20">
-          <h2 className="text-4xl md:text-[44px] font-medium text-black text-center">
+      <section className="px-6 md:px-28 py-20 bg-white space-y-10 md:space-y-[78px]">
+        <div className="flex flex-col items-center gap-6 max-w-[1222px] mx-auto text-center">
+          <h2 className="text-[32px] md:text-[44px] font-medium tracking-[-0.02em] text-black leading-tight">
             SIMPLE. SUSTAINABLE. DELICIOUS.
           </h2>
-          <p className="text-xl md:text-[30px] leading-relaxed text-[#838383] text-center max-w-5xl">
-            We make healthy, eco-conscious eating easy for everyone. Discover recipes and habits that taste as good as they feel.
+          <p className="max-w-[900px] text-[18px] md:text-[30px] tracking-[-0.02em] leading-relaxed md:leading-[34px] text-[#838383]">
+            We make healthy, eco-conscious eating easy for everyone. Discover
+            recipes and habits that taste as good as they feel.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Card 1 */}
-          <div className="flex flex-col h-full">
-            <div className="relative w-full h-64 bg-gray-200">
-              <Image src="/highlight/recipe.png" alt="Recipes" fill className="object-cover" />
-            </div>
-            <div className="flex flex-col justify-between items-center px-6 py-8 gap-9 bg-[#F2F2F2] flex-1">
-              <div className="flex flex-col gap-6">
-                <h3 className="text-3xl font-semibold text-black">
-                  RECIPES FOR EVERY MOOD
-                </h3>
-                <p className="text-xl text-black">
-                  Find delicious inspiration for every occasion — from quick bites to weekend-worthy meals.
-                </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-[31px] max-w-[1222px] mx-auto">
+          {[
+            {
+              title: "RECIPES FOR EVERY MOOD",
+              desc: "Find delicious inspiration for every occasion — from quick bites to weekend-worthy meals.",
+              img: "/highlight/recipe.png",
+            },
+            {
+              title: "ECO LIVING TIPS",
+              desc: "Learn simple, sustainable habits to make your kitchen and home more eco-friendly.",
+              img: "/highlight/eco-living.png",
+            },
+            {
+              title: "MEET CHEF AMBER",
+              desc: "Discover Chef Amber's story, her cooking philosophy, and the passion behind every flavorful dish.",
+              img: "/highlight/meet-chef.png",
+            },
+          ].map((item, index) => (
+            <div key={index} className="flex flex-col w-full h-full">
+              <div className="relative w-full aspect-387/257">
+                <Image
+                  src={item.img}
+                  alt={item.title}
+                  fill
+                  className="object-cover"
+                />
               </div>
-              <Button size="lg" className="px-6 py-4 text-xl font-medium h-auto">
-                More Info
-              </Button>
-            </div>
-          </div>
 
-          {/* Card 2 */}
-          <div className="flex flex-col h-full">
-            <div className="relative w-full h-64 bg-gray-200">
-              <Image src="/highlight/eco-living.png" alt="Eco Living" fill className="object-cover" />
-            </div>
-            <div className="flex flex-col justify-between items-center px-6 py-8 gap-9 bg-[#F2F2F2] flex-1">
-              <div className="flex flex-col gap-6">
-                <h3 className="text-3xl font-semibold text-black">
-                  ECO LIVING TIPS
-                </h3>
-                <p className="text-xl text-black">
-                  Learn simple, sustainable habits to make your kitchen and home more eco-friendly.
-                </p>
-              </div>
-              <Button size="lg" className="px-6 py-4 text-xl font-medium h-auto">
-                More Info
-              </Button>
-            </div>
-          </div>
+              <div className="flex flex-col bg-[#F2F2F2] px-[25px] py-[34px] gap-6 grow md:min-h-[314px]">
+                <div className="flex flex-col gap-6 grow text-center md:text-left">
+                  <h3 className="text-[24px] md:text-[28px] font-semibold tracking-[-0.02em] leading-tight text-black">
+                    {item.title}
+                  </h3>
+                  <p className="text-[18px] md:text-[22px] font-normal tracking-[-0.02em] leading-snug text-black">
+                    {item.desc}
+                  </p>
+                </div>
 
-          {/* Card 3 */}
-          <div className="flex flex-col h-full">
-            <div className="relative w-full h-64 bg-gray-200">
-              <Image src="/highlight/meet-chef.png" alt="Meet Chef Amber" fill className="object-cover" />
-            </div>
-            <div className="flex flex-col justify-between items-center px-6 py-8 gap-9 bg-[#F2F2F2] flex-1">
-              <div className="flex flex-col gap-6">
-                <h3 className="text-3xl font-semibold text-black">
-                  MEET CHEF AMBER
-                </h3>
-                <p className="text-xl text-black">
-                  Discover Chef Amber&apos;s story, her cooking philosophy, and the passion behind every flavorful dish.
-                </p>
+                <div className="w-full flex justify-center">
+                  <Button className="w-[142px] h-14 rounded-lg bg-[#388082] px-6 py-4 text-[20px] md:text-[22px] font-medium text-white hover:bg-[#2f6e70] transition-colors">
+                    More Info
+                  </Button>
+                </div>
               </div>
-              <Button size="lg" className="px-6 py-4 text-xl font-medium h-auto">
-                More Info
-              </Button>
             </div>
-          </div>
+          ))}
         </div>
       </section>
 
       {/* About Chef Amber Section */}
-      <section className="flex flex-col md:flex-row w-full bg-[#388082]">
-        <div className="relative w-full md:w-[546px] h-96 md:h-auto bg-gray-300">
-          <Image
-            src="/highlight/meet-chef.png"
-            alt="Chef Amber"
-            fill
-            className="object-cover"
-          />
-        </div>
+      <section className="relative w-full min-h-[700px] md:h-[764px] flex items-center justify-center overflow-hidden">
+        <Image
+          src="/highlight/amber-chef.png"
+          alt="Chef Amber Background"
+          fill
+          className="object-cover"
+          priority
+        />
 
-        <div className="flex-1 px-6 md:px-12 py-12 bg-white">
-          <div className="flex flex-col gap-10 max-w-3xl">
-            <div className="flex flex-col gap-9">
-              <h2 className="text-4xl font-semibold text-black">
+        <div className="relative z-10 w-full bg-white/90 backdrop-blur-sm shadow-xl border-y border-white/20 py-10 md:py-14 flex justify-center">
+          <div className="flex flex-col items-center w-full max-w-[810px] px-6 gap-8 md:gap-10">
+            <div className="flex flex-col items-center w-full gap-6 md:gap-[37px]">
+              <h2 className="text-[24px] md:text-[34px] font-semibold leading-tight tracking-[-0.02em] text-black text-center font-sans">
                 ABOUT CHEF AMBER
               </h2>
-              <p className="text-xl leading-relaxed font-semibold text-black">
-                Chef Amber is the creative force behind WaistLess Foods, blending flavor, sustainability, and heart into every dish she makes. As a Houston-based private chef, Amber transforms everyday ingredients into soulful, nourishing meals designed to make healthy eating effortless and enjoyable. Her journey began cooking for her family of four — now it&apos;s her mission to show that mindful cooking can be both exciting and full of love.
-              </p>
 
-              <div className="flex flex-col gap-3">
-                {[
-                  'Sustainable Cooking',
-                  'Flavor-Driven Recipes',
-                  'Family-Inspired Meals',
-                  'Always Made with Care'
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-4">
-                    <svg className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24" fill="#388082">
-                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
-                    </svg>
-                    <span className="text-lg font-semibold text-[#388082]">{item}</span>
-                  </div>
-                ))}
+              <div className="flex flex-col gap-4 text-center max-w-full font-sans">
+                <p className="text-[17px] md:text-[20px] leading-relaxed text-black">
+                  <span className="font-semibold">Chef Amber </span>
+                  <span className="font-normal">
+                    is the creative force behind{" "}
+                  </span>
+                  <span className="font-semibold">WaistLess Foods, </span>
+                  <span className="font-normal">
+                    blending flavor, sustainability, and heart into every dish
+                    she makes.
+                  </span>
+                </p>
+
+                <p className="text-[17px] md:text-[20px] leading-relaxed text-[#7A7A7A]">
+                  As a Houston-based private chef, Amber transforms everyday
+                  ingredients into soulful, nourishing meals designed to make
+                  healthy eating effortless and enjoyable.
+                </p>
+
+                <p className="text-[17px] md:text-[20px] leading-relaxed text-[#7A7A7A]">
+                  Her journey began cooking for her family of four — now it’s
+                  her mission to show that mindful cooking can be both exciting
+                  and full of love.
+                </p>
+              </div>
+
+              <div className="w-full flex justify-center">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 w-full max-w-[650px]">
+                  {[
+                    "Sustainable Cooking",
+                    "Flavor-Driven Recipes",
+                    "Family-Inspired Meals",
+                    "Always Made with Care",
+                  ].map((text, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3.5 p-3 border border-[#388082] rounded-lg
+                           bg-white min-h-[50px]"
+                    >
+                      <div className="flex items-center justify-center w-5 h-5 md:w-6 md:h-6 rounded-md bg-[#388082] shrink-0">
+                        <svg
+                          className="w-3 h-3 md:w-4 md:h-4"
+                          viewBox="0 0 18 21"
+                          fill="none"
+                        >
+                          <path
+                            d="M16.5 5.5L6.5 15.5L1.5 10.5"
+                            stroke="#FFFFFF"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-[14px] md:text-[16px] font-semibold text-[#388082] font-sans">
+                        {text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <Button size="lg" className="px-6 py-4 text-xl font-medium self-start h-auto">
+            <Button
+              className="w-full max-w-[255px] h-12 md:h-14 rounded-lg bg-[#388082]
+           text-[18px] md:text-[20px] font-medium 
+           text-white hover:brightness-110 transition-all active:scale-95"
+            >
               Meet Chef Amber
             </Button>
           </div>
@@ -234,99 +331,204 @@ export default function Home() {
       </section>
 
       {/* Featured Recipes Section */}
-      <section className="px-6 md:px-24 py-20 bg-white">
-        <h2 className="text-6xl md:text-[80px] leading-tight text-black text-center mb-14 font-['Bebas_Neue']">
+      <section className="w-full max-w-[1246px] mx-auto px-6 lg:px-0 py-20 bg-white">
+        <h2 className="text-[50px] md:text-[80px] font-semibold text-black text-center mb-14 tracking-[-0.02em] leading-[86px] font-[family-name:--font-schibsted)]">
           Featured Recipes
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { title: 'BREAKFAST', image: '/featured/breakfast.png' },
-            { title: 'LUNCH', image: '/featured/lunch.png' },
-            { title: 'DINNER', image: '/featured/dinner.png' },
-            { title: 'DESSERT', image: '/featured/dessert.png' }
-          ].map((recipe) => (
-            <a key={recipe.title} href="#" className="relative h-[369px] bg-gray-400 group cursor-pointer block">
-              <Image src={recipe.image} alt={recipe.title} fill className="object-cover" />
-              <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-all duration-300" />
-              
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
-                <div className="flex flex-col items-center gap-5">
-                  <h3 className="text-5xl leading-tight uppercase text-white text-center font-['Bebas_Neue']">
-                    {recipe.title}
-                  </h3>
-                  <div className="w-40 h-px bg-white" />
-                </div>
-                <Button variant="outline" className="px-3.5 py-2.5 border-white bg-transparent text-white hover:bg-white/20 h-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  CLICK FOR MORE
-                </Button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[26px] justify-items-center">
+          <div className="relative w-full max-w-[292px] h-[369px] group overflow-hidden">
+            <Image
+              src="/featured/breakfast.png"
+              alt="Breakfast"
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/50" />
+
+            <div className="absolute top-[67px] left-1/2 -translate-x-1/2 w-[183px] h-[235px] flex flex-col items-center justify-between">
+              <div className="flex flex-col items-center gap-5 w-full shrink-0">
+                <h3 className="text-[55.88px] text-white text-center uppercase tracking-[-0.02em] font-(family-name:--font-bebas-neue) leading-[38px] font-normal">
+                  BREAKFAST
+                </h3>
+                <div className="w-[161px] border-t border-white" />
               </div>
-            </a>
-          ))}
+
+              <div className="flex items-center grow">
+                <p className="text-[16px] text-white text-center font-medium tracking-[-0.02em] leading-5 font-sans">
+                  Start your day with nourishing, flavor-packed dishes made from
+                  fresh, sustainable ingredients.
+                </p>
+              </div>
+
+              <a
+                href="#"
+                className="w-[170px] h-10 shrink-0 border border-white rounded-lg flex items-center justify-center py-2.5 px-3.5 transition-colors hover:bg-white/10"
+              >
+                <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
+                  CLICK FOR MORE
+                </span>
+              </a>
+            </div>
+          </div>
+
+          <div className="relative w-full max-w-[292px] h-[369px] group overflow-hidden">
+            <Image
+              src="/featured/lunch.png"
+              alt="Lunch"
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/50" />
+            <div className="absolute top-[67px] left-1/2 -translate-x-1/2 w-[183px] h-[235px] flex flex-col items-center justify-between">
+              <div className="flex flex-col items-center gap-5 w-full shrink-0">
+                <h3 className="text-[55.88px] text-white text-center uppercase tracking-[-0.02em] font-(family-name:--font-bebas-neue) leading-[38px] font-normal">
+                  LUNCH
+                </h3>
+                <div className="w-[161px] border-t border-white" />
+              </div>
+              <div className="flex items-center grow">
+                <p className="text-[16px] text-white text-center font-medium tracking-[-0.02em] leading-5 font-sans">
+                  Light yet satisfying recipes perfect for a mid-day boost
+                  wholesome, colorful, and full of life.
+                </p>
+              </div>
+              <a
+                href="#"
+                className="w-[170px] h-10 shrink-0 border border-white rounded-lg flex items-center justify-center py-2.5 px-3.5 hover:bg-white/10"
+              >
+                <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
+                  CLICK FOR MORE
+                </span>
+              </a>
+            </div>
+          </div>
+
+          <div className="relative w-full max-w-[292px] h-[369px] group overflow-hidden">
+            <Image
+              src="/featured/dinner.png"
+              alt="Dinner"
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/50" />
+            <div className="absolute top-[67px] left-1/2 -translate-x-1/2 w-[183px] h-[235px] flex flex-col items-center justify-between">
+              <div className="flex flex-col items-center gap-5 w-full shrink-0">
+                <h3 className="text-[55.88px] text-white text-center uppercase tracking-[-0.02em] font-(family-name:--font-bebas-neue) leading-[38px] font-normal">
+                  DINNER
+                </h3>
+                <div className="w-[161px] border-t border-white" />
+              </div>
+              <div className="flex items-center grow">
+                <p className="text-[16px] text-white text-center font-medium tracking-[-0.02em] leading-5 font-sans">
+                  End your day with hearty, soulful meals crafted to bring
+                  comfort, balance, and joy to your table.
+                </p>
+              </div>
+              <a
+                href="#"
+                className="w-[170px] h-10 shrink-0 border border-white rounded-lg flex items-center justify-center py-2.5 px-3.5 hover:bg-white/10"
+              >
+                <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
+                  CLICK FOR MORE
+                </span>
+              </a>
+            </div>
+          </div>
+
+          <div className="relative w-full max-w-[292px] h-[369px] group overflow-hidden">
+            <Image
+              src="/featured/dessert.png"
+              alt="Dessert"
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/50" />
+            <div className="absolute top-[67px] left-1/2 -translate-x-1/2 w-[183px] h-[235px] flex flex-col items-center justify-between">
+              <div className="flex flex-col items-center gap-5 w-full shrink-0">
+                <h3 className="text-[55.88px] text-white text-center uppercase tracking-[-0.02em] font-(family-name:--font-bebas-neue) leading-[38px] font-normal">
+                  DESSERT
+                </h3>
+                <div className="w-[161px] border-t border-white" />
+              </div>
+              <div className="flex items-center grow">
+                <p className="text-[16px] text-white text-center font-medium tracking-[-0.02em] leading-lg font-sans">
+                  Sweet creations that satisfy your cravings while keeping
+                  things natural and mindful.
+                </p>
+              </div>
+              <a
+                href="#"
+                className="w-[170px] h-10 shrink-0 border border-white rounded-lg flex items-center justify-center py-2.5 px-3.5 hover:bg-white/10"
+              >
+                <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
+                  CLICK FOR MORE
+                </span>
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Testimonial Section */}
-      <section className="relative w-full h-[619px]">
-        <Image src="/testimonial.png" alt="Background" fill className="object-cover" />
-        
-        <div className="absolute inset-0 flex items-center justify-center px-4">
-          <Carousel className="w-full max-w-5xl">
-            <CarouselContent>
-              <CarouselItem>
-                <div className="relative w-full p-10 md:p-16 bg-white/80 backdrop-blur-sm rounded-md border-4 border-[#16B0B9]">
-                  <div className="flex flex-col items-center gap-6">
-                    <h3 className="text-3xl text-[#5B5B5B] text-center font-['Royale_Couture']">
-                      Cooking Class
-                    </h3>
-                    <div className="flex flex-col items-center gap-5">
-                      <p className="text-lg md:text-xl leading-relaxed text-[#5B5B5B] text-center">
-                        &quot; I&apos;m a realtor and I hired Chef Amber to help me bring a unique idea to life. A cooking class attached to a finance class. Sounds crazy but everyone loved it. They appreciated the gems she dropped, her made from scratch sauces and her personality. At one point the room filled with 20+ people was dead silent. Now you know when people are silent and they are eating that means the food is good! I can&apos;t wait to work with her again. She was professional, intentional about the details and did I mention how good the food was. Oh that&apos;s right I already did. &quot;
-                      </p>
-                      <p className="text-xl font-bold text-[#5B5B5B]">
-                        -Lisa Barnes, J. Barnes Realty-
-                      </p>
+      <section className="relative w-full min-h-[650px] md:h-[619px] overflow-hidden flex items-center justify-center py-12">
+        <Image
+          src="/testimonial.png"
+          alt="Background"
+          fill
+          className="object-cover"
+        />
+
+        <div className="relative z-10 w-full max-w-[1252px] px-8 md:px-12">
+          <Carousel className="relative w-full">
+            <div className="hidden md:block absolute -top-8 -right-8 w-full h-full border-4 border-[#16B0B9] rounded-xl z-50 pointer-events-none" />
+
+            <CarouselContent className="z-10">
+              {[
+                {
+                  title: "COOKING CLASS",
+                  text: "“ I’m a realtor and I hired Chef Amber to help me bring a unique idea to life. A cooking class attached to a finance class. Sounds crazy but everyone loved it. They appreciated the gems she dropped, her made from scratch sauces and her personality. At one point the room filled with 20+ people was dead silent. Now you know when people are silent and they are eating that means the food is good! I can’t wait to work with her again. ”",
+                  author: "-Lisa Barnes, J. Barnes Realty-",
+                },
+              ].map((item, index) => (
+                <CarouselItem key={index}>
+                  <div className="w-full min-h-[450px] md:min-h-[409px] bg-white/85 backdrop-blur-[10px] shadow-lg flex items-center justify-center border border-white/20 rounded-xl p-6 md:p-12">
+                    <div className="w-full max-w-[997px] flex flex-col items-center gap-6">
+                      <h3
+                        className="text-[24px] md:text-[30px] font-normal leading-tight tracking-tight text-[#5B5B5B] text-center uppercase"
+                        style={{ fontFamily: "Royale Couture, sans-serif" }}
+                      >
+                        {item.title}
+                      </h3>
+
+                      <div className="flex flex-col items-center gap-6 w-full">
+                        <p
+                          className="text-[16px] md:text-[22px] font-medium leading-relaxed text-[#5B5B5B] text-center italic"
+                          style={{ fontFamily: "Metropolis, sans-serif" }}
+                        >
+                          {item.text}
+                        </p>
+
+                        <p
+                          className="text-[16px] md:text-[22px] font-bold text-[#5B5B5B] text-center"
+                          style={{ fontFamily: "Metropolis, sans-serif" }}
+                        >
+                          {item.author}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CarouselItem>
-              <CarouselItem>
-                <div className="relative w-full p-10 md:p-16 bg-white/80 backdrop-blur-sm rounded-md border-4 border-[#16B0B9]">
-                  <div className="flex flex-col items-center gap-6">
-                    <h3 className="text-3xl text-[#5B5B5B] text-center font-['Royale_Couture']">
-                      Private Chef Service
-                    </h3>
-                    <div className="flex flex-col items-center gap-5">
-                      <p className="text-lg md:text-xl leading-relaxed text-[#5B5B5B] text-center">
-                        &quot; Chef Amber exceeded all expectations! The meal was absolutely divine and perfectly suited to our dietary preferences. Her attention to detail and passion for sustainable cooking truly shines through in every dish. &quot;
-                      </p>
-                      <p className="text-xl font-bold text-[#5B5B5B]">
-                        -Sarah M., Houston-
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CarouselItem>
-              <CarouselItem>
-                <div className="relative w-full p-10 md:p-16 bg-white/80 backdrop-blur-sm rounded-md border-4 border-[#16B0B9]">
-                  <div className="flex flex-col items-center gap-6">
-                    <h3 className="text-3xl text-[#5B5B5B] text-center font-['Royale_Couture']">
-                      Family Meal Prep
-                    </h3>
-                    <div className="flex flex-col items-center gap-5">
-                      <p className="text-lg md:text-xl leading-relaxed text-[#5B5B5B] text-center">
-                        &quot; Working with Chef Amber has transformed how our family eats. Her meal prep services are a lifesaver, and everything is so fresh and delicious. Our kids actually ask for seconds of vegetables now! &quot;
-                      </p>
-                      <p className="text-xl font-bold text-[#5B5B5B]">
-                        -The Johnson Family-
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CarouselItem>
+                </CarouselItem>
+              ))}
             </CarouselContent>
-            <CarouselPrevious className="left-4 md:left-14 w-14 h-14 bg-[#0F8DAB] border-0 hover:bg-[#0d7691]" />
-            <CarouselNext className="right-4 md:right-14 w-14 h-14 bg-[#0F8DAB] border-0 hover:bg-[#0d7691]" />
+
+            <CarouselPrevious className="absolute -left-4 md:-left-12 top-1/2 -translate-y-1/2 w-10 h-10 md:w-[58px] md:h-[58px] bg-[#0F8DAB] hover:bg-[#0c768f] border-0 rounded-full z-40 shadow-xl opacity-100! [&_svg]:text-white" />
+            <CarouselNext className="absolute -right-4 md:-right-12 top-1/2 -translate-y-1/2 w-10 h-10 md:w-[58px] md:h-[58px] bg-[#0F8DAB] hover:bg-[#0c768f] border-0 rounded-full z-40 shadow-xl opacity-100! [&_svg]:text-white" />
+
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex justify-center gap-3">
+              <div className="w-2.5 h-2.5 rounded-full bg-[#16B0B9]"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-white/50"></div>
+            </div>
           </Carousel>
         </div>
       </section>
@@ -358,13 +560,21 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Footer Links */}
             <div className="flex gap-10">
               <div className="flex flex-col gap-4">
                 <h4 className="text-lg font-medium text-white">Quick Menu</h4>
                 <div className="flex flex-col gap-4">
-                  {['Home', 'Meet Chef Amber', 'Recipes & Lifestyle', 'Blog'].map((link) => (
-                    <a key={link} href="#" className="text-base font-semibold text-white hover:text-white/80 transition">
+                  {[
+                    "Home",
+                    "Meet Chef Amber",
+                    "Recipes & Lifestyle",
+                    "Blog",
+                  ].map((link) => (
+                    <a
+                      key={link}
+                      href="#"
+                      className="text-base font-semibold text-white hover:text-white/80 transition"
+                    >
                       {link}
                     </a>
                   ))}
@@ -374,11 +584,17 @@ export default function Home() {
               <div className="flex flex-col gap-4">
                 <h4 className="text-lg font-medium text-white">Licence</h4>
                 <div className="flex flex-col gap-4">
-                  {['Privacy Policy', 'Copyright', 'Term & Condition'].map((link) => (
-                    <a key={link} href="#" className="text-base font-semibold text-white hover:text-white/80 transition">
-                      {link}
-                    </a>
-                  ))}
+                  {["Privacy Policy", "Copyright", "Term & Condition"].map(
+                    (link) => (
+                      <a
+                        key={link}
+                        href="#"
+                        className="text-base font-semibold text-white hover:text-white/80 transition"
+                      >
+                        {link}
+                      </a>
+                    ),
+                  )}
                 </div>
               </div>
             </div>
@@ -388,7 +604,7 @@ export default function Home() {
 
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="flex items-center gap-3">
-              {['instagram', 'facebook', 'yelp'].map((social) => (
+              {["instagram", "facebook", "yelp"].map((social) => (
                 <a
                   key={social}
                   href="#"
@@ -396,14 +612,14 @@ export default function Home() {
                   aria-label={social}
                 >
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="white">
-                    {social === 'instagram' && (
-                      <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153a4.908 4.908 0 0 1 1.153 1.772c.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 0 1-1.153 1.772 4.915 4.915 0 0 1-1.772 1.153c-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 0 1-1.772-1.153 4.904 4.904 0 0 1-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.066.217-1.79.465-2.428a4.88 4.88 0 0 1 1.153-1.772A4.897 4.897 0 0 1 5.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.25a1.25 1.25 0 0 0-2.5 0 1.25 1.25 0 0 0 2.5 0zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/>
+                    {social === "instagram" && (
+                      <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153a4.908 4.908 0 0 1 1.153 1.772c.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 0 1-1.153 1.772 4.915 4.915 0 0 1-1.772 1.153c-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 0 1-1.772-1.153 4.904 4.904 0 0 1-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.066.217-1.79.465-2.428a4.88 4.88 0 0 1 1.153-1.772A4.897 4.897 0 0 1 5.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.25a1.25 1.25 0 0 0-2.5 0 1.25 1.25 0 0 0 2.5 0zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
                     )}
-                    {social === 'facebook' && (
-                      <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/>
+                    {social === "facebook" && (
+                      <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z" />
                     )}
-                    {social === 'yelp' && (
-                      <path d="M12.271 17.652c.276.342.616.496 1.03.496.413 0 .77-.154 1.03-.496l4.02-4.98c.275-.342.413-.703.413-1.084 0-.38-.138-.741-.413-1.083a1.484 1.484 0 0 0-1.03-.496h-8.04c-.414 0-.77.154-1.03.496-.276.342-.414.703-.414 1.083 0 .38.138.742.413 1.084l4.02 4.98z"/>
+                    {social === "yelp" && (
+                      <path d="M12.271 17.652c.276.342.616.496 1.03.496.413 0 .77-.154 1.03-.496l4.02-4.98c.275-.342.413-.703.413-1.084 0-.38-.138-.741-.413-1.083a1.484 1.484 0 0 0-1.03-.496h-8.04c-.414 0-.77.154-1.03.496-.276.342-.414.703-.414 1.083 0 .38.138.742.413 1.084l4.02 4.98z" />
                     )}
                   </svg>
                 </a>
