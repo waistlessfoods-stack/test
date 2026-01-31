@@ -1,19 +1,57 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
+  CarouselApi,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Menu, ShoppingCart } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (!api) return;
+
+    const onSelect = () => {
+      setCurrent(api.selectedScrollSnap());
+    };
+
+    onSelect();
+    api.on("select", onSelect);
+
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api]);
+
   return (
     <div className="flex flex-col w-full">
       {/* Header Navigation */}
       <header className="w-full bg-white">
+        <div
+          className="w-full h-[45px] flex items-center justify-center overflow-hidden"
+          style={{ backgroundColor: "#00676E", opacity: 1 }}
+        >
+          <span
+            className="text-white uppercase tracking-normal"
+            style={{
+              fontFamily: "General Sans, sans-serif",
+              fontWeight: 600,
+              fontSize: "16px",
+              lineHeight: "100%",
+            }}
+          >
+            Promotion Here
+          </span>
+        </div>
         <div className="hidden lg:grid grid-cols-3 items-start px-12 py-5 w-full bg-white">
           <div className="relative w-28 h-28 justify-self-start">
             <Image
@@ -141,35 +179,43 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative w-full h-[707px]">
+      <section className="relative w-full min-h-[700px] md:h-[707px] flex items-center justify-center overflow-hidden">
         <Image
           src="/hero.png"
           alt="Hero Background"
           fill
           className="object-cover"
+          priority
         />
 
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-12 max-w-[562px] px-4">
-            <div className="flex flex-col items-center gap-6">
-              <h1 className="text-8xl md:text-[100px] leading-tight tracking-wide uppercase text-white text-center font-['Bebas_Neue']">
-                Waste Less. Taste More.
+        <div className="absolute inset-0 bg-black/20 md:bg-transparent" />
+
+        <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-[1200px] px-6 py-20">
+          <div className="flex flex-col items-center gap-8 md:gap-12 max-w-[800px]">
+            <div className="flex flex-col items-center gap-4 md:gap-6">
+              <h1 className="text-5xl sm:text-7xl md:text-[100px] leading-[0.9] md:leading-tight tracking-wide uppercase text-white text-center font-['Bebas_Neue']">
+                Waste Less.
+                <br className="md:hidden" /> Taste More.
               </h1>
-              <p className="text-2xl md:text-[26px] leading-relaxed text-white text-center">
+
+              <p className="text-lg md:text-[26px] leading-relaxed text-white text-center max-w-[600px]">
                 Private Chef Amber curates fresh, flavorful meals, from
                 pescatarian feasts to hearty family dinners, with an
                 eco-conscious touch.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-5">
-              <Button size="lg" className="px-6 py-4 text-xl h-auto">
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <Button
+                size="lg"
+                className="px-6 py-4 text-lg md:text-xl h-auto w-full sm:w-auto"
+              >
                 Book a Private Experience
               </Button>
               <Button
                 variant="outline"
                 size="lg"
-                className="px-6 py-4 border-2 border-white bg-transparent text-white text-xl h-auto hover:bg-white/10"
+                className="px-6 py-4 border-2 border-white bg-transparent text-white text-lg md:text-xl h-auto hover:bg-white/10 w-full sm:w-auto"
               >
                 View Services
               </Button>
@@ -240,14 +286,14 @@ export default function Home() {
       </section>
 
       {/* About Chef Amber Section */}
-      <section className="relative w-full min-h-[700px] md:h-[764px] flex items-center justify-center overflow-hidden">
-        <Image
-          src="/highlight/amber-chef.png"
-          alt="Chef Amber Background"
-          fill
-          className="object-cover"
-          priority
-        />
+      <section
+        className="relative w-full min-h-[700px] md:h-[764px] flex items-center justify-center overflow-hidden bg-fixed bg-center bg-cover"
+        style={{
+          backgroundImage: "url('/highlight/amber-chef.png')",
+          backgroundAttachment: "fixed",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/10" />
 
         <div className="relative z-10 w-full bg-white/90 backdrop-blur-sm shadow-xl border-y border-white/20 py-10 md:py-14 flex justify-center">
           <div className="flex flex-col items-center w-full max-w-[810px] px-6 gap-8 md:gap-10">
@@ -293,7 +339,7 @@ export default function Home() {
                     <div
                       key={index}
                       className="flex items-center gap-3.5 p-3 border border-[#388082] rounded-lg
-                           bg-white min-h-[50px]"
+                     bg-white min-h-[50px]"
                     >
                       <div className="flex items-center justify-center w-5 h-5 md:w-6 md:h-6 rounded-md bg-[#388082] shrink-0">
                         <svg
@@ -319,11 +365,7 @@ export default function Home() {
               </div>
             </div>
 
-            <Button
-              className="w-full max-w-[255px] h-12 md:h-14 rounded-lg bg-[#388082]
-           text-[18px] md:text-[20px] font-medium 
-           text-white hover:brightness-110 transition-all active:scale-95"
-            >
+            <Button className="w-full max-w-[255px] h-12 md:h-14 rounded-lg bg-[#388082] text-[18px] md:text-[20px] font-medium text-white hover:brightness-110 transition-all active:scale-95">
               Meet Chef Amber
             </Button>
           </div>
@@ -361,14 +403,14 @@ export default function Home() {
                 </p>
               </div>
 
-              <a
-                href="#"
-                className="w-[170px] h-10 shrink-0 border border-white rounded-lg flex items-center justify-center py-2.5 px-3.5 transition-colors hover:bg-white/10"
+              <Button
+                variant="outline"
+                className="w-[170px] h-10 shrink-0 border border-white bg-transparent rounded-lg flex items-center justify-center py-2.5 px-3.5 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-white/10 text-white"
               >
                 <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
                   CLICK FOR MORE
                 </span>
-              </a>
+              </Button>
             </div>
           </div>
 
@@ -393,14 +435,14 @@ export default function Home() {
                   wholesome, colorful, and full of life.
                 </p>
               </div>
-              <a
-                href="#"
-                className="w-[170px] h-10 shrink-0 border border-white rounded-lg flex items-center justify-center py-2.5 px-3.5 hover:bg-white/10"
+              <Button
+                variant="outline"
+                className="w-[170px] h-10 shrink-0 border border-white bg-transparent rounded-lg flex items-center justify-center py-2.5 px-3.5 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-white/10 text-white"
               >
                 <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
                   CLICK FOR MORE
                 </span>
-              </a>
+              </Button>
             </div>
           </div>
 
@@ -425,14 +467,14 @@ export default function Home() {
                   comfort, balance, and joy to your table.
                 </p>
               </div>
-              <a
-                href="#"
-                className="w-[170px] h-10 shrink-0 border border-white rounded-lg flex items-center justify-center py-2.5 px-3.5 hover:bg-white/10"
+              <Button
+                variant="outline"
+                className="w-[170px] h-10 shrink-0 border border-white bg-transparent rounded-lg flex items-center justify-center py-2.5 px-3.5 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-white/10 text-white"
               >
                 <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
                   CLICK FOR MORE
                 </span>
-              </a>
+              </Button>
             </div>
           </div>
 
@@ -457,21 +499,21 @@ export default function Home() {
                   things natural and mindful.
                 </p>
               </div>
-              <a
-                href="#"
-                className="w-[170px] h-10 shrink-0 border border-white rounded-lg flex items-center justify-center py-2.5 px-3.5 hover:bg-white/10"
+              <Button
+                variant="outline"
+                className="w-[170px] h-10 shrink-0 border border-white bg-transparent rounded-lg flex items-center justify-center py-2.5 px-3.5 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-white/10 text-white"
               >
                 <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
                   CLICK FOR MORE
                 </span>
-              </a>
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Testimonial Section */}
-      <section className="relative w-full min-h-[650px] md:h-[619px] overflow-hidden flex items-center justify-center py-12">
+      <section className="relative w-full min-h-[650px] md:h-[619px] overflow-visible flex items-center justify-center py-12">
         <Image
           src="/testimonial.png"
           alt="Background"
@@ -480,7 +522,11 @@ export default function Home() {
         />
 
         <div className="relative z-10 w-full max-w-[1252px] px-8 md:px-12">
-          <Carousel className="relative w-full">
+          <Carousel
+            setApi={setApi}
+            opts={{ align: "start", loop: true }}
+            className="relative w-full"
+          >
             <div className="hidden md:block absolute -top-8 -right-8 w-full h-full border-4 border-[#16B0B9] rounded-xl z-50 pointer-events-none" />
 
             <CarouselContent className="z-10">
@@ -489,6 +535,16 @@ export default function Home() {
                   title: "COOKING CLASS",
                   text: "“ I’m a realtor and I hired Chef Amber to help me bring a unique idea to life. A cooking class attached to a finance class. Sounds crazy but everyone loved it. They appreciated the gems she dropped, her made from scratch sauces and her personality. At one point the room filled with 20+ people was dead silent. Now you know when people are silent and they are eating that means the food is good! I can’t wait to work with her again. ”",
                   author: "-Lisa Barnes, J. Barnes Realty-",
+                },
+                {
+                  title: "PRIVATE DINING",
+                  text: "“ Chef Amber provided an exceptional dining experience for our anniversary. The attention to detail and the fusion of flavors was unlike anything we've had before. Highly recommend! ”",
+                  author: "-Michael & Sarah J.-",
+                },
+                {
+                  title: "MEAL PREP",
+                  text: "“ Her meal prep service has changed my life. Eating healthy has never been this easy and delicious. Each dish feels like it was made with so much care and soul. ”",
+                  author: "-David Wilson-",
                 },
               ].map((item, index) => (
                 <CarouselItem key={index}>
@@ -522,12 +578,24 @@ export default function Home() {
               ))}
             </CarouselContent>
 
-            <CarouselPrevious className="absolute -left-4 md:-left-12 top-1/2 -translate-y-1/2 w-10 h-10 md:w-[58px] md:h-[58px] bg-[#0F8DAB] hover:bg-[#0c768f] border-0 rounded-full z-40 shadow-xl opacity-100! [&_svg]:text-white" />
-            <CarouselNext className="absolute -right-4 md:-right-12 top-1/2 -translate-y-1/2 w-10 h-10 md:w-[58px] md:h-[58px] bg-[#0F8DAB] hover:bg-[#0c768f] border-0 rounded-full z-40 shadow-xl opacity-100! [&_svg]:text-white" />
+            <CarouselPrevious className="absolute -left-4 md:-left-12 top-1/2 -translate-y-1/2 w-10 h-10 md:w-[70px] md:h-[70px] bg-[#0F8DAB] hover:bg-[#0c768f] border-0 rounded-full z-40 shadow-xl opacity-100! flex items-center justify-center [&_svg]:text-white [&_svg]:w-3.5 [&_svg]:h-4 md:[&_svg]:w-[21.16px] md:[&_svg]:h-[24.69px] [&_svg]:stroke-[3.53px]" />
+            <CarouselNext className="absolute -right-4 md:-right-12 top-1/2 -translate-y-1/2 w-10 h-10 md:w-[70px] md:h-[70px] bg-[#0F8DAB] hover:bg-[#0c768f] border-0 rounded-full z-40 shadow-xl opacity-100! flex items-center justify-center [&_svg]:text-white [&_svg]:w-3.5 [&_svg]:h-4 md:[&_svg]:w-[21.16px] md:[&_svg]:h-[24.69px] [&_svg]:stroke-[3.53px]" />
 
-            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex justify-center gap-3">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#16B0B9]"></div>
-              <div className="w-2.5 h-2.5 rounded-full bg-white/50"></div>
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-50">
+              {["COOKING CLASS", "PRIVATE DINING", "MEAL PREP"].map(
+                (_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => api?.scrollTo(index)}
+                    className={`w-2.5 h-2.5 rounded-full transition-all ${
+                      current === index
+                        ? "bg-[#16B0B9] scale-125"
+                        : "bg-white/50"
+                    }`}
+                    aria-label={`Go to testimonial ${index + 1}`}
+                  />
+                ),
+              )}
             </div>
           </Carousel>
         </div>
