@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/carousel";
 import { Menu, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function Home() {
   const [api, setApi] = useState<CarouselApi>();
@@ -31,6 +32,33 @@ export default function Home() {
       api.off("select", onSelect);
     };
   }, [api]);
+
+  const featuredRecipes = [
+    {
+      title: "BREAKFAST",
+      slug: "breakfast",
+      image: "/featured/breakfast.png",
+      desc: "Start your day with nourishing, flavor-packed dishes made from fresh, sustainable ingredients.",
+    },
+    {
+      title: "LUNCH",
+      slug: "lunch",
+      image: "/featured/lunch.png",
+      desc: "Light yet satisfying recipes perfect for a mid-day boost wholesome, colorful, and full of life.",
+    },
+    {
+      title: "DINNER",
+      slug: "dinner",
+      image: "/featured/dinner.png",
+      desc: "End your day with hearty, soulful meals crafted to bring comfort, balance, and joy to your table.",
+    },
+    {
+      title: "DESSERT",
+      slug: "dessert",
+      image: "/featured/dessert.png",
+      desc: "Sweet creations that satisfy your cravings while keeping things natural and mindful.",
+    },
+  ];
 
   return (
     <div className="flex flex-col w-full">
@@ -379,136 +407,47 @@ export default function Home() {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[26px] justify-items-center">
-          <div className="relative w-full max-w-[292px] h-[369px] group overflow-hidden">
-            <Image
-              src="/featured/breakfast.png"
-              alt="Breakfast"
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/50" />
+          {featuredRecipes.map((item) => (
+            <div
+              key={item.slug}
+              className="relative w-full max-w-[292px] h-[369px] group overflow-hidden"
+            >
+              <Image
+                src={item.image}
+                alt={item.title}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+              />
 
-            <div className="absolute top-[67px] left-1/2 -translate-x-1/2 w-[183px] h-[235px] flex flex-col items-center justify-between">
-              <div className="flex flex-col items-center gap-5 w-full shrink-0">
-                <h3 className="text-[55.88px] text-white text-center uppercase tracking-[-0.02em] font-(family-name:--font-bebas-neue) leading-[38px] font-normal">
-                  BREAKFAST
-                </h3>
-                <div className="w-[161px] border-t border-white" />
+              <div className="absolute inset-0 bg-black/60 transition-all duration-300 group-hover:bg-black/25" />
+
+              <div className="absolute top-[67px] left-1/2 -translate-x-1/2 w-[183px] h-[235px] flex flex-col items-center justify-between">
+                <div className="flex flex-col items-center gap-5 w-full shrink-0">
+                  <h3 className="text-[55.88px] text-white text-center uppercase tracking-[-0.02em] font-(family-name:--font-bebas-neue) leading-[38px] font-normal">
+                    {item.title}
+                  </h3>
+                  <div className="w-[161px] border-t border-white" />
+                </div>
+
+                <div className="flex items-center grow">
+                  <p className="text-[16px] text-white text-center font-medium tracking-[-0.02em] leading-5 font-sans">
+                    {item.desc}
+                  </p>
+                </div>
+
+                <Link href={`/recipes/${item.slug}`}>
+                  <Button
+                    variant="outline"
+                    className="w-[170px] h-10 shrink-0 border border-white bg-transparent rounded-lg flex items-center justify-center py-2.5 px-3.5 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-white/10 text-white"
+                  >
+                    <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
+                      CLICK FOR MORE
+                    </span>
+                  </Button>
+                </Link>
               </div>
-
-              <div className="flex items-center grow">
-                <p className="text-[16px] text-white text-center font-medium tracking-[-0.02em] leading-5 font-sans">
-                  Start your day with nourishing, flavor-packed dishes made from
-                  fresh, sustainable ingredients.
-                </p>
-              </div>
-
-              <Button
-                variant="outline"
-                className="w-[170px] h-10 shrink-0 border border-white bg-transparent rounded-lg flex items-center justify-center py-2.5 px-3.5 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-white/10 text-white"
-              >
-                <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
-                  CLICK FOR MORE
-                </span>
-              </Button>
             </div>
-          </div>
-
-          <div className="relative w-full max-w-[292px] h-[369px] group overflow-hidden">
-            <Image
-              src="/featured/lunch.png"
-              alt="Lunch"
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/50" />
-            <div className="absolute top-[67px] left-1/2 -translate-x-1/2 w-[183px] h-[235px] flex flex-col items-center justify-between">
-              <div className="flex flex-col items-center gap-5 w-full shrink-0">
-                <h3 className="text-[55.88px] text-white text-center uppercase tracking-[-0.02em] font-(family-name:--font-bebas-neue) leading-[38px] font-normal">
-                  LUNCH
-                </h3>
-                <div className="w-[161px] border-t border-white" />
-              </div>
-              <div className="flex items-center grow">
-                <p className="text-[16px] text-white text-center font-medium tracking-[-0.02em] leading-5 font-sans">
-                  Light yet satisfying recipes perfect for a mid-day boost
-                  wholesome, colorful, and full of life.
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                className="w-[170px] h-10 shrink-0 border border-white bg-transparent rounded-lg flex items-center justify-center py-2.5 px-3.5 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-white/10 text-white"
-              >
-                <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
-                  CLICK FOR MORE
-                </span>
-              </Button>
-            </div>
-          </div>
-
-          <div className="relative w-full max-w-[292px] h-[369px] group overflow-hidden">
-            <Image
-              src="/featured/dinner.png"
-              alt="Dinner"
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/50" />
-            <div className="absolute top-[67px] left-1/2 -translate-x-1/2 w-[183px] h-[235px] flex flex-col items-center justify-between">
-              <div className="flex flex-col items-center gap-5 w-full shrink-0">
-                <h3 className="text-[55.88px] text-white text-center uppercase tracking-[-0.02em] font-(family-name:--font-bebas-neue) leading-[38px] font-normal">
-                  DINNER
-                </h3>
-                <div className="w-[161px] border-t border-white" />
-              </div>
-              <div className="flex items-center grow">
-                <p className="text-[16px] text-white text-center font-medium tracking-[-0.02em] leading-5 font-sans">
-                  End your day with hearty, soulful meals crafted to bring
-                  comfort, balance, and joy to your table.
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                className="w-[170px] h-10 shrink-0 border border-white bg-transparent rounded-lg flex items-center justify-center py-2.5 px-3.5 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-white/10 text-white"
-              >
-                <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
-                  CLICK FOR MORE
-                </span>
-              </Button>
-            </div>
-          </div>
-
-          <div className="relative w-full max-w-[292px] h-[369px] group overflow-hidden">
-            <Image
-              src="/featured/dessert.png"
-              alt="Dessert"
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/50" />
-            <div className="absolute top-[67px] left-1/2 -translate-x-1/2 w-[183px] h-[235px] flex flex-col items-center justify-between">
-              <div className="flex flex-col items-center gap-5 w-full shrink-0">
-                <h3 className="text-[55.88px] text-white text-center uppercase tracking-[-0.02em] font-(family-name:--font-bebas-neue) leading-[38px] font-normal">
-                  DESSERT
-                </h3>
-                <div className="w-[161px] border-t border-white" />
-              </div>
-              <div className="flex items-center grow">
-                <p className="text-[16px] text-white text-center font-medium tracking-[-0.02em] leading-lg font-sans">
-                  Sweet creations that satisfy your cravings while keeping
-                  things natural and mindful.
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                className="w-[170px] h-10 shrink-0 border border-white bg-transparent rounded-lg flex items-center justify-center py-2.5 px-3.5 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-white/10 text-white"
-              >
-                <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
-                  CLICK FOR MORE
-                </span>
-              </Button>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
