@@ -405,37 +405,36 @@ export default function Home() {
         <h2 className="text-[50px] md:text-[80px] font-semibold text-black text-center mb-14 tracking-[-0.02em] leading-[86px] font-[family-name:--font-schibsted)]">
           Featured Recipes
         </h2>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[26px] justify-items-center">
           {featuredRecipes.map((item) => (
             <div
               key={item.slug}
               className="relative w-full max-w-[292px] h-[369px] group overflow-hidden"
             >
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-              />
+              <Link href={`/recipes/${item.slug}`}>
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
 
-              <div className="absolute inset-0 bg-black/60 transition-all duration-300 group-hover:bg-black/25" />
+                <div className="absolute inset-0 bg-black/60 transition-all duration-300 group-hover:bg-black/25" />
 
-              <div className="absolute top-[67px] left-1/2 -translate-x-1/2 w-[183px] h-[235px] flex flex-col items-center justify-between">
-                <div className="flex flex-col items-center gap-5 w-full shrink-0">
-                  <h3 className="text-[55.88px] text-white text-center uppercase tracking-[-0.02em] font-(family-name:--font-bebas-neue) leading-[38px] font-normal">
-                    {item.title}
-                  </h3>
-                  <div className="w-[161px] border-t border-white" />
-                </div>
+                <div className="absolute top-[67px] left-1/2 -translate-x-1/2 w-[183px] h-[235px] flex flex-col items-center justify-between">
+                  <div className="flex flex-col items-center gap-5 w-full shrink-0">
+                    <h3 className="text-[55.88px] text-white text-center uppercase tracking-[-0.02em] font-(family-name:--font-bebas-neue) leading-[38px] font-normal">
+                      {item.title}
+                    </h3>
+                    <div className="w-[161px] border-t border-white" />
+                  </div>
 
-                <div className="flex items-center grow">
-                  <p className="text-[16px] text-white text-center font-medium tracking-[-0.02em] leading-5 font-sans">
-                    {item.desc}
-                  </p>
-                </div>
+                  <div className="flex items-center grow">
+                    <p className="text-[16px] text-white text-center font-medium tracking-[-0.02em] leading-5 font-sans">
+                      {item.desc}
+                    </p>
+                  </div>
 
-                <Link href={`/recipes/${item.slug}`}>
                   <Button
                     variant="outline"
                     className="w-[170px] h-10 shrink-0 border border-white bg-transparent rounded-lg flex items-center justify-center py-2.5 px-3.5 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-white/10 text-white"
@@ -444,8 +443,8 @@ export default function Home() {
                       CLICK FOR MORE
                     </span>
                   </Button>
-                </Link>
-              </div>
+                </div>
+              </Link>
             </div>
           ))}
         </div>
