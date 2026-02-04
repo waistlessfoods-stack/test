@@ -10,9 +10,17 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Menu, ShoppingCart } from "lucide-react";
+import { Facebook, Instagram, Menu, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 export default function Home() {
   const [api, setApi] = useState<CarouselApi>();
@@ -64,123 +72,132 @@ export default function Home() {
     <div className="flex flex-col w-full">
       {/* Header Navigation */}
       <header className="w-full bg-white">
-        <div
-          className="w-full h-[45px] flex items-center justify-center overflow-hidden"
-          style={{ backgroundColor: "#00676E", opacity: 1 }}
-        >
-          <span
-            className="text-white uppercase tracking-normal"
-            style={{
-              fontFamily: "General Sans, sans-serif",
-              fontWeight: 600,
-              fontSize: "16px",
-              lineHeight: "100%",
-            }}
-          >
+        {/* Top Promotion Bar */}
+        <div className="w-full h-[45px] flex items-center justify-center bg-[#00676E]">
+          <span className="text-white uppercase text-[16px] font-semibold font-sans">
             Promotion Here
           </span>
         </div>
+
+        {/* Desktop Navigation */}
         <div className="hidden lg:grid grid-cols-3 items-start px-12 py-5 w-full bg-white">
+          {/* Logo */}
           <div className="relative w-28 h-28 justify-self-start">
             <Image
               src="/logo.png"
-              alt="Waist Less Food Logo"
+              alt="Logo"
               width={119}
               height={119}
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
             />
           </div>
 
-          <nav className="flex items-center gap-10 justify-self-center self-end">
-            <a
-              href="#"
-              className="px-0 py-2 border-b border-[#09686E] text-[#09686E] font-semibold text-base uppercase"
-            >
-              Home
-            </a>
-            <a
-              href="#"
-              className="text-[#464646] font-semibold text-base uppercase"
-            >
-              About
-            </a>
-            <div className="flex items-center gap-1 cursor-pointer">
-              <span className="text-[#464646] font-semibold text-base uppercase">
-                Chef Services
-              </span>
-              <svg
-                className="w-6 h-6 rotate-180"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <path
-                  d="M7 10l5 5 5-5"
-                  stroke="#464646"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-            <a
-              href="#"
-              className="text-[#464646] font-semibold text-base uppercase"
-            >
-              Recipes
-            </a>
-            <a
-              href="#"
-              className="text-[#464646] font-semibold text-base uppercase"
-            >
-              Gallery
-            </a>
-          </nav>
+          {/* Center Nav */}
+          <div className="justify-self-center self-end pb-2">
+            <NavigationMenu>
+              <NavigationMenuList className="gap-10">
+                <NavigationMenuItem>
+                  <Link
+                    href="/"
+                    className="px-0 py-2 border-b border-[#09686E] text-[#09686E] font-semibold text-base uppercase font-sans"
+                  >
+                    Home
+                  </Link>
+                </NavigationMenuItem>
 
-          <div className="flex flex-col items-end justify-between">
+                <NavigationMenuItem>
+                  <Link
+                    href="/about"
+                    className="text-[#464646] font-semibold text-base uppercase font-sans hover:text-[#09686E]"
+                  >
+                    About
+                  </Link>
+                </NavigationMenuItem>
+
+                {/* Chef Services Dropdown */}
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="h-auto p-0 bg-transparent hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
+                    <span className="text-[#464646] font-semibold text-base uppercase font-sans group-data-[state=open]:text-[#09686E]">
+                      Chef Services
+                    </span>
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-60 p-2 bg-white shadow-xl rounded-md border border-gray-100">
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a
+                            href="#private"
+                            className="block p-3 text-sm font-medium text-[#464646] hover:bg-[#F4F4F4] hover:text-[#00676E] rounded-md font-sans"
+                          >
+                            Private Service
+                          </a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a
+                            href="#catering"
+                            className="block p-3 text-sm font-medium text-[#464646] hover:bg-[#F4F4F4] hover:text-[#00676E] rounded-md font-sans"
+                          >
+                            Catering
+                          </a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a
+                            href="#class"
+                            className="block p-3 text-sm font-medium text-[#464646] hover:bg-[#F4F4F4] hover:text-[#00676E] rounded-md font-sans"
+                          >
+                            Cooking Class
+                          </a>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link
+                    href="/recipes"
+                    className="text-[#464646] font-semibold text-base uppercase font-sans hover:text-[#09686E]"
+                  >
+                    Recipes
+                  </Link>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link
+                    href="/gallery"
+                    className="text-[#464646] font-semibold text-base uppercase font-sans hover:text-[#09686E]"
+                  >
+                    Gallery
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
+
+          {/* Right Actions */}
+          <div className="flex flex-col items-end justify-between h-full">
             <div className="flex items-center gap-6">
               <Button
-                variant="default"
                 size="sm"
-                className="px-2 py-2 text-xs rounded-sm"
+                className="px-4 py-2 text-xs rounded-sm font-sans font-semibold"
               >
                 Complimentary Chef Consultation
               </Button>
               <div className="w-8 h-0 border border-[#19767C] rotate-90" />
-              <div className="flex items-center gap-1.5">
-                <a
-                  href="#"
-                  className="w-5 h-5 text-[#00676E]"
-                  aria-label="Instagram"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153a4.908 4.908 0 0 1 1.153 1.772c.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 0 1-1.153 1.772 4.915 4.915 0 0 1-1.772 1.153c-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 0 1-1.772-1.153 4.904 4.904 0 0 1-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.066.217-1.79.465-2.428a4.88 4.88 0 0 1 1.153-1.772A4.897 4.897 0 0 1 5.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.25a1.25 1.25 0 0 0-2.5 0 1.25 1.25 0 0 0 2.5 0zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
-                  </svg>
-                </a>
-                <a
-                  href="#"
-                  className="w-5 h-5 text-[#00676E]"
-                  aria-label="Facebook"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z" />
-                  </svg>
-                </a>
-                <a
-                  href="#"
-                  className="w-5 h-5 text-[#00676E]"
-                  aria-label="Yelp"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12.271 17.652c.276.342.616.496 1.03.496.413 0 .77-.154 1.03-.496l4.02-4.98c.275-.342.413-.703.413-1.084 0-.38-.138-.741-.413-1.083a1.484 1.484 0 0 0-1.03-.496h-8.04c-.414 0-.77.154-1.03.496-.276.342-.414.703-.414 1.083 0 .38.138.742.413 1.084l4.02 4.98z" />
-                  </svg>
-                </a>
+              <div className="flex items-center gap-2 text-[#00676E]">
+                <Instagram className="w-5 h-5 cursor-pointer" />
+                <Facebook className="w-5 h-5 cursor-pointer" />
               </div>
             </div>
 
             <div className="mt-7">
               <Button
                 variant="outline"
-                className="w-[117px] h-12 px-5 py-3 flex items-center justify-center gap-2 rounded-lg border bg-[#F9F8F8] text-[#464646] text-base font-semibold uppercase leading-none"
+                className="px-6 h-12 gap-3 rounded-lg border bg-[#F9F8F8] text-[#464646] font-bold font-sans"
               >
                 CART
                 <ShoppingCart className="w-6 h-6" />
@@ -189,19 +206,14 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="lg:hidden flex items-center justify-between px-4 py-3">
+        {/* Mobile Nav */}
+        <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b">
           <div className="relative w-16 h-16">
             <Image src="/logo.png" alt="Logo" fill className="object-contain" />
           </div>
-
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="icon">
-              <ShoppingCart className="w-5 h-5" />
-            </Button>
-
-            <Button aria-label="Menu">
-              <Menu />
-            </Button>
+            <ShoppingCart className="w-6 h-6 text-[#00676E]" />
+            <Menu className="w-8 h-8 text-[#00676E]" />
           </div>
         </div>
       </header>
@@ -496,17 +508,11 @@ export default function Home() {
                       </h3>
 
                       <div className="flex flex-col items-center gap-6 w-full">
-                        <p
-                          className="text-[16px] md:text-[22px] font-medium leading-relaxed text-[#5B5B5B] text-center italic"
-                          style={{ fontFamily: "Metropolis, sans-serif" }}
-                        >
+                        <p className="text-[16px] md:text-[22px] font-medium leading-relaxed text-[#5B5B5B] text-center italic font-sans">
                           {item.text}
                         </p>
 
-                        <p
-                          className="text-[16px] md:text-[22px] font-bold text-[#5B5B5B] text-center"
-                          style={{ fontFamily: "Metropolis, sans-serif" }}
-                        >
+                        <p className="text-[16px] md:text-[22px] font-bold text-[#5B5B5B] text-center font-sans">
                           {item.author}
                         </p>
                       </div>
