@@ -116,13 +116,13 @@ export default function Home() {
 
                 {/* Chef Services Dropdown */}
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="h-auto p-0 bg-transparent hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
+                  <NavigationMenuTrigger className="h-auto p-0 bg-transparent hover:bg-transparent focus:bg-transparent data-[state=open]:!bg-transparent">
                     <span className="text-[#464646] font-semibold text-base uppercase font-sans group-data-[state=open]:text-[#09686E]">
                       Chef Services
                     </span>
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-60 p-2 bg-white shadow-xl rounded-md border border-gray-100">
+                    <ul className="grid w-60 p-0 bg-white rounded-md">
                       <li>
                         <NavigationMenuLink asChild>
                           <a
