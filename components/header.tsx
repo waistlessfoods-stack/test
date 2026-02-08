@@ -5,6 +5,9 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Menu, ShoppingCart, ChevronDown, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useCart } from "@/lib/cart-context";
 
 const services = [
   { label: "Private Service", href: "/services/private" },
@@ -15,14 +18,31 @@ const services = [
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const pathname = usePathname();
+  const { items, totalItems, totalPrice, removeItem, updateQuantity } =
+    useCart();
+
+  const formattedTotal = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(totalPrice / 100);
 
   const navLinks = [
-    { label: "Home", href: "/", active: true },
+    { label: "Home", href: "/" },
     { label: "About", href: "/about" },
     { label: "Shop", href: "/shop" },
     { label: "Recipes", href: "/recipes" },
     { label: "Gallery", href: "/gallery" },
   ];
+
+  const isLinkActive = (href: string) => {
+    if (href === "/") {
+      return pathname === "/";
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   return (
     <header className="w-full bg-white relative z-50">
@@ -36,7 +56,7 @@ const Header = () => {
       {/* DESKTOP VIEW */}
       <div className="hidden lg:flex items-center px-12 py-5 w-full">
         <div className="flex-1 flex justify-start">
-          <div className="relative w-28 h-28">
+          <Link href="/" className="relative w-28 h-28">
             <Image
               src="/logo.png"
               alt="Logo"
@@ -44,7 +64,7 @@ const Header = () => {
               height={119}
               className="absolute left-0 top-1/2 -translate-y-1/2"
             />
-          </div>
+          </Link>
         </div>
 
         <nav className="flex justify-center">
@@ -54,7 +74,7 @@ const Header = () => {
                 <Link
                   href={link.href}
                   className={`${
-                    link.active
+                    isLinkActive(link.href)
                       ? "border-b border-[#09686E] text-[#09686E]"
                       : "text-[#464646]"
                   } font-semibold uppercase hover:text-[#09686E] transition-colors`}
@@ -71,7 +91,11 @@ const Header = () => {
             >
               <Link
                 href="/services"
-                className="flex items-center gap-1 text-[#464646] font-semibold uppercase group-hover:text-[#09686E] transition-colors"
+                className={`flex items-center gap-1 font-semibold uppercase transition-colors ${
+                  isLinkActive("/services")
+                    ? "text-[#09686E]"
+                    : "text-[#464646] group-hover:text-[#09686E]"
+                }`}
               >
                 Chef Services
                 <ChevronDown
@@ -103,7 +127,11 @@ const Header = () => {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="text-[#464646] font-semibold uppercase hover:text-[#09686E] transition-colors"
+                  className={`${
+                    isLinkActive(link.href)
+                      ? "border-b border-[#09686E] text-[#09686E]"
+                      : "text-[#464646]"
+                  } font-semibold uppercase hover:text-[#09686E] transition-colors`}
                 >
                   {link.label}
                 </Link>
@@ -130,41 +158,236 @@ const Header = () => {
             </div>
           </div>
           <div className="pr-12">
-            <Button variant="outline" className="gap-2 bg-[#F9F8F8] font-bold">
-              CART
-              <ShoppingCart className="w-5 h-5" />
-            </Button>
+            <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="gap-2 bg-[#F9F8F8] font-bold"
+                >
+                  CART
+                  <div className="relative">
+                    <ShoppingCart className="w-5 h-5" />
+                    {totalItems > 0 && (
+                      <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#00676E] px-1 text-[11px] font-semibold text-white">
+                        {totalItems}
+                      </span>
+                    )}
+                  </div>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="p-6">
+                <div className="flex flex-col gap-6">
+                  <div>
+                    <h2 className="text-2xl font-semibold text-[#1C1C1C]">
+                      Your Cart
+                    </h2>
+                    <p className="mt-2 text-sm text-[#6B6B6B]">
+                      {totalItems === 0
+                        ? "Your cart is empty. Add an item to get started."
+                        : `${totalItems} item${
+                            totalItems === 1 ? "" : "s"
+                          } in your cart.`}
+                    </p>
+                  </div>
+                  {items.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-[#D4E4E2] bg-[#F8FCFB] p-5 text-sm text-[#6B6B6B]">
+                      When you add products, they will appear here with totals
+                      and checkout.
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      {items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between gap-4 border-b border-[#EEF2F1] pb-3"
+                        >
+                          <div>
+                            <p className="text-sm font-semibold text-[#1C1C1C]">
+                              {item.name}
+                            </p>
+                            <p className="text-xs text-[#6B6B6B]">
+                              ${(item.price / 100).toFixed(2)} each
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              className="h-7 w-7 rounded-full border border-[#D4E4E2] text-sm text-[#09686E]"
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity - 1)
+                              }
+                            >
+                              -
+                            </button>
+                            <span className="min-w-6 text-center text-sm">
+                              {item.quantity}
+                            </span>
+                            <button
+                              className="h-7 w-7 rounded-full border border-[#D4E4E2] text-sm text-[#09686E]"
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity + 1)
+                              }
+                            >
+                              +
+                            </button>
+                            <button
+                              className="text-xs font-semibold text-[#B84B3A]"
+                              onClick={() => removeItem(item.id)}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="flex items-center justify-between text-sm font-semibold text-[#1C1C1C]">
+                        <span>Total</span>
+                        <span>{formattedTotal}</span>
+                      </div>
+                      <Button className="bg-[#00676E] hover:bg-[#00575e]">
+                        Checkout
+                      </Button>
+                    </div>
+                  )}
+                  <Button
+                    variant="outline"
+                    className="border-[#D4E4E2] text-[#09686E]"
+                  >
+                    Continue Shopping
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
 
       {/* MOBILE VIEW */}
-      <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b bg-white relative z-100">
-        <div className="relative w-16 h-16">
-          <Image src="/logo.png" alt="Logo" fill className="object-contain" />
+      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+        <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b bg-white relative z-100">
+          <Link href="/" className="relative w-16 h-16">
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              fill
+              className="object-contain"
+            />
+          </Link>
+          <div className="flex items-center gap-3">
+            <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
+              <SheetTrigger asChild>
+                <button className="relative">
+                  <ShoppingCart className="w-6 h-6 text-[#00676E]" />
+                  {totalItems > 0 && (
+                    <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#00676E] px-1 text-[11px] font-semibold text-white">
+                      {totalItems}
+                    </span>
+                  )}
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="p-6">
+                <div className="flex flex-col gap-6">
+                  <div>
+                    <h2 className="text-2xl font-semibold text-[#1C1C1C]">
+                      Your Cart
+                    </h2>
+                    <p className="mt-2 text-sm text-[#6B6B6B]">
+                      {totalItems === 0
+                        ? "Your cart is empty. Add an item to get started."
+                        : `${totalItems} item${
+                            totalItems === 1 ? "" : "s"
+                          } in your cart.`}
+                    </p>
+                  </div>
+                  {items.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-[#D4E4E2] bg-[#F8FCFB] p-5 text-sm text-[#6B6B6B]">
+                      When you add products, they will appear here with totals
+                      and checkout.
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      {items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between gap-4 border-b border-[#EEF2F1] pb-3"
+                        >
+                          <div>
+                            <p className="text-sm font-semibold text-[#1C1C1C]">
+                              {item.name}
+                            </p>
+                            <p className="text-xs text-[#6B6B6B]">
+                              ${(item.price / 100).toFixed(2)} each
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              className="h-7 w-7 rounded-full border border-[#D4E4E2] text-sm text-[#09686E]"
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity - 1)
+                              }
+                            >
+                              -
+                            </button>
+                            <span className="min-w-6 text-center text-sm">
+                              {item.quantity}
+                            </span>
+                            <button
+                              className="h-7 w-7 rounded-full border border-[#D4E4E2] text-sm text-[#09686E]"
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity + 1)
+                              }
+                            >
+                              +
+                            </button>
+                            <button
+                              className="text-xs font-semibold text-[#B84B3A]"
+                              onClick={() => removeItem(item.id)}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="flex items-center justify-between text-sm font-semibold text-[#1C1C1C]">
+                        <span>Total</span>
+                        <span>{formattedTotal}</span>
+                      </div>
+                      <Button className="bg-[#00676E] hover:bg-[#00575e]">
+                        Checkout
+                      </Button>
+                    </div>
+                  )}
+                  <Button
+                    variant="outline"
+                    className="border-[#D4E4E2] text-[#09686E]"
+                  >
+                    Continue Shopping
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
+            <SheetTrigger asChild>
+              <button>
+                {isMobileMenuOpen ? (
+                  <X className="w-8 h-8 text-[#00676E]" />
+                ) : (
+                  <Menu className="w-8 h-8 text-[#00676E]" />
+                )}
+              </button>
+            </SheetTrigger>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <ShoppingCart className="w-6 h-6 text-[#00676E]" />
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-            {isMobileMenuOpen ? (
-              <X className="w-8 h-8 text-[#00676E]" />
-            ) : (
-              <Menu className="w-8 h-8 text-[#00676E]" />
-            )}
-          </button>
-        </div>
-      </div>
 
-      {/* MOBILE MENU OVERLAY */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-[110px] bg-white z-90 animate-in slide-in-from-right duration-300">
-          <nav className="flex flex-col p-6 gap-6 h-full overflow-y-auto">
+        <SheetContent side="right" className="p-0">
+          <nav className="flex h-full flex-col gap-6 overflow-y-auto p-6">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-xl font-bold uppercase text-[#464646] border-b pb-2"
+                className={`${
+                  isLinkActive(link.href)
+                    ? "text-[#09686E]"
+                    : "text-[#464646]"
+                } text-xl font-bold uppercase border-b pb-2`}
               >
                 {link.label}
               </Link>
@@ -175,7 +398,13 @@ const Header = () => {
                 href={"/services"}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <span className="text-xl font-bold uppercase text-[#00676E]">
+                <span
+                  className={`text-xl font-bold uppercase ${
+                    isLinkActive("/services")
+                      ? "text-[#09686E]"
+                      : "text-[#00676E]"
+                  }`}
+                >
                   Chef Services
                 </span>
               </Link>
@@ -203,8 +432,8 @@ const Header = () => {
               <Image alt="STAR" width={32} height={32} src={"/STAR.svg"} />
             </div>
           </nav>
-        </div>
-      )}
+        </SheetContent>
+      </Sheet>
     </header>
   );
 };
