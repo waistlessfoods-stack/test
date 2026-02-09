@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 
-const Footer = () => {
+export default function Footer() {
   return (
     <footer className="px-6 md:px-14 py-18 bg-[#00676E]">
       <div className="max-w-7xl mx-auto">
@@ -47,6 +47,4 @@ const Footer = () => {
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}
