@@ -20,6 +20,16 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Stripe CLI Setup
+
+Stripe's VS Code extension requires the Stripe CLI to forward webhooks and stream events.
+
+1. Install the Stripe CLI: https://docs.stripe.com/stripe-cli/install
+2. Log in: `stripe login`
+3. Verify: `stripe --version`
+
+If the Stripe CLI is installed in a non-default location, set `stripe.cliInstallPath` in VS Code settings.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

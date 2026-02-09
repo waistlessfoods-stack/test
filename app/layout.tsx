@@ -3,6 +3,7 @@ import { Manrope, Bebas_Neue, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import { CartProvider } from "@/lib/cart-context";
 
 const metropolis = Manrope({
   subsets: ["latin"],
@@ -23,9 +24,33 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "WaistLess Foods - Private Chef Amber",
+  title: "WaistLess Foods | Waste Less. Taste More.",
   description:
     "Private Chef Amber curates fresh, flavorful meals, from pescatarian feasts to hearty family dinners, with an eco-conscious touch.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
+  openGraph: {
+    title: "WaistLess Foods | Waste Less. Taste More.",
+    description:
+      "Private Chef Amber curates fresh, flavorful meals, from pescatarian feasts to hearty family dinners, with an eco-conscious touch.",
+    images: [
+      {
+        url: "/logo.png",
+        width: 512,
+        height: 512,
+        alt: "WaistLess Foods logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "WaistLess Foods | Waste Less. Taste More.",
+    description:
+      "Private Chef Amber curates fresh, flavorful meals, from pescatarian feasts to hearty family dinners, with an eco-conscious touch.",
+    images: ["/logo.png"],
+  },
 };
 
 export default function RootLayout({
@@ -38,9 +63,11 @@ export default function RootLayout({
       <body
         className={`${metropolis.variable} ${bebasNeue.variable} ${playfair.variable} font-sans antialiased`}
       >
-        <Header />
-        {children}
-        <Footer />
+        <CartProvider>
+          <Header />
+          {children}
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

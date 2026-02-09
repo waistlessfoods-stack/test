@@ -55,7 +55,7 @@ export default async function ServicesPage() {
     <div className="flex flex-col w-full">
       <section className="bg-white py-[50px] px-6 md:px-[62px]">
         <div className="max-w-[1315px] mx-auto">
-          <h2 className="font-[--font-bebas-neue] text-[80px] font-normal leading-[85.37px] tracking-[0.01em] uppercase text-black text-center mb-[60px] align-bottom">
+          <h2 className="font-['Bebas_Neue'] text-[80px] font-normal leading-[85.37px] tracking-[0.01em] uppercase text-black text-center mb-[60px] align-bottom">
             Our Service
           </h2>
 
