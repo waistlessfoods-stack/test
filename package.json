@@ -6,13 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "contentful:seed": "node scripts/contentful/seed-services.mjs",
+    "contentful:seed-homepage": "node scripts/contentful/seed-homepage.mjs"
   },
   "dependencies": {
-    "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-dialog": "^1.1.6",
+    "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "contentful-management": "^11.69.1",
+    "dotenv": "^17.2.4",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
