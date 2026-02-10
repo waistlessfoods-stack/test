@@ -15,7 +15,7 @@ const services = [
   { label: "Cooking Class", href: "/services/cooking-class" },
 ];
 
-const Header = () => {
+export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -436,6 +436,4 @@ const Header = () => {
       </Sheet>
     </header>
   );
-};
-
-export default Header;
+}
