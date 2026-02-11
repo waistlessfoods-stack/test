@@ -1,58 +1,76 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import React, { useState } from "react";
 import { Star } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
-const reviews = [
-  {
-    name: "Sarah J.",
-    rating: 5,
-    date: "2 weeks ago",
-    comment:
-      "Chef Amber menyulap makan malam kami jadi luar biasa! Presentasi cantik dan rasanya premium.",
-  },
-  {
-    name: "Michael T.",
-    rating: 5,
-    date: "1 month ago",
-    comment:
-      "Professional service dari awal sampai akhir. Highly recommended untuk acara spesial.",
-  },
-  {
-    name: "Dina K.",
-    rating: 4,
-    date: "2 months ago",
-    comment:
-      "Menu sangat personal dan sesuai request kami. Pengalaman dining yang intimate.",
-  },
-];
+type Review = {
+  name: string;
+  rating: number;
+  date: string;
+  comment: string;
+};
 
-export default function PrivateServicePage() {
+type ServiceDetail = {
+  title: string;
+  breadcrumbLabel: string;
+  priceText: string;
+  description: string;
+  includes: string[];
+  howToBook: string[];
+  images: {
+    main: string;
+    gallery: string[];
+  };
+  reviews: {
+    averageRating: number;
+    totalReviews: number;
+    items: Review[];
+  };
+};
+
+type ServiceDetailClientProps = {
+  service: ServiceDetail;
+};
+
+export default function ServiceDetailClient({
+  service,
+}: ServiceDetailClientProps) {
   const [visibleCount, setVisibleCount] = useState(2);
-  const averageRating = 4.8;
-  const totalReviews = 27;
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-8 md:py-16 bg-white min-h-screen">
-      <nav className="flex items-center gap-4 w-full max-w-[315px] h-7 mb-[53px]">
-        <span className="font-sans font-medium text-[22px] leading-7 tracking-[-2%] text-black">
-          Our Service
-        </span>
-        <span className="font-sans font-medium text-[22px] leading-7 tracking-[-2%] text-black">
-          /
-        </span>
-        <span className="font-sans font-medium text-[22px] leading-7 tracking-[-2%] text-black">
-          Private Service
-        </span>
-      </nav>
+      <Breadcrumb className="w-full max-w-[315px] h-7 mb-[53px]">
+        <BreadcrumbList className="font-sans font-medium text-[22px] leading-7 tracking-[-2%] text-black">
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/services">Our Service</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator className="text-black" />
+          <BreadcrumbItem>
+            <BreadcrumbPage className="text-black">
+              {service.breadcrumbLabel}
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       <div className="flex flex-col lg:flex-row gap-[53px] items-start">
         <section className="w-full lg:w-[557px] flex flex-col gap-[25px]">
           <div className="relative w-full lg:w-[557px] aspect-557/642 rounded-[12px] overflow-hidden">
             <Image
-              src="/services/private-service/main-img-private.png"
-              alt="Main service"
+              src={service.images.main}
+              alt={`${service.title} main image`}
               fill
               sizes="(max-width: 1024px) 100vw, 557px"
               className="object-cover"
@@ -61,14 +79,14 @@ export default function PrivateServicePage() {
           </div>
 
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 lg:gap-[18px] w-full lg:w-[557px]">
-            {[1, 2, 3, 4, 5].map((i) => (
+            {service.images.gallery.map((image, index) => (
               <div
-                key={i}
+                key={image}
                 className="relative aspect-square rounded-[6px] overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all group"
               >
                 <Image
-                  src={`/services/private-service/img-${i}.png`}
-                  alt={`Gallery image ${i}`}
+                  src={image}
+                  alt={`${service.title} gallery image ${index + 1}`}
                   fill
                   sizes="(max-width: 768px) 25vw, 97px"
                   className="object-cover group-hover:scale-110 transition-transform duration-300"
@@ -77,30 +95,28 @@ export default function PrivateServicePage() {
             ))}
           </div>
 
-          {/* Ratings & Reviews */}
           <div className="mt-10 pt-8 border-t border-gray-100 w-full lg:w-[557px]">
             <h2 className="font-sans font-medium text-[22px] text-black mb-6">
               Ratings & Reviews
             </h2>
 
-            {/* Summary */}
             <div className="bg-gray-50 rounded-2xl p-6 mb-6 flex items-center justify-between">
               <div className="flex flex-col gap-2">
                 <div className="flex items-end gap-3">
                   <span className="text-4xl font-semibold text-black">
-                    {averageRating}
+                    {service.reviews.averageRating}
                   </span>
                   <div className="flex items-center gap-1">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-4 h-4 ${i < Math.round(averageRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                        className={`w-4 h-4 ${i < Math.round(service.reviews.averageRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
                       />
                     ))}
                   </div>
                 </div>
                 <p className="text-sm text-gray-500">
-                  Based on {totalReviews} reviews
+                  Based on {service.reviews.totalReviews} reviews
                 </p>
               </div>
               <button className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium hover:bg-gray-100 transition">
@@ -108,39 +124,40 @@ export default function PrivateServicePage() {
               </button>
             </div>
 
-            {/* Review List */}
             <div className="space-y-4">
-              {reviews.slice(0, visibleCount).map((review, idx) => (
-                <div
-                  key={idx}
-                  className="border border-gray-100 rounded-2xl p-5 hover:shadow-sm transition"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex flex-col">
-                      <span className="font-medium text-black">
-                        {review.name}
-                      </span>
-                      <span className="text-xs text-gray-400">
-                        {review.date}
-                      </span>
+              {service.reviews.items
+                .slice(0, visibleCount)
+                .map((review, idx) => (
+                  <div
+                    key={`${review.name}-${idx}`}
+                    className="border border-gray-100 rounded-2xl p-5 hover:shadow-sm transition"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex flex-col">
+                        <span className="font-medium text-black">
+                          {review.name}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {review.date}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 ${i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                          />
+                        ))}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
-                        />
-                      ))}
-                    </div>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {review.comment}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    {review.comment}
-                  </p>
-                </div>
-              ))}
+                ))}
             </div>
 
-            {visibleCount < reviews.length && (
+            {visibleCount < service.reviews.items.length && (
               <button
                 onClick={() => setVisibleCount((prev) => prev + 2)}
                 className="w-full mt-4 py-3 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50 transition"
@@ -154,11 +171,11 @@ export default function PrivateServicePage() {
         <section className="w-full lg:w-[673px] flex flex-col gap-[51px]">
           <header className="flex flex-col gap-[21px] max-w-[513px]">
             <h1 className="font-sans font-medium text-[44px] leading-12 tracking-[-2%] text-black">
-              Private Service
+              {service.title}
             </h1>
             <div className="w-fit flex items-center px-[18px] py-3 gap-2.5 border border-[#848484] rounded-[100px]">
               <span className="font-sans font-medium text-[22px] leading-7 tracking-[-2%] text-black">
-                Starting at: $XXX per person / $XXX per event
+                {service.priceText}
               </span>
             </div>
           </header>
@@ -169,11 +186,7 @@ export default function PrivateServicePage() {
                 Description
               </h2>
               <p className="font-sans font-normal text-[22px] leading-7 tracking-[-2%] text-[#878787]">
-                Enjoy a fully personalized dining experience cooked on-site by
-                Chef Amber. Every menu is crafted around your preferences,
-                dietary needs, and the mood of your occasion — using fresh,
-                sustainable, and high-quality ingredients. Perfect for intimate
-                dinners, family meals, or special celebrations at home.
+                {service.description}
               </p>
             </article>
 
@@ -182,12 +195,9 @@ export default function PrivateServicePage() {
                 Includes
               </h2>
               <ul className="list-disc list-inside font-sans font-normal text-[22px] leading-7 tracking-[-2%] text-[#878787]">
-                <li>Custom menu consultation</li>
-                <li>Groceries & ingredient sourcing</li>
-                <li>On-site cooking & full meal preparation</li>
-                <li>Professional plating & table presentation</li>
-                <li>Kitchen cleanup after service</li>
-                <li>Optional add-ons: dessert course, mocktails, kids’ menu</li>
+                {service.includes.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
               </ul>
             </article>
 
@@ -196,16 +206,9 @@ export default function PrivateServicePage() {
                 How to Book
               </h2>
               <ol className="list-decimal list-inside font-sans font-normal text-[22px] leading-7 tracking-[-2%] text-[#878787]">
-                <li>
-                  Fill out the booking form or send an inquiry through our
-                  contact page.
-                </li>
-                <li>
-                  Share your preferred date, guest count, and any dietary notes.
-                </li>
-                <li>Receive a customized menu proposal & quote.</li>
-                <li>Confirm your booking with a deposit.</li>
-                <li>Relax — Chef Amber handles the rest.</li>
+                {service.howToBook.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
               </ol>
             </article>
           </div>

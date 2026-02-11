@@ -157,7 +157,7 @@ export default function Header() {
               </div>
             </div>
           </div>
-          <div className="pr-12">
+          <div className="">
             <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
               <SheetTrigger asChild>
                 <Button

@@ -2,8 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 
 type Service = {
+  slug: string;
   title: string;
   description: string;
   benefits: string[];
@@ -15,11 +17,13 @@ export default function ServicesClientPage({
 }: {
   services: Service[];
 }) {
+
+  console.log(services,"services")
   return (
     <div className="flex flex-col w-full">
-      <section className="bg-white py-[50px] px-6 md:px-[62px]">
-        <div className="max-w-[1315px] mx-auto">
-          <h2 className="font-['Bebas_Neue'] text-[80px] font-normal leading-[85.37px] tracking-[0.01em] uppercase text-black text-center mb-[60px] align-bottom">
+      <section className="bg-white py-12.5 px-6 md:px-15.5">
+        <div className="max-w-328.75 mx-auto">
+          <h2 className="font-['Bebas_Neue'] text-[80px] font-normal leading-[85.37px] tracking-[0.01em] uppercase text-black text-center mb-15 align-bottom">
             Our Service
           </h2>
 
@@ -27,10 +31,10 @@ export default function ServicesClientPage({
             {services.map((service, index) => (
               <div
                 key={index}
-                className="bg-[#F4F4F4] rounded-[12px] p-5 md:p-10 lg:p-[41px_20px] flex flex-col justify-between min-h-[874px] gap-9"
+                className="bg-[#F4F4F4] rounded-[12px] p-5 md:p-10 lg:p-[41px_20px] flex flex-col justify-between min-h-218.5 gap-9"
               >
-                <div className="flex flex-col gap-9">
-                  <div className="flex flex-col gap-[30px]">
+                <div className="flex flex-col gap-9 flex-1">
+                  <div className="flex flex-col gap-7.5">
                     <h3 className="font-[family-name:var(--sans font-semibold text-[32px] md:text-[44px] leading-tight md:leading-12 tracking-[-0.02em] text-black">
                       {service.title}
                     </h3>
@@ -55,12 +59,15 @@ export default function ServicesClientPage({
                     </ul>
                   </div>
 
-                  <Button className="w-full h-[52px] border border-[#00676E] bg-white rounded-[6px] font-sans font-bold text-[18px] uppercase tracking-wide text-[#00676E] transition-all hover:bg-[#00676E] hover:text-white active:scale-[0.97]">
-                    Learn More
+                  <Button
+                    asChild
+                    className="w-full h-13 border border-[#00676E] bg-white rounded-[6px] font-sans font-bold text-[18px] uppercase tracking-wide text-[#00676E] transition-all hover:bg-[#00676E] hover:text-white active:scale-[0.97] mt-auto"
+                  >
+                    <Link href={`/services/${service.slug}`}>Learn More</Link>
                   </Button>
                 </div>
 
-                <div className="relative w-full h-[289px] overflow-hidden rounded-[12px]">
+                <div className="relative w-full h-72.25 overflow-hidden rounded-[12px]">
                   <Image
                     src={service.image}
                     alt={service.title}
