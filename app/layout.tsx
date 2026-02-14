@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Manrope, Bebas_Neue, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
 import { CartProvider } from "@/lib/cart-context";
+import LayoutShell from "@/components/layout/layout-shell";
 
 const metropolis = Manrope({
   subsets: ["latin"],
@@ -64,9 +63,7 @@ export default function RootLayout({
         className={`${metropolis.variable} ${bebasNeue.variable} ${playfair.variable} font-sans antialiased`}
       >
         <CartProvider>
-          <Header />
-          {children}
-          <Footer />
+          <LayoutShell>{children}</LayoutShell>
         </CartProvider>
       </body>
     </html>
