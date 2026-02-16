@@ -152,7 +152,7 @@ export default function LinksPageClient({
     searchParams.get("qr") === "1" ||
     searchParams.get("utm_campaign") === qrCampaign;
   const campaign = isQr ? qrCampaign : "links";
-
+console.log(profile.image, "image")
   return (
     <main className="relative min-h-screen bg-[#f6f4f0] text-[#1b1b1b]">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">

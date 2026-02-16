@@ -89,7 +89,7 @@ export default function LinksPageComponent({ linksData }: { linksData: LinksPage
         description: linksData.profileDescription,
         phone: linksData.profilePhone,
         email: linksData.profileEmail,
-        image: linksData.profileImagePath,
+        image: linksData.profileImageUrl,
       }
     : defaultProfile;
 

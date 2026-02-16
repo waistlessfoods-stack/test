@@ -99,7 +99,7 @@ export type LinksPageData = {
   profileDescription: string;
   profilePhone: string;
   profileEmail: string;
-  profileImagePath: string;
+  profileImageUrl: string;
   conferenceHeading: string;
   conferenceSubheading: string;
   primaryLinks: LinksPageLink[];
@@ -124,7 +124,7 @@ const mapLinksPageData = (entry: {
     ),
     profilePhone: String(fields.profilePhone?.[DEFAULT_LOCALE] ?? ""),
     profileEmail: String(fields.profileEmail?.[DEFAULT_LOCALE] ?? ""),
-    profileImagePath: String(fields.profileImagePath?.[DEFAULT_LOCALE] ?? ""),
+    profileImageUrl: "",
     conferenceHeading: String(fields.conferenceHeading?.[DEFAULT_LOCALE] ?? ""),
     conferenceSubheading: String(
       fields.conferenceSubheading?.[DEFAULT_LOCALE] ?? ""
@@ -183,7 +183,7 @@ export async function fetchLinksPageFromContentful(): Promise<LinksPageData | nu
     );
 
     if (profileImageUrl) {
-      linksPageData.profileImagePath = profileImageUrl;
+      linksPageData.profileImageUrl = profileImageUrl;
     }
 
     // Fetch referenced link entries
