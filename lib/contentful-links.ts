@@ -2,6 +2,65 @@ import { createClient } from "contentful-management";
 
 const DEFAULT_LOCALE = "en-US";
 
+type ContentfulEnvironment = {
+  getAsset: (id: string) => Promise<{
+    fields?: {
+      file?: Record<string, { url?: string } | undefined>;
+    };
+  }>;
+};
+
+const normalizeAssetUrl = (url: string): string =>
+  url.startsWith("//") ? `https:${url}` : url;
+
+const extractAssetUrl = (asset: {
+  fields?: {
+    file?: Record<string, { url?: string } | undefined>;
+  };
+}): string | null => {
+  const fileByLocale = asset.fields?.file;
+  const url = fileByLocale?.[DEFAULT_LOCALE]?.url;
+
+  if (typeof url !== "string" || url.length === 0) {
+    return null;
+  }
+
+  return normalizeAssetUrl(url);
+};
+
+const resolveAssetUrl = async (
+  value: unknown,
+  environment: ContentfulEnvironment
+): Promise<string | null> => {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const asset = value as {
+    sys?: { id?: string };
+    fields?: {
+      file?: Record<string, { url?: string } | undefined>;
+    };
+  };
+
+  const directUrl = extractAssetUrl(asset);
+  if (directUrl) {
+    return directUrl;
+  }
+
+  const assetId = asset.sys?.id;
+  if (!assetId) {
+    return null;
+  }
+
+  try {
+    const fetchedAsset = await environment.getAsset(assetId);
+    return extractAssetUrl(fetchedAsset);
+  } catch {
+    return null;
+  }
+};
+
 function getContentfulConfig() {
   const accessToken = process.env.CMA_CONTENTFUL;
   const spaceId =
@@ -113,6 +172,19 @@ export async function fetchLinksPageFromContentful(): Promise<LinksPageData | nu
         fields: Record<string, Record<string, unknown>>;
       }
     );
+
+    const profileImageAsset = linksPageEntry.fields.profileImage?.[
+      DEFAULT_LOCALE
+    ] as unknown;
+
+    const profileImageUrl = await resolveAssetUrl(
+      profileImageAsset,
+      environment as ContentfulEnvironment
+    );
+
+    if (profileImageUrl) {
+      linksPageData.profileImagePath = profileImageUrl;
+    }
 
     // Fetch referenced link entries
     const primaryLinksReferences = (

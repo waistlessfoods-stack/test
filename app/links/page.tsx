@@ -14,7 +14,7 @@ export const revalidate = 0;
 
 export default async function LinksPage() {
   const linksData = await fetchLinksPageFromContentful();
-
+  console.log(linksData, "linksData")
   return (
     <Suspense fallback={<LinksPageComponent linksData={null} />}>
       <LinksPageComponent linksData={linksData} />
