@@ -1,3 +1,5 @@
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import React from "react";
 
@@ -35,7 +37,10 @@ export default function About() {
           </div>
 
           <div className="w-full md:w-[551px]">
-            <div className="relative w-full aspect-square rounded-[12px] overflow-hidden shadow-sm">
+            <AspectRatio
+              ratio={1 / 1}
+              className="overflow-hidden rounded-[12px] shadow-sm"
+            >
               <Image
                 src="/about/chef-img.png"
                 fill
@@ -43,60 +48,65 @@ export default function About() {
                 className="object-cover"
                 priority
               />
-            </div>
+            </AspectRatio>
           </div>
         </div>
       </section>
 
       <section className="w-full bg-[#F4F4F4] pt-[70px] pb-[70px] px-6 md:px-[86px]">
-        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-[97px]">
-          <div className="w-full md:w-[547px]">
-            <div className="relative w-full h-[543px] bg-[#D3D3D3] rounded-[12px] overflow-hidden">
-              <Image
-                src="/about/food-img.png"
-                fill
-                alt="WaistLess Foods Background"
-                className="object-cover"
-              />
-
-              <div className="absolute inset-0 bg-white/80" />
-
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative w-[301px] h-[301px]">
-                  <Image
-                    src="/logo.png"
-                    fill
-                    alt="Logo WaistLess"
-                    className="object-contain"
-                  />
+        <Card className="max-w-[1440px] mx-auto border-none bg-transparent shadow-none">
+          <CardContent className="p-0 flex flex-col md:flex-row items-center gap-10 md:gap-[97px]">
+            <div className="w-full md:w-[547px]">
+              <AspectRatio
+                ratio={547 / 543}
+                className="bg-[#D3D3D3] rounded-[12px] overflow-hidden relative"
+              >
+                <Image
+                  src="/about/food-img.png"
+                  fill
+                  alt="WaistLess Foods Background"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-white/80" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative w-[301px] h-[301px]">
+                    <Image
+                      src="/logo.png"
+                      fill
+                      alt="Logo WaistLess"
+                      className="object-contain"
+                    />
+                  </div>
                 </div>
+              </AspectRatio>
+            </div>
+
+            <div className="w-full md:w-[608px] flex flex-col gap-[38px]">
+              <h2 className="font-sans font-semibold text-[34px] leading-6 tracking-[-0.02em] text-black">
+                More about waistless
+              </h2>
+
+              <div className="flex flex-col gap-[30px] font-sans font-normal text-[26px] leading-[30px] tracking-[-0.02em] text-black">
+                <p>
+                  WaistLess is built on the idea that good food shouldn’t come
+                  with waste—of ingredients, time, or intention.
+                </p>
+
+                <p>
+                  Chef Amber created WaistLess as a space to share recipes,
+                  techniques, and simple habits that make cooking more
+                  sustainable and more joyful. From everyday meals to family
+                  gatherings, every part of WaistLess centers around flavor,
+                  quality, and mindful living.
+                </p>
+
+                <p>
+                  Here, we help you eat better, live brighter, and waste less
+                </p>
               </div>
             </div>
-          </div>
-
-          <div className="w-full md:w-[608px] flex flex-col gap-[38px]">
-            <h2 className="font-sans font-semibold text-[34px] leading-6 tracking-[-0.02em] text-black">
-              More about waistless
-            </h2>
-
-            <div className="flex flex-col gap-[30px] font-sans font-normal text-[26px] leading-[30px] tracking-[-0.02em] text-black">
-              <p>
-                WaistLess is built on the idea that good food shouldn’t come
-                with waste—of ingredients, time, or intention.
-              </p>
-
-              <p>
-                Chef Amber created WaistLess as a space to share recipes,
-                techniques, and simple habits that make cooking more sustainable
-                and more joyful. From everyday meals to family gatherings, every
-                part of WaistLess centers around flavor, quality, and mindful
-                living.
-              </p>
-
-              <p>Here, we help you eat better, live brighter, and waste less</p>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </section>
     </main>
   );
