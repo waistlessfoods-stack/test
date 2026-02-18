@@ -6,10 +6,10 @@ const defaultProfile = {
   name: "WaistLess Foods",
   tagline: "Luxury In-Home Dining & Private Events",
   description:
-    "WaistLess Foods delivers the ultimate private chef and catering service, transforming every ingredient into intentional, indulgent cuisine. Experience a menu curated to your needs, bringing captivating flavors and artful presentation to your next special occasion.",
+    "Intimate In-Home Dining & Boutique Events",
   phone: "281-436-9245",
   email: "info@waistlessfoods.com",
-  image: "/amber.jpg",
+  image: "/logo.png",
 };
 
 const defaultPrimaryLinks: Array<{
@@ -18,11 +18,12 @@ const defaultPrimaryLinks: Array<{
   href: string;
   highlight?: boolean;
   icon: string;
+  hidden?: boolean;
 }> = [
   {
     title: "Book Private Chef",
     description: "In-home dining experiences tailored to your event.",
-    href: "/services/private",
+    href: "mailto:info@waistlessfoods.com?subject=Private%20Chef%20Inquiry",
     highlight: true,
     icon: "ChefHat",
   },
@@ -35,7 +36,7 @@ const defaultPrimaryLinks: Array<{
   {
     title: "Cooking Classes",
     description: "Interactive classes for teams, groups, and celebrations.",
-    href: "/services/cooking-class",
+    href: "mailto:info@waistlessfoods.com?subject=Cooking%20Class%20Inquiry",
     icon: "Users",
   },
   {
@@ -43,12 +44,14 @@ const defaultPrimaryLinks: Array<{
     description: "Priority access to menus, events, and private drops.",
     href: "mailto:info@waistlessfoods.com?subject=VIP%20List",
     icon: "Crown",
+    hidden: true,
   },
   {
     title: "Recipes & Blog",
     description: "Explore seasonal recipes and kitchen tips.",
     href: "/recipes",
     icon: "BookOpen",
+    hidden: true,
   },
 ];
 
@@ -93,16 +96,25 @@ export default function LinksPageComponent({ linksData }: { linksData: LinksPage
       }
     : defaultProfile;
 
-  const conferenceHeading = linksData?.conferenceHeading || "Visiting from Culinary Conference?";
-  const conferenceSubheading = linksData?.conferenceSubheading || "Join the VIP list for exclusive menus and private event booking priority.";
+  const conferenceHeading = linksData?.conferenceHeading || "Visiting from Feed The Soul Culinary Conference?";
+  const conferenceSubheading = linksData?.conferenceSubheading || "Join the list for exclusive recipes and inspiration from the WaistLess Foods Blog.";
 
-  const primaryLinks = (linksData?.primaryLinks || defaultPrimaryLinks).map((link) => ({
-    title: link.title || "",
-    description: link.description || "",
-    href: link.href || "",
-    highlight: (link as LinksPageLink).highlight === true,
-    iconName: (link as LinksPageLink).icon || "BookOpen",
-  }));
+  const primaryLinks = (linksData?.primaryLinks || defaultPrimaryLinks).map((link) => {
+    // Check if the link has a hidden field from Contentful, otherwise fall back to default
+    const defaultLink = defaultPrimaryLinks.find(dl => dl.title === link.title);
+    const isHidden = linksData?.primaryLinks 
+      ? (link as LinksPageLink).hidden === true  // Use Contentful data if available
+      : defaultLink?.hidden === true;             // Otherwise use default
+    
+    return {
+      title: link.title || "",
+      description: link.description || "",
+      href: link.href || "",
+      highlight: (link as LinksPageLink).highlight === true,
+      iconName: (link as LinksPageLink).icon || "BookOpen",
+      hidden: isHidden,
+    };
+  });
 
   const socialLinks = (linksData?.socialLinks || defaultSocialLinks).map((link) => ({
     title: link.title,

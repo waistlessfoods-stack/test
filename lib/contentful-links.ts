@@ -85,6 +85,7 @@ export type LinksPageLink = {
   highlight: boolean;
   icon: string;
   sortOrder: number;
+  hidden?: boolean;
 };
 
 export type SocialLink = {
@@ -213,6 +214,7 @@ export async function fetchLinksPageFromContentful(): Promise<LinksPageData | nu
           highlight: Boolean(fields.highlight?.[DEFAULT_LOCALE] ?? false),
           icon: String(fields.icon?.[DEFAULT_LOCALE] ?? ""),
           sortOrder: Number(fields.sortOrder?.[DEFAULT_LOCALE] ?? 0),
+          hidden: Boolean(fields.hidden?.[DEFAULT_LOCALE] ?? false),
         };
         primaryLinksMap.set(linkEntry.sys.id, link);
       });

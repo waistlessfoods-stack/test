@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import {
   Instagram,
   Facebook,
@@ -13,6 +14,7 @@ import {
   Star,
 } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
+import EnquiryDialog from "@/components/enquiry-dialog";
 
 // Icon map for dynamic icon rendering
 const iconMap: Record<string, ComponentType<{ className?: string }>> = {
@@ -38,6 +40,7 @@ interface LinkData {
   href: string;
   highlight: boolean;
   iconName: string;
+  hidden?: boolean;
 }
 
 interface SocialLinkData {
@@ -147,12 +150,12 @@ export default function LinksPageClient({
   footerText: string;
 }) {
   const searchParams = useSearchParams();
+  const [openDialog, setOpenDialog] = useState<string | null>(null);
   const qrCampaign = "conference-2026";
   const isQr =
     searchParams.get("qr") === "1" ||
     searchParams.get("utm_campaign") === qrCampaign;
   const campaign = isQr ? qrCampaign : "links";
-console.log(profile.image, "image")
   return (
     <main className="relative min-h-screen bg-[#f6f4f0] text-[#1b1b1b]">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -219,20 +222,90 @@ console.log(profile.image, "image")
         </section>
 
         <section className="rounded-2xl border border-[#0f6f73]/30 bg-[#0f6f73] px-5 py-4 text-white shadow-lg">
-          <p className="text-sm uppercase tracking-[0.3em] text-white/70">
-            {conferenceHeading}
-          </p>
-          <p className="text-lg font-semibold">
-            {conferenceSubheading}
-          </p>
+          <button
+            onClick={() => {
+              setOpenDialog("blog");
+              trackLink("Conference Blog", "conference", "conference-blog");
+            }}
+            className="w-full flex flex-col gap-1 transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded text-left"
+          >
+            <p className="text-sm uppercase tracking-[0.3em] text-white/70">
+              {conferenceHeading}
+            </p>
+            <p className="text-lg font-semibold">
+              {conferenceSubheading}
+            </p>
+          </button>
         </section>
 
         <section className="flex flex-col gap-4">
-          {primaryLinks.map((link) => {
+          {primaryLinks.filter(link => !link.hidden).map((link) => {
             const IconComponent = iconMap[link.iconName] as IconType | undefined;
             const trackedHref = addUtmParams(link.href, campaign);
+            
+            // Determine if this link should open a dialog
+            const isPrivateChef = link.title === "Book Private Chef";
+            const isCookingClass = link.title === "Cooking Classes";
+            const isDialogLink = isPrivateChef || isCookingClass;
 
-            return (
+            const handleClick = () => {
+              if (isPrivateChef) {
+                setOpenDialog("private_chef");
+                trackLink(link.title, "primary", "private-chef-dialog");
+              } else if (isCookingClass) {
+                setOpenDialog("cooking_class");
+                trackLink(link.title, "primary", "cooking-class-dialog");
+              } else {
+                trackLink(link.title, "primary", trackedHref);
+              }
+            };
+
+            return isDialogLink ? (
+              <button
+                key={link.title}
+                onClick={handleClick}
+                className={`group flex flex-col gap-2 rounded-2xl border px-5 py-4 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0f6f73]/60 text-left ${
+                  link.highlight
+                    ? "border-[#0f6f73] bg-[#0f6f73] text-white shadow-xl hover:shadow-2xl"
+                    : "border-[#d7e3e2] bg-white/95 text-[#0e2f31] shadow-md hover:-translate-y-0.5 hover:shadow-lg"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`flex h-10 w-10 items-center justify-center rounded-full border ${
+                        link.highlight
+                          ? "border-white/30 bg-white/10"
+                          : "border-[#e5eeed] bg-[#f4f8f7]"
+                      }`}
+                    >
+                      {IconComponent && (
+                        <IconComponent
+                          className={`h-5 w-5 ${
+                            link.highlight ? "text-white" : "text-[#0f6f73]"
+                          }`}
+                        />
+                      )}
+                    </span>
+                    <h2 className="text-lg font-semibold tracking-tight">
+                      {link.title}
+                    </h2>
+                  </div>
+                  {link.highlight ? (
+                    <span className="rounded-full bg-white/15 px-3 py-1 text-xs uppercase tracking-[0.2em]">
+                      Priority
+                    </span>
+                  ) : null}
+                </div>
+                <p
+                  className={`text-sm ${
+                    link.highlight ? "text-white/80" : "text-[#5b6b69]"
+                  }`}
+                >
+                  {link.description}
+                </p>
+              </button>
+            ) : (
               <ActionLink
                 key={link.title}
                 href={trackedHref}
@@ -318,6 +391,31 @@ console.log(profile.image, "image")
           {footerText}
         </section>
       </div>
+
+      {/* Enquiry Dialogs */}
+      <EnquiryDialog
+        isOpen={openDialog === "private_chef"}
+        onOpenChange={(open) => setOpenDialog(open ? "private_chef" : null)}
+        enquiryType="private_chef"
+        title="Book Private Chef"
+        description="Tell us about your event and dining preferences"
+      />
+
+      <EnquiryDialog
+        isOpen={openDialog === "cooking_class"}
+        onOpenChange={(open) => setOpenDialog(open ? "cooking_class" : null)}
+        enquiryType="cooking_class"
+        title="Cooking Class Inquiry"
+        description="Let us know about your group and preferences"
+      />
+
+      <EnquiryDialog
+        isOpen={openDialog === "blog"}
+        onOpenChange={(open) => setOpenDialog(open ? "blog" : null)}
+        enquiryType="blog"
+        title="Join Our Blog & Recipe List"
+        description="Get exclusive recipes and inspiration from WaistLess Foods"
+      />
     </main>
   );
 }
