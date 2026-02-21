@@ -10,17 +10,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Facebook, Instagram, Menu, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
 
 export default function Home() {
   const [api, setApi] = useState<CarouselApi>();

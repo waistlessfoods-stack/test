@@ -264,12 +264,7 @@ export default function Header() {
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b bg-white relative z-100">
           <Link href="/" className="relative w-16 h-16">
-            <Image
-              src="/logo.png"
-              alt="Logo"
-              fill
-              className="object-contain"
-            />
+            <Image src="/logo.png" alt="Logo" fill className="object-contain" />
           </Link>
           <div className="flex items-center gap-3">
             <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
@@ -384,9 +379,7 @@ export default function Header() {
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`${
-                  isLinkActive(link.href)
-                    ? "text-[#09686E]"
-                    : "text-[#464646]"
+                  isLinkActive(link.href) ? "text-[#09686E]" : "text-[#464646]"
                 } text-xl font-bold uppercase border-b pb-2`}
               >
                 {link.label}
