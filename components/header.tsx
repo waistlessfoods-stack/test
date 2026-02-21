@@ -8,6 +8,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/lib/cart-context";
+import { getIconPath } from "@/lib/social-links";
+import type { SocialLink } from "@/lib/contentful-links";
 
 const services = [
   { label: "Private Service", href: "/services/private" },
@@ -15,7 +17,7 @@ const services = [
   { label: "Cooking Class", href: "/services/cooking-class" },
 ];
 
-export default function Header() {
+export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -54,7 +56,7 @@ export default function Header() {
       </div>
 
       {/* DESKTOP VIEW */}
-      <div className="hidden lg:flex items-center px-12 py-5 w-full">
+      <div className="hidden xl:flex items-center px-12 py-5 w-full">
         <div className="flex-1 flex justify-start">
           <Link href="/" className="relative w-28 h-28">
             <Image
@@ -67,7 +69,7 @@ export default function Header() {
           </Link>
         </div>
 
-        <nav className="flex justify-center">
+        <nav className="flex justify-center pt-6">
           <ul className="flex items-center gap-10">
             {navLinks.slice(0, 2).map((link) => (
               <li key={link.href}>
@@ -148,12 +150,26 @@ export default function Header() {
             >
               Complimentary Chef Consultation
             </Button>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
               <div className="h-8 w-px bg-[#19767C] shrink-0" />
-              <div className="flex items-center gap-4">
-                <Image alt="IG" width={24} height={24} src={"/IG.svg"} />
-                <Image alt="FB" width={24} height={24} src={"/FB.svg"} />
-                <Image alt="STAR" width={24} height={24} src={"/STAR.svg"} />
+              <div className="flex items-center gap-2">
+                {socialLinks.slice(0, 2).map((social) => (
+                  <a
+                    key={social.title}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={social.title}
+                    className="transition-all hover:opacity-70 hover:scale-110"
+                  >
+                    <Image
+                      alt={social.title}
+                      width={24}
+                      height={24}
+                      src={getIconPath(social.icon)}
+                    />
+                  </a>
+                ))}
               </div>
             </div>
           </div>
@@ -262,7 +278,7 @@ export default function Header() {
 
       {/* MOBILE VIEW */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-        <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b bg-white relative z-100">
+        <div className="xl:hidden flex items-center justify-between px-4 py-3 border-b bg-white relative z-100">
           <Link href="/" className="relative w-16 h-16">
             <Image src="/logo.png" alt="Logo" fill className="object-contain" />
           </Link>
@@ -372,7 +388,7 @@ export default function Header() {
         </div>
 
         <SheetContent side="right" className="p-0">
-          <nav className="flex h-full flex-col gap-6 overflow-y-auto p-6">
+          <nav className="flex h-full flex-col gap-6 overflow-y-auto p-6 py-12">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -420,9 +436,23 @@ export default function Header() {
             </Button>
 
             <div className="flex justify-center gap-8 mt-auto pb-10">
-              <Image alt="IG" width={32} height={32} src={"/IG.svg"} />
-              <Image alt="FB" width={32} height={32} src={"/FB.svg"} />
-              <Image alt="STAR" width={32} height={32} src={"/STAR.svg"} />
+              {socialLinks.slice(0, 3).map((social) => (
+                <a
+                  key={social.title}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={social.title}
+                  className="transition-all hover:opacity-70 hover:scale-110"
+                >
+                  <Image
+                    alt={social.title}
+                    width={32}
+                    height={32}
+                    src={getIconPath(social.icon)}
+                  />
+                </a>
+              ))}
             </div>
           </nav>
         </SheetContent>
