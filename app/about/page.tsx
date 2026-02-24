@@ -47,11 +47,11 @@ export default function About() {
       </section>
 
       <section className="w-full bg-[#F4F4F4] pt-[70px] pb-[70px] px-6 md:px-[86px]">
-        <Card className="max-w-[1440px] mx-auto border-none bg-transparent shadow-none">
+        <Card className="max-w-[1440px] border-none bg-transparent shadow-none">
           <CardContent className="p-0 flex flex-col md:flex-row items-center gap-10 md:gap-[97px]">
-            <div className="w-full md:w-[547px]">
+            <div className="w-full md:w-[650px] shrink-0">
               <AspectRatio
-                ratio={547 / 543}
+                ratio={1 / 1}
                 className="bg-[#D3D3D3] rounded-[12px] overflow-hidden relative"
               >
                 <Image
@@ -62,7 +62,7 @@ export default function About() {
                 />
                 <div className="absolute inset-0 bg-white/80" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative w-[301px] h-[301px]">
+                  <div className="relative w-[35%] h-[35%]">
                     <Image
                       src="/logo.png"
                       fill
