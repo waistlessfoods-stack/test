@@ -26,22 +26,13 @@ export default function Recipes() {
   }, [api]);
 
   const categories = [
-    {
-      name: "BEEF",
-      img: "/recipes/beef.png",
-    },
-    {
-      name: "FISH & SEAFOOD",
-      img: "/recipes/fish-seafood.png",
-    },
-    {
-      name: "PASTA",
-      img: "/recipes/pasta.png",
-    },
-    {
-      name: "HEALTHY MEALS",
-      img: "/recipes/meals.png",
-    },
+    { name: "BEEF", img: "/recipes/beef.png" },
+    { name: "FISH & SEAFOOD", img: "/recipes/fish-seafood.png" },
+    { name: "PASTA", img: "/recipes/pasta.png" },
+    { name: "HEALTHY MEALS", img: "/recipes/meals.png" },
+    { name: "DESSERT", img: "/recipes/donuts.png" },
+    { name: "VEGAN", img: "/recipes/potato.png" },
+    { name: "BREAKFAST", img: "/recipes/mango.png" },
   ];
 
   const recipes = [
@@ -86,15 +77,48 @@ export default function Recipes() {
   return (
     <div className="w-full min-h-screen bg-white overflow-x-hidden font-metropolis">
       {/* --- BANNER --- */}
-      <section className="w-full px-4 md:px-12 py-6 flex justify-center">
-        <div className="relative aspect-3/1 w-full overflow-hidden rounded-4xl">
-          <Image
-            src="/recipes/recipes-banner.png"
-            alt="Banner"
-            fill
-            className="object-cover"
-            priority
-          />
+      <section className="w-full px-4 md:px-12 py-12">
+        <div className="relative w-full aspect-16/5 min-h-[400px] overflow-hidden rounded-[40px] flex items-center">
+          <div className="absolute inset-0">
+            <Image
+              src="/recipes/banner-recipes.png"
+              alt="Wholesome Recipes Background"
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-black/50" />
+          </div>
+
+          <div className="relative z-10 px-8 md:px-16 w-full lg:w-[60%] flex flex-col gap-6">
+            <h1 className="font-metropolis font-bold text-white text-[40px] md:text-[64px] leading-[1.1] max-w-3xl">
+              Wholesome Recipes for Every Mood
+            </h1>
+            <p className="font-metropolis text-white text-[22px] md:text-[28px] leading-relaxed max-w-2xl opacity-90">
+              From quick bites to hearty meals, explore dishes made with simple
+              ingredients, bold flavors, and mindful cooking.
+            </p>
+          </div>
+
+          <div className="hidden lg:flex relative z-10 w-1/2 h-full items-center justify-end pr-16 gap-6">
+            <div className="relative w-[280px] h-[360px] rounded-3xl overflow-hidden shadow-2xl transform translate-y-4">
+              <Image
+                src="/recipes/mango.png"
+                alt="Mango Parfait"
+                fill
+                className="object-cover"
+              />
+            </div>
+
+            <div className="relative w-60 h-[200px] rounded-3xl overflow-hidden shadow-2xl">
+              <Image
+                src="/recipes/cake.png"
+                alt="Brownie"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -147,21 +171,33 @@ export default function Recipes() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-
             <CarouselPrevious className="absolute -left-4 -mt-8 w-12 h-12  z-30 bg-white opacity-100! border border-[#B0B0B0]" />
             <CarouselNext className="absolute -right-4 -mt-8 w-12 h-12  z-30 bg-white opacity-100! border border-[#B0B0B0]" />
 
             {/* DOT CAROUSEL */}
             <div className="flex justify-center gap-4 mt-12">
-              {categories.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => api?.scrollTo(i)}
-                  className={`h-2.5 rounded-full transition-all duration-300 ${
-                    current === i ? "w-16 bg-[#FF4000]" : "w-16 bg-gray-300"
-                  }`}
-                />
-              ))}
+              {[0, 1, 2].map((index) => {
+                const targetIndex = Math.round(
+                  (categories.length - 1) * (index / 2),
+                );
+                const isActive =
+                  index === 0
+                    ? current <= Math.floor(categories.length / 3)
+                    : index === 1
+                      ? current > Math.floor(categories.length / 3) &&
+                        current <= Math.floor((categories.length * 2) / 3)
+                      : current > Math.floor((categories.length * 2) / 3);
+
+                return (
+                  <button
+                    key={index}
+                    onClick={() => api?.scrollTo(targetIndex)}
+                    className={`h-2.5 rounded-full transition-all duration-300 ${
+                      isActive ? "w-16 bg-[#FF4000]" : "w-16 bg-gray-300"
+                    }`}
+                  />
+                );
+              })}
             </div>
           </Carousel>
         </div>
