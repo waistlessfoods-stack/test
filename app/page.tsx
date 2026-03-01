@@ -78,7 +78,7 @@ export default function Home() {
             <div className="flex flex-col items-center gap-4 md:gap-6">
               <h1 className="text-5xl sm:text-7xl md:text-[100px] leading-[0.9] md:leading-tight tracking-wide uppercase text-white text-center font-['Bebas_Neue']">
                 Waste Less.
-                <br className="md:hidden" /> Taste More.
+                <br  /> Taste More.
               </h1>
 
               <p className="text-lg md:text-[26px] leading-relaxed text-white text-center max-w-[600px]">

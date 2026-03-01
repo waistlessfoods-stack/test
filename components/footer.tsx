@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
 import { useState } from "react";
 import Image from "next/image";
 import { getIconPath } from "@/lib/social-links";
@@ -43,8 +44,8 @@ export default function Footer({ socialLinks = [] }: { socialLinks?: SocialLink[
   };
 
   return (
-    <footer className="px-6 md:px-14 py-18 bg-[#00676E]">
-      <div className="max-w-7xl mx-auto">
+    <footer className="py-18 bg-[#00676E]">
+      <Container>
         <div className="flex flex-col md:flex-row justify-between gap-12 mb-8">
           <div className="flex flex-col gap-6 max-w-md">
             <h3 className="text-2xl text-white">WaistLess Foods</h3>
@@ -112,7 +113,7 @@ export default function Footer({ socialLinks = [] }: { socialLinks?: SocialLink[
         <p className="text-sm text-white text-center">
           © {new Date().getFullYear()} waistlessfoods.com. All rights reserved.
         </p>
-      </div>
+      </Container>
     </footer>
   );
 }

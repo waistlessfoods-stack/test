@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
 import { Menu, ShoppingCart, ChevronDown, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -56,8 +57,9 @@ export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[
       </div>
 
       {/* DESKTOP VIEW */}
-      <div className="hidden xl:flex items-center px-12 py-5 w-full">
-        <div className="flex-1 flex justify-start">
+      <div className="hidden xl:flex items-center py-5 w-full">
+        <Container className="flex items-center">
+          <div className="flex-1 flex justify-start">
           <Link href="/" className="relative w-28 h-28">
             <Image
               src="/logo.png"
@@ -274,11 +276,12 @@ export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[
             </Sheet>
           </div>
         </div>
+        </Container>
       </div>
 
       {/* MOBILE VIEW */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-        <div className="xl:hidden flex items-center justify-between px-4 py-3 border-b bg-white relative z-100">
+        <Container className="xl:hidden flex items-center justify-between py-3 border-b bg-white relative z-100">
           <Link href="/" className="relative w-16 h-16">
             <Image src="/logo.png" alt="Logo" fill className="object-contain" />
           </Link>
@@ -385,7 +388,7 @@ export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[
               </button>
             </SheetTrigger>
           </div>
-        </div>
+        </Container>
 
         <SheetContent side="right" className="p-0">
           <nav className="flex h-full flex-col gap-6 overflow-y-auto p-6 py-12">

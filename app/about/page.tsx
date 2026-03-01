@@ -1,5 +1,6 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card, CardContent } from "@/components/ui/card";
+import { Container } from "@/components/ui/container";
 import Image from "next/image";
 import React from "react";
 
@@ -19,7 +20,7 @@ export default function About() {
           <div className="absolute inset-0 bg-linear-to-r from-black via-black/60 to-transparent" />
         </div>
 
-        <div className="relative z-10 w-full max-w-[1440px] px-6 md:pl-[90px] md:pr-6 pt-16 pb-24 md:py-0">
+        <Container className="relative z-10 pt-16 pb-24 md:py-0">
           <div className="flex flex-col gap-8 md:gap-10">
             <div className="w-fit">
               <h1 className="font-bebas text-6xl md:text-7xl lg:text-8xl leading-[0.9] tracking-tight uppercase text-white">
@@ -43,12 +44,13 @@ export default function About() {
               </p>
             </div>
           </div>
-        </div>
+        </Container>
       </section>
 
       {/* --- CONTENT SECTION --- */}
-      <section className="w-full bg-[#F4F4F4] py-16 md:py-24 px-6 md:px-[86px]">
-        <Card className="max-w-[1440px] border-none bg-transparent shadow-none mx-auto">
+      <section className="w-full bg-[#F4F4F4] py-16 md:py-24">
+        <Container>
+          <Card className="border-none bg-transparent shadow-none">
           <CardContent className="p-0 flex flex-col md:flex-row items-center gap-12 lg:gap-24">
             <div className="w-full md:w-[600px] shrink-0">
               <AspectRatio
@@ -101,6 +103,7 @@ export default function About() {
             </div>
           </CardContent>
         </Card>
+        </Container>
       </section>
     </main>
   );

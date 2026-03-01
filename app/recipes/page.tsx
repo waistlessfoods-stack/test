@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Search } from "lucide-react";
+import { Container } from "@/components/ui/container";
 import {
   Carousel,
   CarouselContent,
@@ -77,8 +78,9 @@ export default function Recipes() {
   return (
     <div className="w-full min-h-screen bg-white overflow-x-hidden font-metropolis">
       {/* --- BANNER --- */}
-      <section className="w-full px-4 md:px-12 py-12">
-        <div className="relative w-full aspect-16/5 min-h-[400px] overflow-hidden rounded-[40px] flex items-center">
+      <section className="w-full py-12">
+        <Container>
+          <div className="relative w-full aspect-16/5 min-h-[400px] overflow-hidden rounded-[40px] flex items-center">
           <div className="absolute inset-0">
             <Image
               src="/recipes/banner-recipes.png"
@@ -118,11 +120,13 @@ export default function Recipes() {
               />
             </div>
           </div>
-        </div>
+          </div>
+        </Container>
       </section>
 
       {/* --- GALLERY SECTION --- */}
-      <section className="bg-[#F4F4F4] px-4 md:px-12 py-20 flex flex-col items-center">
+      <section className="bg-[#F4F4F4] py-20">
+        <Container className="flex flex-col items-center">
         <h2 className="font-bebas text-6xl md:text-7xl text-black mb-10 leading-none">
           RECIPE GALLERY
         </h2>
@@ -212,6 +216,7 @@ export default function Recipes() {
             </div>
           ))}
         </div>
+        </Container>
       </section>
     </div>
   );
