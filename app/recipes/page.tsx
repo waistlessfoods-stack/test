@@ -77,12 +77,12 @@ export default function Recipes() {
   return (
     <div className="w-full min-h-screen bg-white overflow-x-hidden font-metropolis">
       {/* --- BANNER --- */}
-      <section className="w-full px-4 md:px-12 py-12">
-        <div className="relative w-full aspect-16/5 min-h-[400px] overflow-hidden rounded-[40px] flex items-center">
+      <section className="w-full px-4 md:px-10 py-20">
+        <div className="relative w-full max-w-[1440px] mx-auto aspect-16/7 min-h-[400px] overflow-hidden rounded-[40px] flex items-center shadow-md">
           <div className="absolute inset-0">
             <Image
               src="/recipes/banner-recipes.png"
-              alt="Wholesome Recipes Background"
+              alt="Background"
               fill
               className="object-cover"
               priority
@@ -90,127 +90,119 @@ export default function Recipes() {
             <div className="absolute inset-0 bg-black/50" />
           </div>
 
-          <div className="relative z-10 px-8 md:px-16 w-full lg:w-[60%] flex flex-col gap-6">
-            <h1 className="font-metropolis font-bold text-white text-4xl md:text-5xl lg:text-6xl leading-tight max-w-3xl">
-              Wholesome Recipes for Every Mood
-            </h1>
-            <p className="font-metropolis text-white text-lg md:text-xl leading-relaxed max-w-2xl opacity-90">
-              From quick bites to hearty meals, explore dishes made with simple
-              ingredients, bold flavors, and mindful cooking.
-            </p>
-          </div>
-
-          <div className="hidden lg:flex relative z-10 w-1/2 h-full items-center justify-end pr-16 gap-6">
-            <div className="relative w-[280px] h-[360px] rounded-3xl overflow-hidden shadow-2xl transform translate-y-4">
-              <Image
-                src="/recipes/mango.png"
-                alt="Mango Parfait"
-                fill
-                className="object-cover"
-              />
+          <div className="relative z-10 px-8 md:px-20 flex flex-col md:flex-row items-center justify-between w-full h-full">
+            <div className="flex-1 max-w-3xl flex flex-col gap-4 mt-10 md:mt-0">
+              <h1 className="font-bold text-white text-4xl md:text-5xl lg:text-6xl leading-[1.1] drop-shadow-lg">
+                Wholesome Recipes for <br className="hidden lg:block" /> Every
+                Mood
+              </h1>
+              <p className="text-white text-lg md:text-xl opacity-90 max-w-xl leading-snug drop-shadow-md">
+                From quick bites to hearty meals, explore dishes made with
+                simple ingredients, bold flavors, and mindful cooking.
+              </p>
             </div>
-            <div className="relative w-60 h-[200px] rounded-3xl overflow-hidden shadow-2xl">
-              <Image
-                src="/recipes/cake.png"
-                alt="Brownie"
-                fill
-                className="object-cover"
-              />
+
+            <div className="hidden lg:flex items-center gap-6 self-center h-full pt-10">
+              <div className="relative w-60 h-80 rounded-3xl overflow-hidden shadow-2xl translate-y-4">
+                <Image
+                  src="/recipes/mango.png"
+                  fill
+                  className="object-cover"
+                  alt="Mango"
+                />
+              </div>
+              <div className="relative w-[200px] h-[200px] rounded-3xl overflow-hidden shadow-2xl translate-y-4">
+                <Image
+                  src="/recipes/cake.png"
+                  fill
+                  className="object-cover"
+                  alt="Cake"
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* --- GALLERY SECTION --- */}
-      <section className="bg-[#F4F4F4] px-4 md:px-12 py-20 flex flex-col items-center">
-        <h2 className="font-bebas text-6xl md:text-7xl text-black mb-10 leading-none">
-          RECIPE GALLERY
-        </h2>
+      <section className="bg-[#F4F4F4] py-16 md:py-20">
+        <div className="w-full max-w-[1440px] mx-auto px-6 md:px-10 flex flex-col items-center">
+          <h2 className="font-bebas text-[80px] md:text-[100px] text-black mb-8 leading-none tracking-tight">
+            RECIPE GALLERY
+          </h2>
 
-        {/* SEARCH BAR */}
-        <div className="relative w-full mb-16">
-          <Input
-            placeholder="Find something food"
-            className="w-full h-20 bg-white rounded-none px-10 border-none shadow-sm focus-visible:ring-0 
-              text-xl font-metropolis text-black 
-              placeholder:font-metropolis 
-              placeholder:text-lg 
-              placeholder:text-black/50"
-          />
-          <Search className="absolute right-10 top-1/2 -translate-y-1/2 w-8 h-8 text-black stroke-[2.5]" />
-        </div>
+          <div className="relative w-full mb-12">
+            <Input
+              placeholder="Find something food"
+              className="w-full h-20 bg-white rounded-none px-10 border-none shadow-sm text-xl placeholder:text-black/40"
+            />
+            <Search className="absolute right-10 top-1/2 -translate-y-1/2 w-8 h-8 text-black stroke-[2.5]" />
+          </div>
 
-        {/* CATEGORY CAROUSEL */}
-        <div className="w-full mb-24 relative">
-          <Carousel
-            setApi={setApi}
-            opts={{ align: "start", loop: true }}
-            className="w-full px-2"
-          >
-            <CarouselContent className="-ml-4">
-              {categories.map((cat, i) => (
-                <CarouselItem
-                  key={i}
-                  className="pl-4 md:basis-1/2 lg:basis-1/4"
-                >
-                  <div className="relative h-[200px] rounded-3xl overflow-hidden group cursor-pointer shadow-md">
-                    <img
-                      src={cat.img}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110"
-                      alt={cat.name}
-                    />
-                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-                    <h3 className="relative z-10 h-full flex items-center justify-center font-bebas text-4xl text-white uppercase">
-                      {cat.name}
-                    </h3>
+          <div className="w-full mb-20 relative px-4">
+            <Carousel setApi={setApi} opts={{ align: "start", loop: true }}>
+              <CarouselContent className="-ml-4">
+                {categories.map((cat, i) => (
+                  <CarouselItem key={i} className="pl-4 basis-1/2 md:basis-1/4">
+                    <div className="relative h-[180px] md:h-[220px] rounded-4xl overflow-hidden group cursor-pointer shadow-sm">
+                      <Image
+                        src={cat.img}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform"
+                        alt={cat.name}
+                      />
+                      <div className="absolute inset-0 bg-black/40" />
+                      <h3 className="absolute inset-0 flex items-center justify-center font-bebas text-4xl text-white">
+                        {cat.name}
+                      </h3>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="absolute -left-5 w-12 h-12 border-none shadow-xl" />
+              <CarouselNext className="absolute -right-5 w-12 h-12 border-none shadow-xl" />
+            </Carousel>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16 w-full">
+            {recipes.map((item, idx) => (
+              <div key={idx} className="group">
+                <div className="relative aspect-square w-full rounded-[48px] overflow-hidden bg-white shadow-lg mb-8">
+                  <Image
+                    src={item.img}
+                    fill
+                    className="object-cover"
+                    alt={item.title}
+                  />
+
+                  <div
+                    className="absolute top-0 right-0 bg-[#0F8DAB] w-36 h-36 flex justify-end items-start"
+                    style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%)" }}
+                  >
+                    <span className="font-bold text-3xl text-white pt-6 pr-6">
+                      {item.price}
+                    </span>
                   </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="absolute -left-4 -mt-8 w-12 h-12 z-30 bg-white border-[#B0B0B0]" />
-            <CarouselNext className="absolute -right-4 -mt-8 w-12 h-12 z-30 bg-white border-[#B0B0B0]" />
-          </Carousel>
-        </div>
 
-        {/* --- RECIPE GRID LIST --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-24 w-full">
-          {recipes.map((item, idx) => (
-            <div key={idx} className="group cursor-pointer">
-              <div className="relative aspect-square w-full rounded-[48px] overflow-hidden bg-white shadow-xl mb-10">
-                <img
-                  src={item.img}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  alt={item.title}
-                />
-
-                <div
-                  className="absolute top-0 right-0 bg-[#0F8DAB] w-32 h-32 md:w-40 md:h-40 flex justify-end items-start"
-                  style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%)" }}
-                >
-                  <span className="font-metropolis font-bold text-2xl md:text-3xl text-white pt-6 pr-4">
-                    {item.price}
-                  </span>
+                  {item.price !== "Free" && (
+                    <div className="absolute bottom-0 left-0 right-0 flex justify-center">
+                      <Button className="w-[90%] h-16 bg-[#0F8DAB] hover:bg-[#0d7a94] text-xl font-bold tracking-widest rounded-t-[35px] rounded-b-none">
+                        FEATURED
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
-                {item.price !== "Free" && (
-                  <div className="absolute bottom-0 left-0 right-0 flex justify-center">
-                    <Button className="w-[90%] h-16 bg-[#0F8DAB] hover:bg-[#0d7a94] text-xl font-bold tracking-widest rounded-t-[35px] rounded-b-none border-none">
-                      FEATURED
-                    </Button>
-                  </div>
-                )}
+                <div className="flex flex-col gap-3 px-4">
+                  <h4 className="font-bold text-3xl text-black leading-tight">
+                    {item.title}
+                  </h4>
+                  <p className="text-gray-700 text-lg leading-relaxed line-clamp-3">
+                    {item.desc}
+                  </p>
+                </div>
               </div>
-
-              <div className="flex flex-col gap-4 px-2">
-                <h4 className="font-metropolis font-bold text-2xl md:text-3xl text-black leading-tight group-hover:text-[#0F8DAB] transition-colors">
-                  {item.title}
-                </h4>
-                <p className="font-metropolis text-base md:text-lg leading-relaxed text-gray-800 line-clamp-2">
-                  {item.desc}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
     </div>
