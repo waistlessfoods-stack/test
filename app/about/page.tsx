@@ -51,18 +51,18 @@ export default function About() {
       <section className="w-full bg-[#F4F4F4] py-16 md:py-24">
         <Container>
           <Card className="border-none bg-transparent shadow-none">
-          <CardContent className="p-0 flex flex-col md:flex-row items-center gap-12 lg:gap-24">
-            <div className="w-full md:w-[600px] shrink-0">
+            <CardContent className="p-0 flex flex-col md:flex-row items-center gap-12 lg:gap-20">
+              <div className="w-full flex-1 max-w-[550px]">
               <AspectRatio
                 ratio={1 / 1}
                 className="bg-[#D3D3D3] rounded-2xl overflow-hidden relative shadow-lg"
               >
-                <Image
-                  src="/about/food-img.png"
-                  fill
-                  alt="WaistLess Foods Background"
-                  className="object-cover"
-                />
+                  <Image
+                    src="/about/food-img.png"
+                    fill
+                    alt="WaistLess Foods"
+                    className="object-cover"
+                  />
                 <div className="absolute inset-0 bg-white/80" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative w-[35%] h-[35%]">
@@ -74,34 +74,32 @@ export default function About() {
                     />
                   </div>
                 </div>
-              </AspectRatio>
-            </div>
+                </AspectRatio>
+              </div>
 
-            <div className="w-full md:w-[608px] flex flex-col gap-8">
-              <h2 className="font-sans font-bold text-3xl md:text-4xl tracking-tight text-black capitalize">
+              <div className="w-full flex-1 flex flex-col gap-6">
+                <h2 className="font-sans font-bold text-3xl md:text-4xl lg:text-5xl tracking-tight text-black capitalize">
                 More about waistless
               </h2>
 
               <div className="flex flex-col gap-6 font-sans font-normal text-base md:text-lg lg:text-xl leading-relaxed text-gray-900">
-                <p>
-                  WaistLess is built on the idea that good food shouldn’t come
-                  with waste—of ingredients, time, or intention.
-                </p>
+                  <p>
+                    WaistLess is built on the idea that good food shouldn't come
+                    with waste—of ingredients, time, or intention.
+                  </p>
 
-                <p>
-                  Chef Amber created WaistLess as a space to share recipes,
-                  techniques, and simple habits that make cooking more
-                  sustainable and more joyful. From everyday meals to family
-                  gatherings, every part of WaistLess centers around flavor,
-                  quality, and mindful living.
-                </p>
+                  <p>
+                    Chef Amber created WaistLess as a space to share recipes,
+                    techniques, and simple habits that make cooking more
+                    sustainable and more joyful.
+                  </p>
 
-                <p>
-                  Here, we help you eat better, live brighter, and waste less.
-                </p>
+                  <p>
+                    Here, we help you eat better, live brighter, and waste less.
+                  </p>
+                </div>
               </div>
-            </div>
-          </CardContent>
+            </CardContent>
         </Card>
         </Container>
       </section>
