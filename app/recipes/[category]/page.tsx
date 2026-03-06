@@ -22,12 +22,14 @@ export default async function RecipesPage({ params, searchParams }: RecipesPageP
   // Mock recipe data - replace with actual data fetching
   const recipeData: Recipe = {
     id: "1",
+    slug: "apple-peanut-donut-bites",
     title: "Apple Peanut Donut Bites",
     description:
       "Crisp apple rings layered with creamy peanut butter, sprinkled with nuts and chocolate chips — a wholesome, fun, and gluten-free treat perfect for snacking or breakfast.",
     price: "$15.00",
     imagePath: "/recipes/apple-donut.jpg",
     categoryId: category,
+    sortOrder: 1,
   };
 
   return (
