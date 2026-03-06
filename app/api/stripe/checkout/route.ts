@@ -18,23 +18,40 @@ export async function POST(request: Request) {
 
   try {
     const origin = request.headers.get("origin") || "http://localhost:3000";
+    const body = await request.json();
+    const { items } = body;
+
+    // If no items provided, use test item (for stripe-test page)
+    const lineItems = items && items.length > 0
+      ? items.map((item: any) => ({
+          quantity: item.quantity,
+          price_data: {
+            currency: "usd",
+            unit_amount: Math.round(item.price * 100), // Convert to cents
+            product_data: {
+              name: item.name,
+              ...(item.imagePath && { images: [item.imagePath] }),
+            },
+          },
+        }))
+      : [
+          {
+            quantity: 1,
+            price_data: {
+              currency: "usd",
+              unit_amount: 500,
+              product_data: {
+                name: "Stripe Test Item",
+                description: "One-time test payment",
+              },
+            },
+          },
+        ];
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: "usd",
-            unit_amount: 500,
-            product_data: {
-              name: "Stripe Test Item",
-              description: "One-time test payment",
-            },
-          },
-        },
-      ],
+      line_items: lineItems,
       success_url: `${origin}/stripe-test?success=1`,
       cancel_url: `${origin}/stripe-test?canceled=1`,
     });

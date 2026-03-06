@@ -4,13 +4,15 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
-import { Menu, ShoppingCart, ChevronDown, X } from "lucide-react";
+import { Menu, ShoppingCart, ChevronDown, X, User, LogOut } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/lib/cart-context";
+import { useSession, signOut } from "@/lib/auth-client";
 import { getIconPath } from "@/lib/social-links";
 import type { SocialLink } from "@/lib/contentful-links";
+import type { HeaderSettings } from "@/lib/contentful-management";
 
 const services = [
   { label: "Private Service", href: "/services/private" },
@@ -18,13 +20,22 @@ const services = [
   { label: "Cooking Class", href: "/services/cooking-class" },
 ];
 
-export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[] }) {
+export default function Header({ 
+  socialLinks = [],
+  headerSettings
+}: { 
+  socialLinks?: SocialLink[];
+  headerSettings?: HeaderSettings | null;
+}) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const pathname = usePathname();
   const { items, totalItems, totalPrice, removeItem, updateQuantity } =
     useCart();
+  const { data: session, isPending } = useSession();
 
   const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -32,6 +43,35 @@ export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[
   });
 
   const formattedTotal = currencyFormatter.format(totalPrice);
+
+  const handleCheckout = async () => {
+    setIsCheckoutLoading(true);
+    try {
+      const response = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      });
+
+      if (!response.ok) {
+        const payload = await response.json();
+        throw new Error(payload?.error || "Checkout failed.");
+      }
+
+      const payload = await response.json();
+      if (payload?.url) {
+        window.location.href = payload.url;
+        return;
+      }
+
+      throw new Error("No checkout URL returned.");
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert(error instanceof Error ? error.message : "Checkout failed. Please try again.");
+    } finally {
+      setIsCheckoutLoading(false);
+    }
+  };
 
   const navLinks = [
     { label: "Home", href: "/" },
@@ -52,11 +92,35 @@ export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[
   return (
     <header className="w-full bg-white relative z-50">
       {/* Banner */}
-      <div className="w-full h-[45px] flex items-center justify-center bg-[#00676E]">
-        <span className="text-white uppercase text-[16px] font-semibold">
-          Promotion Here
-        </span>
-      </div>
+      {headerSettings?.promotionBannerEnabled && headerSettings.promotionBannerText && (
+        <div 
+          className="w-full h-[45px] flex items-center justify-center"
+          style={{
+            backgroundColor: headerSettings.promotionBannerBackgroundColor || "#00676E",
+          }}
+        >
+          {headerSettings.promotionBannerLink ? (
+            <Link 
+              href={headerSettings.promotionBannerLink}
+              className="text-uppercase text-[16px] font-semibold hover:opacity-80 transition-opacity"
+              style={{
+                color: headerSettings.promotionBannerTextColor || "#FFFFFF",
+              }}
+            >
+              {headerSettings.promotionBannerText}
+            </Link>
+          ) : (
+            <span 
+              className="text-uppercase text-[16px] font-semibold"
+              style={{
+                color: headerSettings.promotionBannerTextColor || "#FFFFFF",
+              }}
+            >
+              {headerSettings.promotionBannerText}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* DESKTOP VIEW */}
       <div className="hidden xl:flex items-center py-5 w-full">
@@ -177,7 +241,54 @@ export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[
               </div>
             </div>
           </div>
-          <div className="">
+          <div className="flex items-center gap-3">
+            {!isPending && (
+              session?.user ? (
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="gap-2 bg-[#F9F8F8] font-bold"
+                    >
+                      <User className="w-5 h-5" />
+                      {session.user.name || session.user.email}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="p-6">
+                    <div className="flex flex-col gap-6">
+                      <div>
+                        <h2 className="text-2xl font-semibold text-[#1C1C1C]">Account</h2>
+                        <p className="mt-2 text-sm text-[#6B6B6B]">
+                          {session.user.email}
+                        </p>
+                      </div>
+                      <Button
+                        onClick={async () => {
+                          await signOut();
+                          router.refresh();
+                        }}
+                        variant="outline"
+                        className="gap-2 border-[#D4E4E2] text-[#09686E]"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                      </Button>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              ) : (
+                <Link href="/signin">
+                  <Button
+                    variant="outline"
+                    className="gap-2 bg-[#F9F8F8] font-bold"
+                  >
+                    <User className="w-5 h-5" />
+                    SIGN IN
+                  </Button>
+                </Link>
+              )
+            )}
+            
             <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
               <SheetTrigger asChild>
                 <Button
@@ -274,14 +385,19 @@ export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[
                         <span>Total</span>
                         <span>{formattedTotal}</span>
                       </div>
-                      <Button className="bg-[#00676E] hover:bg-[#00575e]">
-                        Checkout
+                      <Button 
+                        className="bg-[#00676E] hover:bg-[#00575e]"
+                        onClick={handleCheckout}
+                        disabled={isCheckoutLoading}
+                      >
+                        {isCheckoutLoading ? "Processing..." : "Checkout"}
                       </Button>
                     </div>
                   )}
                   <Button
                     variant="outline"
                     className="border-[#D4E4E2] text-[#09686E]"
+                    onClick={() => setIsCartOpen(false)}
                   >
                     Continue Shopping
                   </Button>
@@ -300,6 +416,45 @@ export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[
             <Image src="/logo.png" alt="Logo" fill className="object-contain" />
           </Link>
           <div className="flex items-center gap-3">
+            {!isPending && (
+              session?.user ? (
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <button className="relative">
+                      <User className="w-6 h-6 text-[#00676E]" />
+                    </button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="p-6">
+                    <div className="flex flex-col gap-6">
+                      <div>
+                        <h2 className="text-2xl font-semibold text-[#1C1C1C]">Account</h2>
+                        <p className="mt-2 text-sm text-[#6B6B6B]">
+                          {session.user.email}
+                        </p>
+                      </div>
+                      <Button
+                        onClick={async () => {
+                          await signOut();
+                          router.refresh();
+                        }}
+                        variant="outline"
+                        className="gap-2 border-[#D4E4E2] text-[#09686E]"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                      </Button>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              ) : (
+                <Link href="/signin">
+                  <button className="relative">
+                    <User className="w-6 h-6 text-[#00676E]" />
+                  </button>
+                </Link>
+              )
+            )}
+            
             <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
               <SheetTrigger asChild>
                 <button className="relative">
@@ -390,14 +545,19 @@ export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[
                         <span>Total</span>
                         <span>{formattedTotal}</span>
                       </div>
-                      <Button className="bg-[#00676E] hover:bg-[#00575e]">
-                        Checkout
+                      <Button 
+                        className="bg-[#00676E] hover:bg-[#00575e]"
+                        onClick={handleCheckout}
+                        disabled={isCheckoutLoading}
+                      >
+                        {isCheckoutLoading ? "Processing..." : "Checkout"}
                       </Button>
                     </div>
                   )}
                   <Button
                     variant="outline"
                     className="border-[#D4E4E2] text-[#09686E]"
+                    onClick={() => setIsCartOpen(false)}
                   >
                     Continue Shopping
                   </Button>

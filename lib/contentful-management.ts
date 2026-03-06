@@ -1,4 +1,5 @@
 import { createClient } from "contentful-management";
+import { unstable_cache } from "next/cache";
 
 const DEFAULT_LOCALE = "en-US";
 
@@ -200,6 +201,15 @@ const getAssetUrl = (asset: any): string => {
   const file = asset.fields?.file?.[DEFAULT_LOCALE];
   if (!file?.url) return "";
   return file.url.startsWith("//") ? `https:${file.url}` : file.url;
+};
+
+// Header Settings Types
+export type HeaderSettings = {
+  promotionBannerEnabled: boolean;
+  promotionBannerText: string;
+  promotionBannerBackgroundColor: string;
+  promotionBannerTextColor: string;
+  promotionBannerLink: string;
 };
 
 // About Page Types
@@ -688,3 +698,47 @@ export async function fetchRecipesPageFromContentful(): Promise<RecipesPageData 
     return null;
   }
 }
+
+async function fetchHeaderSettingsFromContentfulRaw(): Promise<HeaderSettings | null> {
+  const config = getContentfulConfig();
+  if (!config) {
+    return null;
+  }
+
+  try {
+    const client = createClient({ accessToken: config.accessToken });
+    const space = await client.getSpace(config.spaceId);
+    const environment = await space.getEnvironment(config.environmentId);
+
+    // Fetch the header settings entry
+    const entries = await environment.getEntries({
+      content_type: "headerSettings",
+      limit: 1,
+    });
+
+    const entry = entries.items[0];
+    if (!entry) {
+      return null;
+    }
+
+    const fields = entry.fields;
+
+    return {
+      promotionBannerEnabled: Boolean(fields.promotionBannerEnabled?.[DEFAULT_LOCALE] ?? false),
+      promotionBannerText: String(fields.promotionBannerText?.[DEFAULT_LOCALE] ?? ""),
+      promotionBannerBackgroundColor: String(fields.promotionBannerBackgroundColor?.[DEFAULT_LOCALE] ?? "#00676E"),
+      promotionBannerTextColor: String(fields.promotionBannerTextColor?.[DEFAULT_LOCALE] ?? "#FFFFFF"),
+      promotionBannerLink: String(fields.promotionBannerLink?.[DEFAULT_LOCALE] ?? ""),
+    };
+  } catch (error) {
+    console.error("Error fetching header settings from Contentful:", error);
+    return null;
+  }
+}
+
+// Cached with ISR-style time-based revalidation for the header banner.
+export const fetchHeaderSettingsFromContentful = unstable_cache(
+  fetchHeaderSettingsFromContentfulRaw,
+  ["contentful-header-settings"],
+  { revalidate: 300, tags: ["header-settings"] }
+);

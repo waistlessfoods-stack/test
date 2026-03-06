@@ -15,9 +15,11 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@better-auth/infra": "^0.1.8",
     "@neondatabase/serverless": "^1.0.2",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-slot": "^1.2.4",
+    "better-auth": "^1.5.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "contentful-management": "^11.69.2",

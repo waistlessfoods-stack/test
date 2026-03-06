@@ -17,11 +17,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { RecipesPageData, RecipeCategory, Recipe } from "@/lib/contentful-management";
 
-type RecipesPageClientProps = {
+type ShopPageClientProps = {
   data: RecipesPageData;
 };
 
-export default function RecipesPageClient({ data }: RecipesPageClientProps) {
+export default function ShopPageClient({ data }: ShopPageClientProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
@@ -44,8 +44,13 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
     setSelectedCategories(newSelected);
   };
 
-  // Filter recipes based on selected categories and search query
-  const filteredRecipes = data.recipes.filter((recipe) => {
+  // Filter only paid recipes
+  const paidRecipes = data.recipes.filter((recipe) => 
+    recipe.price && recipe.price !== "Free"
+  );
+
+  // Filter paid recipes based on selected categories and search query
+  const filteredRecipes = paidRecipes.filter((recipe) => {
     // Filter by category
     const categoryMatch = selectedCategories.size === 0 || (recipe.categoryId && selectedCategories.has(recipe.categoryId));
     
@@ -77,15 +82,10 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
             <div className="relative z-10 px-8 md:px-20 lg:px-12 2xl:px-12 flex flex-col md:flex-row items-center justify-between w-full h-full">
               <div className="flex-1 max-w-3xl flex flex-col gap-4 lg:gap-2.5 2xl:gap-3 mt-10 md:mt-0">
                 <h1 className="font-bold text-white text-4xl md:text-5xl lg:text-4xl 2xl:text-5xl leading-[1.1] drop-shadow-lg">
-                  {data.bannerTitle.split(/\n|<br>/).map((line, index, arr) => (
-                    <span key={index}>
-                      {line}
-                      {index < arr.length - 1 && <br />}
-                    </span>
-                  ))}
+                  Premium Recipe Shop
                 </h1>
                 <p className="text-white text-lg md:text-xl lg:text-base 2xl:text-lg opacity-90 max-w-xl leading-snug drop-shadow-md">
-                  {data.bannerDescription}
+                  Discover our exclusive collection of premium recipes. Add them to your cart and unlock professional cooking secrets.
                 </p>
               </div>
 
@@ -116,16 +116,16 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
         </Container>
       </section>
 
-      {/* --- GALLERY SECTION --- */}
+      {/* --- SHOP SECTION --- */}
       <section className="bg-[#F4F4F4] py-20 lg:py-12 2xl:py-14">
         <Container className="flex flex-col items-center">
           <h2 className="font-bebas text-6xl md:text-7xl lg:text-5xl 2xl:text-5xl text-black mb-10 lg:mb-6 2xl:mb-6 leading-none">
-            RECIPE GALLERY
+            PREMIUM RECIPES
           </h2>
 
           <div className="relative w-full mb-12 lg:mb-8 2xl:mb-8">
             <Input
-              placeholder="Find something food"
+              placeholder="Search premium recipes"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-20 lg:h-14 2xl:h-16 bg-white rounded-lg px-10 lg:px-7 2xl:px-8 border-none shadow-sm text-xl lg:text-base 2xl:text-lg placeholder:text-black/40"
@@ -177,30 +177,35 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
             </Carousel>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-10 lg:gap-x-5 2xl:gap-x-6 gap-y-16 lg:gap-y-10 2xl:gap-y-10 w-full">
-            {filteredRecipes.map((item: Recipe) => (
-              <Link
-                key={item.id}
-                href={`/recipes/detail/${item.slug}`}
-                className="group block transition-transform duration-300 hover:-translate-y-2"
-              >
-                <div className="relative aspect-square w-full rounded-[48px] lg:rounded-[32px] 2xl:rounded-[36px] overflow-hidden bg-white shadow-lg group-hover:shadow-2xl transition-shadow duration-300 mb-8 lg:mb-5 2xl:mb-5">
-                  <Image
-                    src={item.imagePath}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    alt={item.title}
-                  />
+          {filteredRecipes.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-2xl text-gray-500">No premium recipes found</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-10 lg:gap-x-5 2xl:gap-x-6 gap-y-16 lg:gap-y-10 2xl:gap-y-10 w-full">
+              {filteredRecipes.map((item: Recipe) => (
+                <div
+                  key={item.id}
+                  className="group block transition-transform duration-300 hover:-translate-y-2"
+                >
+                  <div className="relative aspect-square w-full rounded-[48px] lg:rounded-[32px] 2xl:rounded-[36px] overflow-hidden bg-white shadow-lg group-hover:shadow-2xl transition-shadow duration-300 mb-8 lg:mb-5 2xl:mb-5">
+                    <Link href={`/recipes/detail/${item.slug}`}>
+                      <Image
+                        src={item.imagePath}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        alt={item.title}
+                      />
 
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300" />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300" />
 
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                    <span className="text-2xl lg:text-xl 2xl:text-2xl font-bebas tracking-widest text-white">
-                      VIEW RECIPE
-                    </span>
-                  </div>
+                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:-translate-y-1/2 transition-all duration-300">
+                        <span className="text-2xl lg:text-xl 2xl:text-2xl font-bebas tracking-widest text-white">
+                          VIEW RECIPE
+                        </span>
+                      </div>
+                    </Link>
 
-                  {item.price && item.price !== "Free" && (
                     <div
                       className="absolute top-0 right-0 bg-[#0F8DAB] w-36 lg:w-24 2xl:w-28 h-36 lg:h-24 2xl:h-28 flex justify-end items-start"
                       style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%)" }}
@@ -209,28 +214,30 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
                         {item.price}
                       </span>
                     </div>
-                  )}
 
-                  {item.featured && (
-                    <div className="absolute bottom-0 left-0 right-0 flex justify-center">
-                      <Button className="w-[90%] h-16 lg:h-12 2xl:h-12 bg-[#0F8DAB] hover:bg-[#0d7a94] text-xl lg:text-base 2xl:text-base font-bold tracking-widest rounded-t-[35px] lg:rounded-t-[24px] 2xl:rounded-t-[25px] rounded-b-none">
-                        FEATURED
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                    {item.featured && (
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center">
+                        <Button className="w-[90%] h-16 lg:h-12 2xl:h-12 bg-[#0F8DAB] hover:bg-[#0d7a94] text-xl lg:text-base 2xl:text-base font-bold tracking-widest rounded-t-[35px] lg:rounded-t-[24px] 2xl:rounded-t-[25px] rounded-b-none pointer-events-none">
+                          FEATURED
+                        </Button>
+                      </div>
+                    )}
+                  </div>
 
-                <div className="flex flex-col gap-3 lg:gap-1.5 2xl:gap-2 px-4 lg:px-2 2xl:px-3">
-                  <h4 className="font-bold text-3xl lg:text-xl 2xl:text-2xl text-black leading-tight transition-colors duration-300 group-hover:text-[#0F8DAB]">
-                    {item.title}
-                  </h4>
-                  <p className="text-gray-700 text-lg lg:text-sm 2xl:text-base leading-relaxed line-clamp-3">
-                    {item.description}
-                  </p>
+                  <div className="flex flex-col gap-3 lg:gap-1.5 2xl:gap-2 px-4 lg:px-2 2xl:px-3">
+                    <Link href={`/recipes/detail/${item.slug}`}>
+                      <h4 className="font-bold text-3xl lg:text-xl 2xl:text-2xl text-black leading-tight transition-colors duration-300 group-hover:text-[#0F8DAB]">
+                        {item.title}
+                      </h4>
+                    </Link>
+                    <p className="text-gray-700 text-lg lg:text-sm 2xl:text-base leading-relaxed line-clamp-2">
+                      {item.description}
+                    </p>
+                  </div>
                 </div>
-              </Link>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </Container>
       </section>
     </div>
