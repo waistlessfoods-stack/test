@@ -226,12 +226,23 @@ export type RecipeCategory = {
 
 export type Recipe = {
   id: string;
+  slug: string;
   title: string;
   price: string;
   description: string;
   imagePath: string;
   sortOrder: number;
+  categoryId?: string;
+  featured?: boolean;
 };
+
+// Helper function to generate URL-friendly slugs
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 export type RecipesPageData = {
   bannerImagePath: string;
@@ -642,13 +653,17 @@ export async function fetchRecipesPageFromContentful(): Promise<RecipesPageData 
           }
         }
         
+        const title = String(recipeFields.title?.[DEFAULT_LOCALE] ?? "");
         recipes.push({
           id: linkedEntry.sys.id,
-          title: String(recipeFields.title?.[DEFAULT_LOCALE] ?? ""),
+          slug: generateSlug(title),
+          title,
           price: String(recipeFields.price?.[DEFAULT_LOCALE] ?? ""),
           description: String(recipeFields.description?.[DEFAULT_LOCALE] ?? ""),
           imagePath: recipeImagePath,
           sortOrder: Number(recipeFields.sortOrder?.[DEFAULT_LOCALE] ?? 0),
+          categoryId: recipeFields.category?.[DEFAULT_LOCALE]?.sys?.id,
+          featured: Boolean(recipeFields.featured?.[DEFAULT_LOCALE] ?? false),
         });
       } catch (error) {
         console.error(`Failed to fetch recipe ${ref.sys.id}:`, error);

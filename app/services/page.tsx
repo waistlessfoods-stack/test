@@ -1,6 +1,8 @@
 import { fetchServicesFromContentful } from "@/lib/contentful-management";
 import ServicesClientPage from "./services-client";
 
+export const revalidate = 300;
+
 const fallbackSlugify = (value: string) =>
   value
     .toLowerCase()

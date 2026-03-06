@@ -4,6 +4,8 @@ import {
 } from "@/lib/contentful-management";
 import AboutPageClient from "./about-page-client";
 
+export const revalidate = 300;
+
 // Fallback data if Contentful is not configured
 const fallbackData: AboutPageData = {
   heroTitle: "Hey There!\nI'm Amber",

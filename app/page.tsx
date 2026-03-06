@@ -4,6 +4,8 @@ import {
 } from "@/lib/contentful-management";
 import HomepageClient from "./homepage-client";
 
+export const revalidate = 300;
+
 // Fallback data if Contentful is not configured
 const fallbackData: HomepageData = {
   heroTitle: "Waste Less.\nTaste More.",

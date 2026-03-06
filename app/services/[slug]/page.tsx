@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { fetchServiceDetailFromContentful } from "@/lib/contentful-management";
 import ServiceDetailClient from "./service-detail-client";
 
+export const revalidate = 300;
+
 type ServiceDetail = {
   title: string;
   breadcrumbLabel: string;

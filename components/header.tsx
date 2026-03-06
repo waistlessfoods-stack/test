@@ -26,10 +26,12 @@ export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[
   const { items, totalItems, totalPrice, removeItem, updateQuantity } =
     useCart();
 
-  const formattedTotal = new Intl.NumberFormat("en-US", {
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-  }).format(totalPrice / 100);
+  });
+
+  const formattedTotal = currencyFormatter.format(totalPrice);
 
   const navLinks = [
     { label: "Home", href: "/" },
@@ -219,13 +221,25 @@ export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[
                           key={item.id}
                           className="flex items-center justify-between gap-4 border-b border-[#EEF2F1] pb-3"
                         >
-                          <div>
-                            <p className="text-sm font-semibold text-[#1C1C1C]">
-                              {item.name}
-                            </p>
-                            <p className="text-xs text-[#6B6B6B]">
-                              ${(item.price / 100).toFixed(2)} each
-                            </p>
+                          <div className="flex items-center gap-3">
+                            <div className="relative h-14 w-14 overflow-hidden rounded-md bg-[#F4F4F4]">
+                              {item.imagePath ? (
+                                <Image
+                                  src={item.imagePath}
+                                  alt={item.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              ) : null}
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-[#1C1C1C]">
+                                {item.name}
+                              </p>
+                              <p className="text-xs text-[#6B6B6B]">
+                                {currencyFormatter.format(item.price)} each
+                              </p>
+                            </div>
                           </div>
                           <div className="flex items-center gap-2">
                             <button
@@ -323,13 +337,25 @@ export default function Header({ socialLinks = [] }: { socialLinks?: SocialLink[
                           key={item.id}
                           className="flex items-center justify-between gap-4 border-b border-[#EEF2F1] pb-3"
                         >
-                          <div>
-                            <p className="text-sm font-semibold text-[#1C1C1C]">
-                              {item.name}
-                            </p>
-                            <p className="text-xs text-[#6B6B6B]">
-                              ${(item.price / 100).toFixed(2)} each
-                            </p>
+                          <div className="flex items-center gap-3">
+                            <div className="relative h-14 w-14 overflow-hidden rounded-md bg-[#F4F4F4]">
+                              {item.imagePath ? (
+                                <Image
+                                  src={item.imagePath}
+                                  alt={item.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              ) : null}
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-[#1C1C1C]">
+                                {item.name}
+                              </p>
+                              <p className="text-xs text-[#6B6B6B]">
+                                {currencyFormatter.format(item.price)} each
+                              </p>
+                            </div>
                           </div>
                           <div className="flex items-center gap-2">
                             <button

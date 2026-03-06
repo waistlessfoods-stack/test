@@ -9,8 +9,8 @@ export const metadata: Metadata = {
     "Official links for WaistLess Foods - book private dining, catering, classes, and more.",
 };
 
-// Revalidate on every request to ensure Contentful updates are reflected immediately
-export const revalidate = 0;
+// Revalidate every 5 minutes for Contentful-backed ISR.
+export const revalidate = 300;
 
 export default async function LinksPage() {
   const linksData = await fetchLinksPageFromContentful();

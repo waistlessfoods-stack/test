@@ -185,7 +185,7 @@ function CarouselPrevious({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-8 rounded-full",
+        "absolute size-8 rounded-full transition-all group",
         orientation === "horizontal"
           ? "top-1/2 -left-12 -translate-y-1/2"
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -195,7 +195,7 @@ function CarouselPrevious({
       onClick={scrollPrev}
       {...props}
     >
-      <Play className="size-5 rotate-180 fill-black text-black" />
+      <Play className="size-5 rotate-180 fill-[#0F8DAB] text-[#0F8DAB] group-hover:fill-white group-hover:text-white transition-colors" />
       <span className="sr-only">Previous slide</span>
     </Button>
   );
@@ -215,7 +215,7 @@ function CarouselNext({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-8 rounded-full",
+        "absolute size-8 rounded-full transition-all group",
         orientation === "horizontal"
           ? "top-1/2 -right-12 -translate-y-1/2"
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -225,7 +225,7 @@ function CarouselNext({
       onClick={scrollNext}
       {...props}
     >
-      <Play className="size-5 rotate-360 fill-black text-black" />
+      <Play className="size-5 rotate-360 fill-[#0F8DAB] text-[#0F8DAB] group-hover:fill-white group-hover:text-white transition-colors" />
       <span className="sr-only">Next slide</span>
     </Button>
   );
