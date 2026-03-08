@@ -216,7 +216,7 @@ export default function Header({
               size="sm"
               className="bg-[#00676E] hover:bg-[#00575e] text-white whitespace-nowrap"
             >
-              Complimentary Chef Consultation
+              Complimentary Consultation
             </Button>
             <div className="flex items-center gap-4">
               <div className="h-8 w-px bg-[#19767C] shrink-0" />

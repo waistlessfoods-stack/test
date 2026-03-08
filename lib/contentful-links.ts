@@ -1,8 +1,18 @@
 import { createClient } from "contentful-management";
+import { unstable_cache } from "next/cache";
 
 const DEFAULT_LOCALE = "en-US";
 
+type ContentfulConfig = {
+  accessToken: string;
+  spaceId: string;
+  environmentId: string;
+};
+
+const environmentPromiseCache = new Map<string, Promise<ContentfulEnvironment>>();
+
 type ContentfulEnvironment = {
+  getEntries: (query: Record<string, unknown>) => Promise<{ items: any[] }>;
   getAsset: (id: string) => Promise<{
     fields?: {
       file?: Record<string, { url?: string } | undefined>;
@@ -77,6 +87,36 @@ function getContentfulConfig() {
   return { accessToken, spaceId, environmentId };
 }
 
+function getEnvironmentCacheKey(config: ContentfulConfig): string {
+  return `${config.spaceId}:${config.environmentId}:${config.accessToken.slice(0, 8)}`;
+}
+
+async function getContentfulEnvironment(
+  config: ContentfulConfig
+): Promise<ContentfulEnvironment> {
+  const cacheKey = getEnvironmentCacheKey(config);
+  const existingPromise = environmentPromiseCache.get(cacheKey);
+
+  if (existingPromise) {
+    return existingPromise;
+  }
+
+  const environmentPromise = (async () => {
+    const client = createClient({ accessToken: config.accessToken });
+    const space = await client.getSpace(config.spaceId);
+    return (await space.getEnvironment(config.environmentId)) as ContentfulEnvironment;
+  })();
+
+  environmentPromiseCache.set(cacheKey, environmentPromise);
+
+  try {
+    return await environmentPromise;
+  } catch (error) {
+    environmentPromiseCache.delete(cacheKey);
+    throw error;
+  }
+}
+
 export type LinksPageLink = {
   id: string;
   title: string;
@@ -145,16 +185,14 @@ const mapLinksPageData = (entry: {
   };
 };
 
-export async function fetchLinksPageFromContentful(): Promise<LinksPageData | null> {
+async function fetchLinksPageFromContentfulRaw(): Promise<LinksPageData | null> {
   const config = getContentfulConfig();
   if (!config) {
     return null;
   }
 
   try {
-    const client = createClient({ accessToken: config.accessToken });
-    const space = await client.getSpace(config.spaceId);
-    const environment = await space.getEnvironment(config.environmentId);
+    const environment = await getContentfulEnvironment(config);
 
     // Fetch the links page entry
     const entries = await environment.getEntries({
@@ -235,3 +273,9 @@ export async function fetchLinksPageFromContentful(): Promise<LinksPageData | nu
     return null;
   }
 }
+
+export const fetchLinksPageFromContentful = unstable_cache(
+  fetchLinksPageFromContentfulRaw,
+  ["contentful-links-page"],
+  { revalidate: 300, tags: ["links-page"] }
+);
