@@ -62,7 +62,7 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
       {/* --- BANNER --- */}
       <section className="w-full py-12 lg:py-8 2xl:py-8">
         <Container>
-          <div className="relative w-full aspect-16/5 min-h-[400px] lg:min-h-[280px] 2xl:min-h-[300px] overflow-hidden rounded-[40px] lg:rounded-[28px] 2xl:rounded-[30px] flex items-center">
+          <div className="relative w-full aspect-16/5 min-h-[400px] lg:min-h-[280px] 2xl:min-h-[300px] overflow-hidden rounded-[16px] lg:rounded-[16px] 2xl:rounded-[16px] flex items-center">
             <div className="absolute inset-0">
               <Image
                 src={data.bannerImagePath}
@@ -91,7 +91,7 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
 
               <div className="hidden lg:flex items-center gap-6 lg:gap-3 2xl:gap-4 self-center h-full pt-10 lg:pt-5">
                 {data.bannerFeaturedImage1Path && (
-                  <div className="relative w-60 h-80 lg:w-36 lg:h-48 2xl:w-48 2xl:h-64 rounded-3xl lg:rounded-xl 2xl:rounded-2xl overflow-hidden shadow-2xl translate-y-4 lg:translate-y-3">
+                  <div className="relative w-60 h-80 lg:w-36 lg:h-48 2xl:w-48 2xl:h-64 rounded-lg lg:rounded-lg 2xl:rounded-md overflow-hidden shadow-2xl translate-y-4 lg:translate-y-3">
                     <Image
                       src={data.bannerFeaturedImage1Path}
                       fill
@@ -101,7 +101,7 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
                   </div>
                 )}
                 {data.bannerFeaturedImage2Path && (
-                  <div className="relative w-[200px] h-[200px] lg:w-[130px] lg:h-[130px] 2xl:w-[160px] 2xl:h-[160px] rounded-3xl lg:rounded-xl 2xl:rounded-2xl overflow-hidden shadow-2xl translate-y-4 lg:translate-y-3">
+                  <div className="relative w-[200px] h-[200px] lg:w-[130px] lg:h-[130px] 2xl:w-[160px] 2xl:h-[160px] rounded-lg lg:rounded-lg 2xl:rounded-md overflow-hidden shadow-2xl translate-y-4 lg:translate-y-3">
                     <Image
                       src={data.bannerFeaturedImage2Path}
                       fill
@@ -154,7 +154,7 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
                   <CarouselItem key={cat.id} className="pl-4 basis-1/2 md:basis-1/5 lg:basis-1/6 2xl:basis-1/6">
                     <div 
                       onClick={() => toggleCategory(cat.id)}
-                      className={`relative h-[140px] md:h-[160px] lg:h-[115px] 2xl:h-[130px] rounded-4xl lg:rounded-2xl 2xl:rounded-3xl overflow-hidden group cursor-pointer shadow-sm transition-all duration-300 ease-in-out ${
+                      className={`relative h-[140px] md:h-[160px] lg:h-[115px] 2xl:h-[130px] rounded-lg lg:rounded-md 2xl:rounded-lg overflow-hidden group cursor-pointer shadow-sm transition-all duration-300 ease-in-out ${
                         selectedCategories.has(cat.id) ? 'ring-4 lg:ring-3 ring-[#0F8DAB] scale-95' : 'hover:scale-105'
                       }`}
                     >
@@ -184,7 +184,7 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
                 href={`/recipes/detail/${item.slug}`}
                 className="group block transition-transform duration-300 hover:-translate-y-2"
               >
-                <div className="relative aspect-square w-full rounded-[48px] lg:rounded-[32px] 2xl:rounded-[36px] overflow-hidden bg-white shadow-lg group-hover:shadow-2xl transition-shadow duration-300 mb-8 lg:mb-5 2xl:mb-5">
+                <div className="relative aspect-square w-full rounded-[16px] lg:rounded-[16px] 2xl:rounded-[16px] overflow-hidden bg-white shadow-lg group-hover:shadow-2xl transition-shadow duration-300 mb-8 lg:mb-5 2xl:mb-5">
                   <Image
                     src={item.imagePath}
                     fill
@@ -213,7 +213,7 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
 
                   {item.featured && (
                     <div className="absolute bottom-0 left-0 right-0 flex justify-center">
-                      <Button className="w-[90%] h-16 lg:h-12 2xl:h-12 bg-[#0F8DAB] hover:bg-[#0d7a94] text-xl lg:text-base 2xl:text-base font-bold tracking-widest rounded-t-[35px] lg:rounded-t-[24px] 2xl:rounded-t-[25px] rounded-b-none">
+                      <Button className="w-[90%] h-16 lg:h-12 2xl:h-12 bg-[#0F8DAB] hover:bg-[#0d7a94] text-xl lg:text-base 2xl:text-base font-bold tracking-widest rounded-t-[10px] lg:rounded-t-[8px] 2xl:rounded-t-[8px] rounded-b-none">
                         FEATURED
                       </Button>
                     </div>

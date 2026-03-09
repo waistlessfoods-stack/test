@@ -56,7 +56,7 @@ export default function AboutPageClient({ data }: AboutPageClientProps) {
               <div className="w-full flex-1 max-w-[550px]">
                 <AspectRatio
                   ratio={1 / 1}
-                  className="bg-[#D3D3D3] rounded-2xl overflow-hidden relative shadow-lg"
+                  className="bg-[#D3D3D3] rounded-md overflow-hidden relative shadow-lg"
                 >
                   <Image
                     src={data.contentImagePath}

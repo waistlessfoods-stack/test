@@ -5,7 +5,9 @@ import Image from "next/image";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
+import { useSession } from "@/lib/auth-client";
 import type { Recipe } from "@/lib/contentful-management";
 
 type RecipeDetailClientProps = {
@@ -13,7 +15,9 @@ type RecipeDetailClientProps = {
 };
 
 export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) {
+  const router = useRouter();
   const { addItem } = useCart();
+  const { data: session } = useSession();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const handleAddToCart = () => {
@@ -41,6 +45,12 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
   };
 
   const handleOrderNow = () => {
+    // Check if user is signed in
+    if (!session?.user) {
+      router.push(`/signin?redirect=/recipes/detail/${recipe.slug}&message=Please sign in to purchase this recipe`);
+      return;
+    }
+
     try {
       // Add to cart
       const priceValue = parseFloat(recipe.price.toString().replace(/[^0-9.-]+/g, ""));
@@ -53,8 +63,8 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
         imagePath: recipe.imagePath,
       });
 
-      // Navigate to checkout
-      window.location.href = "/checkout";
+      // Navigate to shop with cart open
+      router.push("/shop");
     } catch (error) {
       console.error("Error in order now:", error);
     }
@@ -81,7 +91,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
           <div className="flex flex-col lg:flex-row gap-14 2xl:gap-8">
             {/* Left Side - Image */}
             <div className="w-full lg:w-1/2 flex items-center">
-              <div className="relative w-full aspect-square lg:aspect-auto lg:h-[642px] rounded-xl 2xl:rounded-lg overflow-hidden bg-[#E9E9E9] shadow-lg">
+              <div className="relative w-full aspect-square lg:aspect-auto lg:h-[642px] rounded-lg 2xl:rounded-lg overflow-hidden bg-[#E9E9E9] shadow-lg">
                 <Image
                   src={recipe.imagePath}
                   alt={recipe.title}
@@ -110,7 +120,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
               </div>
 
               {/* Price Box */}
-              <div className="bg-[#F7F7F7] rounded-xl 2xl:rounded-lg p-5 2xl:p-4">
+              <div className="bg-[#F7F7F7] rounded-lg 2xl:rounded-lg p-5 2xl:p-4">
                 <div className="flex flex-col gap-5 2xl:gap-4">
                   {/* Price Row */}
                   <div className="flex items-center justify-between">

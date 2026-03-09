@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
-import { Menu, ShoppingCart, ChevronDown, X, User, LogOut } from "lucide-react";
+import { Menu, ShoppingCart, ChevronDown, X, User, LogOut, Package, BadgeCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -32,6 +32,9 @@ export default function Header({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+  const [isVerificationSending, setIsVerificationSending] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState("");
+  const [verificationError, setVerificationError] = useState("");
   const pathname = usePathname();
   const { items, totalItems, totalPrice, removeItem, updateQuantity } =
     useCart();
@@ -45,6 +48,13 @@ export default function Header({
   const formattedTotal = currencyFormatter.format(totalPrice);
 
   const handleCheckout = async () => {
+    // Check if user is signed in
+    if (!session?.user) {
+      // Redirect to sign in page with return URL
+      router.push("/signin?redirect=/shop&message=Please sign in to complete your purchase");
+      return;
+    }
+
     setIsCheckoutLoading(true);
     try {
       const response = await fetch("/api/stripe/checkout", {
@@ -55,6 +65,13 @@ export default function Header({
 
       if (!response.ok) {
         const payload = await response.json();
+        
+        // If auth error, redirect to sign in
+        if (response.status === 401) {
+          router.push("/signin?redirect=/shop&message=" + encodeURIComponent(payload.error || "Please sign in to checkout"));
+          return;
+        }
+        
         throw new Error(payload?.error || "Checkout failed.");
       }
 
@@ -70,6 +87,37 @@ export default function Header({
       alert(error instanceof Error ? error.message : "Checkout failed. Please try again.");
     } finally {
       setIsCheckoutLoading(false);
+    }
+  };
+
+  const handleRequestVerification = async () => {
+    if (!session?.user?.email || session.user.emailVerified) {
+      return;
+    }
+
+    setIsVerificationSending(true);
+    setVerificationMessage("");
+    setVerificationError("");
+
+    try {
+      const response = await fetch("/api/account/verify-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: session.user.email }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setVerificationError(payload?.error || "Failed to send verification email.");
+        return;
+      }
+
+      setVerificationMessage("Verification email sent. Please check your inbox.");
+    } catch {
+      setVerificationError("Failed to send verification email.");
+    } finally {
+      setIsVerificationSending(false);
     }
   };
 
@@ -261,7 +309,56 @@ export default function Header({
                         <p className="mt-2 text-sm text-[#6B6B6B]">
                           {session.user.email}
                         </p>
+                        <div className="mt-3 rounded-lg border border-[#D4E4E2] bg-[#F8FCFB] p-3">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-[#4D5A59]">
+                            Email Status
+                          </p>
+                          <p
+                            className={`mt-1 text-sm font-medium ${
+                              session.user.emailVerified ? "text-green-700" : "text-amber-700"
+                            }`}
+                          >
+                            {session.user.emailVerified ? "Verified" : "Not verified"}
+                          </p>
+                          {!session.user.emailVerified ? (
+                            <>
+                              <Button
+                                onClick={handleRequestVerification}
+                                disabled={isVerificationSending}
+                                variant="outline"
+                                className="mt-3 w-full gap-2 border-[#D4E4E2] text-[#09686E]"
+                              >
+                                <BadgeCheck className="w-4 h-4" />
+                                {isVerificationSending ? "Sending..." : "Verify Email"}
+                              </Button>
+                              {verificationMessage ? (
+                                <p className="mt-2 text-xs text-green-700">{verificationMessage}</p>
+                              ) : null}
+                              {verificationError ? (
+                                <p className="mt-2 text-xs text-red-600">{verificationError}</p>
+                              ) : null}
+                            </>
+                          ) : null}
+                        </div>
                       </div>
+                      <Link href="/account">
+                        <Button
+                          variant="outline"
+                          className="w-full gap-2 border-[#D4E4E2] text-[#09686E]"
+                        >
+                          <User className="w-4 h-4" />
+                          Account Settings
+                        </Button>
+                      </Link>
+                      <Link href="/orders">
+                        <Button
+                          variant="outline"
+                          className="w-full gap-2 border-[#D4E4E2] text-[#09686E]"
+                        >
+                          <Package className="w-4 h-4" />
+                          My Orders
+                        </Button>
+                      </Link>
                       <Button
                         onClick={async () => {
                           await signOut();
@@ -321,7 +418,7 @@ export default function Header({
                     </p>
                   </div>
                   {items.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-[#D4E4E2] bg-[#F8FCFB] p-5 text-sm text-[#6B6B6B]">
+                    <div className="rounded-lg border border-dashed border-[#D4E4E2] bg-[#F8FCFB] p-5 text-sm text-[#6B6B6B]">
                       When you add products, they will appear here with totals
                       and checkout.
                     </div>
@@ -431,7 +528,56 @@ export default function Header({
                         <p className="mt-2 text-sm text-[#6B6B6B]">
                           {session.user.email}
                         </p>
+                        <div className="mt-3 rounded-lg border border-[#D4E4E2] bg-[#F8FCFB] p-3">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-[#4D5A59]">
+                            Email Status
+                          </p>
+                          <p
+                            className={`mt-1 text-sm font-medium ${
+                              session.user.emailVerified ? "text-green-700" : "text-amber-700"
+                            }`}
+                          >
+                            {session.user.emailVerified ? "Verified" : "Not verified"}
+                          </p>
+                          {!session.user.emailVerified ? (
+                            <>
+                              <Button
+                                onClick={handleRequestVerification}
+                                disabled={isVerificationSending}
+                                variant="outline"
+                                className="mt-3 w-full gap-2 border-[#D4E4E2] text-[#09686E]"
+                              >
+                                <BadgeCheck className="w-4 h-4" />
+                                {isVerificationSending ? "Sending..." : "Verify Email"}
+                              </Button>
+                              {verificationMessage ? (
+                                <p className="mt-2 text-xs text-green-700">{verificationMessage}</p>
+                              ) : null}
+                              {verificationError ? (
+                                <p className="mt-2 text-xs text-red-600">{verificationError}</p>
+                              ) : null}
+                            </>
+                          ) : null}
+                        </div>
                       </div>
+                      <Link href="/account">
+                        <Button
+                          variant="outline"
+                          className="w-full gap-2 border-[#D4E4E2] text-[#09686E]"
+                        >
+                          <User className="w-4 h-4" />
+                          Account Settings
+                        </Button>
+                      </Link>
+                      <Link href="/orders">
+                        <Button
+                          variant="outline"
+                          className="w-full gap-2 border-[#D4E4E2] text-[#09686E]"
+                        >
+                          <Package className="w-4 h-4" />
+                          My Orders
+                        </Button>
+                      </Link>
                       <Button
                         onClick={async () => {
                           await signOut();
@@ -481,7 +627,7 @@ export default function Header({
                     </p>
                   </div>
                   {items.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-[#D4E4E2] bg-[#F8FCFB] p-5 text-sm text-[#6B6B6B]">
+                    <div className="rounded-lg border border-dashed border-[#D4E4E2] bg-[#F8FCFB] p-5 text-sm text-[#6B6B6B]">
                       When you add products, they will appear here with totals
                       and checkout.
                     </div>

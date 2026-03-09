@@ -137,7 +137,7 @@ export default function EnquiryDialog({
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-[#d7e3e2] rounded-lg text-[#0e2f31] placeholder-[#8b9493] focus:outline-none focus:ring-2 focus:ring-[#0f6f73]/50"
+                className="w-full px-3 py-2 border border-[#d7e3e2] rounded text-[#0e2f31] placeholder-[#8b9493] focus:outline-none focus:ring-2 focus:ring-[#0f6f73]/50"
                 placeholder="Your name"
                 disabled={isLoading}
               />
@@ -157,7 +157,7 @@ export default function EnquiryDialog({
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-[#d7e3e2] rounded-lg text-[#0e2f31] placeholder-[#8b9493] focus:outline-none focus:ring-2 focus:ring-[#0f6f73]/50"
+                className="w-full px-3 py-2 border border-[#d7e3e2] rounded text-[#0e2f31] placeholder-[#8b9493] focus:outline-none focus:ring-2 focus:ring-[#0f6f73]/50"
                 placeholder="your@email.com"
                 disabled={isLoading}
               />
@@ -176,7 +176,7 @@ export default function EnquiryDialog({
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-[#d7e3e2] rounded-lg text-[#0e2f31] placeholder-[#8b9493] focus:outline-none focus:ring-2 focus:ring-[#0f6f73]/50"
+                className="w-full px-3 py-2 border border-[#d7e3e2] rounded text-[#0e2f31] placeholder-[#8b9493] focus:outline-none focus:ring-2 focus:ring-[#0f6f73]/50"
                 placeholder="(281) 436-9245"
                 disabled={isLoading}
               />
@@ -195,7 +195,7 @@ export default function EnquiryDialog({
                 value={formData.message}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-3 py-2 border border-[#d7e3e2] rounded-lg text-[#0e2f31] placeholder-[#8b9493] focus:outline-none focus:ring-2 focus:ring-[#0f6f73]/50 resize-none"
+                className="w-full px-3 py-2 border border-[#d7e3e2] rounded text-[#0e2f31] placeholder-[#8b9493] focus:outline-none focus:ring-2 focus:ring-[#0f6f73]/50 resize-none"
                 placeholder="Tell us more about your inquiry..."
                 disabled={isLoading}
               />
@@ -205,14 +205,14 @@ export default function EnquiryDialog({
               <button
                 type="button"
                 onClick={() => onOpenChange(false)}
-                className="flex-1 px-4 py-2 text-sm font-medium text-[#0f6f73] border border-[#0f6f73] rounded-lg hover:bg-[#f6f4f0] disabled:opacity-50"
+                className="flex-1 px-4 py-2 text-sm font-medium text-[#0f6f73] border border-[#0f6f73] rounded hover:bg-[#f6f4f0] disabled:opacity-50"
                 disabled={isLoading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-[#0f6f73] rounded-lg hover:bg-[#0d5a5d] disabled:opacity-50"
+                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-[#0f6f73] rounded hover:bg-[#0d5a5d] disabled:opacity-50"
                 disabled={isLoading}
               >
                 {isLoading ? "Sending..." : "Send Enquiry"}

@@ -11,7 +11,7 @@ export default function ServicesLoading() {
             {Array.from({ length: 3 }).map((_, index) => (
               <div
                 key={index}
-                className="bg-[#F4F4F4] rounded-[12px] p-5 md:p-10 lg:p-[41px_20px] flex flex-col justify-between min-h-[874px] gap-9"
+                className="bg-[#F4F4F4] rounded-[16px] p-5 md:p-10 lg:p-[41px_20px] flex flex-col justify-between min-h-[874px] gap-9"
               >
                 <div className="flex flex-col gap-9">
                   <div className="flex flex-col gap-[30px]">
@@ -32,7 +32,7 @@ export default function ServicesLoading() {
                   <Skeleton className="h-[52px] w-full" />
                 </div>
 
-                <Skeleton className="h-[289px] w-full rounded-[12px]" />
+                <Skeleton className="h-[289px] w-full rounded-[16px]" />
               </div>
             ))}
           </div>

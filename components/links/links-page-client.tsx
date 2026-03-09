@@ -164,7 +164,7 @@ export default function LinksPageClient({
       </div>
 
       <div className="relative mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 pb-20 pt-14">
-        <section className="rounded-3xl border border-[#d7e3e2] bg-white/90 p-6 shadow-[0_20px_60px_-40px_rgba(0,0,0,0.35)] backdrop-blur">
+        <section className="rounded-lg border border-[#d7e3e2] bg-white/90 p-6 shadow-[0_20px_60px_-40px_rgba(0,0,0,0.35)] backdrop-blur">
           <div className="flex flex-col items-center gap-6 text-center">
             <div className="relative h-28 w-28 overflow-hidden rounded-full border-4 border-white shadow-xl">
               <Image
@@ -221,13 +221,13 @@ export default function LinksPageClient({
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[#0f6f73]/30 bg-[#0f6f73] px-5 py-4 text-white shadow-lg">
+        <section className="rounded-md border border-[#0f6f73]/30 bg-[#0f6f73] px-5 py-4 text-white shadow-lg">
           <button
             onClick={() => {
               setOpenDialog("blog");
               trackLink("Conference Blog", "conference", "conference-blog");
             }}
-            className="w-full flex flex-col gap-1 transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded text-left"
+            className="w-full flex flex-col gap-1 transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-lg text-left"
           >
             <p className="text-sm uppercase tracking-[0.3em] text-white/70">
               {conferenceHeading}
@@ -264,7 +264,7 @@ export default function LinksPageClient({
               <button
                 key={link.title}
                 onClick={handleClick}
-                className={`group flex flex-col gap-2 rounded-2xl border px-5 py-4 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0f6f73]/60 text-left ${
+                className={`group flex flex-col gap-2 rounded-md border px-5 py-4 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0f6f73]/60 text-left ${
                   link.highlight
                     ? "border-[#0f6f73] bg-[#0f6f73] text-white shadow-xl hover:shadow-2xl"
                     : "border-[#d7e3e2] bg-white/95 text-[#0e2f31] shadow-md hover:-translate-y-0.5 hover:shadow-lg"
@@ -310,7 +310,7 @@ export default function LinksPageClient({
                 key={link.title}
                 href={trackedHref}
                 onClick={() => trackLink(link.title, "primary", trackedHref)}
-                className={`group flex flex-col gap-2 rounded-2xl border px-5 py-4 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0f6f73]/60 ${
+                className={`group flex flex-col gap-2 rounded-md border px-5 py-4 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0f6f73]/60 ${
                   link.highlight
                     ? "border-[#0f6f73] bg-[#0f6f73] text-white shadow-xl"
                     : "border-[#d7e3e2] bg-white/95 text-[#0e2f31] shadow-md hover:-translate-y-0.5 hover:shadow-lg"
@@ -355,7 +355,7 @@ export default function LinksPageClient({
           })}
         </section>
 
-        <section className="rounded-2xl border border-[#d7e3e2] bg-white/90 p-6 shadow-md">
+        <section className="rounded-md border border-[#d7e3e2] bg-white/90 p-6 shadow-md">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-[#0e2f31]">
               Follow + Reviews
@@ -374,7 +374,7 @@ export default function LinksPageClient({
                   key={link.title}
                   href={trackedHref}
                   onClick={() => trackLink(link.title, "social", trackedHref)}
-                  className="flex items-center justify-between rounded-xl border border-[#edf2f1] px-4 py-3 text-sm font-semibold text-[#0e2f31] transition hover:border-[#0f6f73]/40 hover:text-[#0f6f73]"
+                  className="flex items-center justify-between rounded-lg border border-[#edf2f1] px-4 py-3 text-sm font-semibold text-[#0e2f31] transition hover:border-[#0f6f73]/40 hover:text-[#0f6f73]"
                 >
                   <span className="inline-flex items-center gap-2">
                     {IconComponent && <IconComponent className="h-4 w-4" />}

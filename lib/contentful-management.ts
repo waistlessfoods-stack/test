@@ -302,6 +302,16 @@ export type RecipesPageData = {
   recipes: Recipe[];
 };
 
+export type ShopPageData = {
+  bannerImagePath: string;
+  bannerTitle: string;
+  bannerDescription: string;
+  bannerFeaturedImage1Path: string;
+  bannerFeaturedImage2Path: string;
+  categories: RecipeCategory[];
+  recipes: Recipe[];
+};
+
 // Helper mappers
 const mapFeatureItem = async (
   entry: {
@@ -754,6 +764,160 @@ async function fetchRecipesPageFromContentfulRaw(): Promise<RecipesPageData | nu
   }
 }
 
+async function fetchShopPageFromContentfulRaw(): Promise<ShopPageData | null> {
+  const config = getContentfulConfig();
+  if (!config) {
+    console.log("[fetchShopPage] No Contentful config found");
+    return null;
+  }
+
+  try {
+    const environment = await getContentfulEnvironment(config);
+
+    // Fetch the shop page entry
+    const entries = await environment.getEntries({
+      content_type: "shopPage",
+      limit: 1,
+    });
+
+    console.log("[fetchShopPage] Found", entries.items.length, "entries");
+
+    const entry = entries.items[0];
+    if (!entry) {
+      return null;
+    }
+
+    const fields = entry.fields;
+
+    // Fetch asset URLs for images
+    let bannerImagePath = "";
+    const bannerImageRef = fields.bannerImage?.[DEFAULT_LOCALE] as any;
+    if (bannerImageRef?.sys?.id) {
+      try {
+        const asset = await environment.getAsset(bannerImageRef.sys.id);
+        bannerImagePath = getAssetUrl(asset);
+      } catch (error) {
+        console.error(`Failed to fetch banner image:`, error);
+      }
+    }
+
+    let bannerFeaturedImage1Path = "";
+    const bannerFeaturedImage1Ref = fields.bannerFeaturedImage1?.[DEFAULT_LOCALE] as any;
+    if (bannerFeaturedImage1Ref?.sys?.id) {
+      try {
+        const asset = await environment.getAsset(bannerFeaturedImage1Ref.sys.id);
+        bannerFeaturedImage1Path = getAssetUrl(asset);
+      } catch (error) {
+        console.error(`Failed to fetch banner featured image 1:`, error);
+      }
+    }
+
+    let bannerFeaturedImage2Path = "";
+    const bannerFeaturedImage2Ref = fields.bannerFeaturedImage2?.[DEFAULT_LOCALE] as any;
+    if (bannerFeaturedImage2Ref?.sys?.id) {
+      try {
+        const asset = await environment.getAsset(bannerFeaturedImage2Ref.sys.id);
+        bannerFeaturedImage2Path = getAssetUrl(asset);
+      } catch (error) {
+        console.error(`Failed to fetch banner featured image 2:`, error);
+      }
+    }
+
+    // Map categories
+    const categoryRefs = (fields.categories?.[DEFAULT_LOCALE] as any[]) || [];
+    const categoryResults = await Promise.all(
+      categoryRefs.map(async (ref) => {
+        try {
+          const linkedEntry = await environment.getEntry(ref.sys.id);
+          const catFields = linkedEntry.fields;
+
+          let categoryImagePath = "";
+          const categoryImageRef = catFields.image?.[DEFAULT_LOCALE] as any;
+          if (categoryImageRef?.sys?.id) {
+            try {
+              const asset = await environment.getAsset(categoryImageRef.sys.id);
+              categoryImagePath = getAssetUrl(asset);
+            } catch (error) {
+              console.error(`Failed to fetch category image:`, error);
+            }
+          }
+
+          return {
+            id: linkedEntry.sys.id,
+            name: String(catFields.name?.[DEFAULT_LOCALE] ?? ""),
+            imagePath: categoryImagePath,
+            sortOrder: Number(catFields.sortOrder?.[DEFAULT_LOCALE] ?? 0),
+          };
+        } catch (error) {
+          console.error(`Failed to fetch category ${ref.sys.id}:`, error);
+          return null;
+        }
+      })
+    );
+    const categories = categoryResults.filter(
+      (item): item is RecipeCategory => item !== null
+    );
+
+    // Map recipes
+    const recipeRefs = (fields.recipes?.[DEFAULT_LOCALE] as any[]) || [];
+    const recipeResults = await Promise.all(
+      recipeRefs.map(async (ref) => {
+        try {
+          const linkedEntry = await environment.getEntry(ref.sys.id);
+          const recipeFields = linkedEntry.fields;
+
+          let recipeImagePath = "";
+          const recipeImageRef = recipeFields.image?.[DEFAULT_LOCALE] as any;
+          if (recipeImageRef?.sys?.id) {
+            try {
+              const asset = await environment.getAsset(recipeImageRef.sys.id);
+              recipeImagePath = getAssetUrl(asset);
+            } catch (error) {
+              console.error(`Failed to fetch recipe image:`, error);
+            }
+          }
+
+          const title = String(recipeFields.title?.[DEFAULT_LOCALE] ?? "");
+          return {
+            id: linkedEntry.sys.id,
+            slug: generateSlug(title),
+            title,
+            price: String(recipeFields.price?.[DEFAULT_LOCALE] ?? ""),
+            description: String(recipeFields.description?.[DEFAULT_LOCALE] ?? ""),
+            imagePath: recipeImagePath,
+            sortOrder: Number(recipeFields.sortOrder?.[DEFAULT_LOCALE] ?? 0),
+            categoryId: recipeFields.category?.[DEFAULT_LOCALE]?.sys?.id,
+            featured: Boolean(recipeFields.featured?.[DEFAULT_LOCALE] ?? false),
+          };
+        } catch (error) {
+          console.error(`Failed to fetch recipe ${ref.sys.id}:`, error);
+          return null;
+        }
+      })
+    );
+    const recipes = recipeResults.filter(
+      (item): item is NonNullable<typeof item> => item !== null
+    );
+
+    // Sort by sortOrder
+    categories.sort((a, b) => a.sortOrder - b.sortOrder);
+    recipes.sort((a, b) => a.sortOrder - b.sortOrder);
+
+    return {
+      bannerImagePath,
+      bannerTitle: String(fields.bannerTitle?.[DEFAULT_LOCALE] ?? ""),
+      bannerDescription: String(fields.bannerDescription?.[DEFAULT_LOCALE] ?? ""),
+      bannerFeaturedImage1Path,
+      bannerFeaturedImage2Path,
+      categories,
+      recipes,
+    };
+  } catch (error) {
+    console.error("Error fetching shop page from Contentful:", error);
+    return null;
+  }
+}
+
 async function fetchHeaderSettingsFromContentfulRaw(): Promise<HeaderSettings | null> {
   const config = getContentfulConfig();
   if (!config) {
@@ -818,6 +982,12 @@ export const fetchRecipesPageFromContentful = unstable_cache(
   fetchRecipesPageFromContentfulRaw,
   ["contentful-recipes-page"],
   { revalidate: 300, tags: ["recipes-page"] }
+);
+
+export const fetchShopPageFromContentful = unstable_cache(
+  fetchShopPageFromContentfulRaw,
+  ["contentful-shop-page"],
+  { revalidate: 300, tags: ["shop-page"] }
 );
 
 export const fetchServiceDetailFromContentful = unstable_cache(

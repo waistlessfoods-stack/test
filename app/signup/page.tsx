@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signUp } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,14 @@ import { Container } from "@/components/ui/container";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  const redirect = searchParams.get("redirect") || "/";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +30,7 @@ export default function SignUpPage() {
         password,
         name,
       });
-      router.push("/");
+      router.push(redirect);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create account");
@@ -39,11 +42,11 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen bg-[#F4F4F4] py-20">
       <Container className="max-w-md">
-        <div className="bg-white rounded-3xl p-8 shadow-lg">
+        <div className="bg-white rounded p-8 shadow-lg">
           <h1 className="text-4xl font-bold text-center mb-8 text-black">Create Account</h1>
           
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
               {error}
             </div>
           )}
@@ -60,7 +63,7 @@ export default function SignUpPage() {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="John Doe"
                 required
-                className="w-full h-12 px-4 rounded-lg border-gray-300"
+                className="w-full h-12 px-4 rounded border-gray-300"
               />
             </div>
 
@@ -75,7 +78,7 @@ export default function SignUpPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full h-12 px-4 rounded-lg border-gray-300"
+                className="w-full h-12 px-4 rounded border-gray-300"
               />
             </div>
 
@@ -91,7 +94,7 @@ export default function SignUpPage() {
                 placeholder="••••••••"
                 required
                 minLength={8}
-                className="w-full h-12 px-4 rounded-lg border-gray-300"
+                className="w-full h-12 px-4 rounded border-gray-300"
               />
               <p className="mt-1 text-xs text-gray-500">Must be at least 8 characters</p>
             </div>
@@ -99,7 +102,7 @@ export default function SignUpPage() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full h-12 bg-[#00676E] hover:bg-[#00575e] text-white font-bold text-lg rounded-lg"
+              className="w-full h-12 bg-[#00676E] hover:bg-[#00575e] text-white font-bold text-lg rounded"
             >
               {isLoading ? "Creating account..." : "Create Account"}
             </Button>
@@ -107,7 +110,10 @@ export default function SignUpPage() {
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Already have an account?{" "}
-            <Link href="/signin" className="text-[#00676E] font-semibold hover:underline">
+            <Link 
+              href={`/signin${redirect !== "/" ? `?redirect=${encodeURIComponent(redirect)}` : ""}`}
+              className="text-[#00676E] font-semibold hover:underline"
+            >
               Sign in
             </Link>
           </div>

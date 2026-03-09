@@ -67,7 +67,7 @@ export default function ServiceDetailClient({
 
       <div className="flex flex-col lg:flex-row gap-[53px] items-start">
         <section className="w-full lg:w-[557px] flex flex-col gap-[25px]">
-          <div className="relative w-full lg:w-[557px] aspect-557/642 rounded-[12px] overflow-hidden">
+          <div className="relative w-full lg:w-[557px] aspect-557/642 rounded-[16px] overflow-hidden">
             <Image
               src={service.images.main}
               alt={`${service.title} main image`}
@@ -82,7 +82,7 @@ export default function ServiceDetailClient({
             {service.images.gallery.map((image, index) => (
               <div
                 key={image}
-                className="relative aspect-square rounded-[6px] overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all group"
+                className="relative aspect-square rounded-[16px] overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all group"
               >
                 <Image
                   src={image}
@@ -100,7 +100,7 @@ export default function ServiceDetailClient({
               Ratings & Reviews
             </h2>
 
-            <div className="bg-gray-50 rounded-2xl p-6 mb-6 flex items-center justify-between">
+            <div className="bg-gray-50 rounded-md p-6 mb-6 flex items-center justify-between">
               <div className="flex flex-col gap-2">
                 <div className="flex items-end gap-3">
                   <span className="text-4xl font-semibold text-black">
@@ -119,7 +119,7 @@ export default function ServiceDetailClient({
                   Based on {service.reviews.totalReviews} reviews
                 </p>
               </div>
-              <button className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium hover:bg-gray-100 transition">
+              <button className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-100 transition">
                 Write a review
               </button>
             </div>
@@ -130,7 +130,7 @@ export default function ServiceDetailClient({
                 .map((review, idx) => (
                   <div
                     key={`${review.name}-${idx}`}
-                    className="border border-gray-100 rounded-2xl p-5 hover:shadow-sm transition"
+                    className="border border-gray-100 rounded-md p-5 hover:shadow-sm transition"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex flex-col">
@@ -160,7 +160,7 @@ export default function ServiceDetailClient({
             {visibleCount < service.reviews.items.length && (
               <button
                 onClick={() => setVisibleCount((prev) => prev + 2)}
-                className="w-full mt-4 py-3 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50 transition"
+                className="w-full mt-4 py-3 rounded-lg border border-gray-200 text-sm font-medium hover:bg-gray-50 transition"
               >
                 Load more reviews
               </button>
@@ -213,7 +213,7 @@ export default function ServiceDetailClient({
             </article>
           </div>
 
-          <button className="w-[148px] h-14 flex items-center justify-center bg-[#388082] rounded-[12px] hover:opacity-90 transition-all active:scale-95">
+          <button className="w-[148px] h-14 flex items-center justify-center bg-[#388082] rounded-[16px] hover:opacity-90 transition-all active:scale-95">
             <span className="font-['Helvetica_Neue'] font-medium text-[22px] leading-[110%] tracking-[-2%] text-white">
               Book now
             </span>

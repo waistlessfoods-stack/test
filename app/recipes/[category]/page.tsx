@@ -49,7 +49,7 @@ export default async function RecipesPage({ params, searchParams }: RecipesPageP
           <div className="flex flex-col lg:flex-row gap-14 2xl:gap-8">
             {/* Left Side - Image */}
             <div className="w-full lg:w-1/2 flex items-center">
-              <div className="relative w-full aspect-square lg:aspect-auto lg:h-[642px] rounded-xl 2xl:rounded-lg overflow-hidden bg-[#E9E9E9] shadow-lg">
+              <div className="relative w-full aspect-square lg:aspect-auto lg:h-[642px] rounded-lg 2xl:rounded-lg overflow-hidden bg-[#E9E9E9] shadow-lg">
                 <Image
                   src={recipeData.imagePath}
                   alt={recipeData.title}
@@ -78,7 +78,7 @@ export default async function RecipesPage({ params, searchParams }: RecipesPageP
               </div>
 
               {/* Price Box */}
-              <div className="bg-[#F7F7F7] rounded-xl 2xl:rounded-lg p-5 2xl:p-4">
+              <div className="bg-[#F7F7F7] rounded-lg 2xl:rounded-lg p-5 2xl:p-4">
                 <div className="flex flex-col gap-5 2xl:gap-4">
                   {/* Price Row */}
                   <div className="flex items-center justify-between">

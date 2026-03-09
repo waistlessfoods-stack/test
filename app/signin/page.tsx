@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,21 @@ import { Container } from "@/components/ui/container";
 
 export default function SignInPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [infoMessage, setInfoMessage] = useState("");
+  
+  const redirect = searchParams.get("redirect") || "/";
+  const message = searchParams.get("message");
+
+  useEffect(() => {
+    if (message) {
+      setInfoMessage(decodeURIComponent(message));
+    }
+  }, [message]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,11 +32,17 @@ export default function SignInPage() {
     setError("");
 
     try {
-      await signIn.email({
+      const result = await signIn.email({
         email,
         password,
       });
-      router.push("/");
+
+      if (result?.error) {
+        setError(result.error.message || "Invalid email or password");
+        return;
+      }
+
+      router.push(redirect);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to sign in");
@@ -37,11 +54,17 @@ export default function SignInPage() {
   return (
     <div className="min-h-screen bg-[#F4F4F4] py-20">
       <Container className="max-w-md">
-        <div className="bg-white rounded-3xl p-8 shadow-lg">
+        <div className="bg-white rounded p-8 shadow-lg">
           <h1 className="text-4xl font-bold text-center mb-8 text-black">Sign In</h1>
           
+          {infoMessage && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded text-blue-700 text-sm">
+              {infoMessage}
+            </div>
+          )}
+          
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
               {error}
             </div>
           )}
@@ -58,7 +81,7 @@ export default function SignInPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full h-12 px-4 rounded-lg border-gray-300"
+                className="w-full h-12 px-4 rounded border-gray-300"
               />
             </div>
 
@@ -73,14 +96,14 @@ export default function SignInPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full h-12 px-4 rounded-lg border-gray-300"
+                className="w-full h-12 px-4 rounded border-gray-300"
               />
             </div>
 
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full h-12 bg-[#00676E] hover:bg-[#00575e] text-white font-bold text-lg rounded-lg"
+              className="w-full h-12 bg-[#00676E] hover:bg-[#00575e] text-white font-bold text-lg rounded"
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
@@ -88,7 +111,10 @@ export default function SignInPage() {
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{" "}
-            <Link href="/signup" className="text-[#00676E] font-semibold hover:underline">
+            <Link 
+              href={`/signup${redirect !== "/" ? `?redirect=${encodeURIComponent(redirect)}` : ""}`} 
+              className="text-[#00676E] font-semibold hover:underline"
+            >
               Sign up
             </Link>
           </div>

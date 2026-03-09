@@ -31,7 +31,7 @@ export default function ServicesClientPage({
             {services.map((service, index) => (
               <div
                 key={index}
-                className="bg-[#F4F4F4] rounded-[12px] p-3 md:p-4 lg:p-4 flex flex-col justify-between gap-3"
+                className="bg-[#F4F4F4] rounded-[16px] p-3 md:p-4 lg:p-4 flex flex-col justify-between gap-3"
               >
                 <div className="flex flex-col gap-3 flex-1">
                   <div className="flex flex-col gap-2">
@@ -61,13 +61,13 @@ export default function ServicesClientPage({
 
                   <Button
                     asChild
-                    className="w-full h-9 border border-[#00676E] bg-white rounded-[6px] font-sans font-bold text-[14px] uppercase tracking-wide text-[#00676E] transition-all hover:bg-[#00676E] hover:text-white active:scale-[0.97] mt-auto"
+                    className="w-full h-9 border border-[#00676E] bg-white rounded-[16px] font-sans font-bold text-[14px] uppercase tracking-wide text-[#00676E] transition-all hover:bg-[#00676E] hover:text-white active:scale-[0.97] mt-auto"
                   >
                     <Link href={`/services/${service.slug}`}>Learn More</Link>
                   </Button>
                 </div>
 
-                <div className="relative w-full h-36 overflow-hidden rounded-[12px]">
+                <div className="relative w-full h-36 overflow-hidden rounded-[16px]">
                   <Image
                     src={service.image}
                     alt={service.title}

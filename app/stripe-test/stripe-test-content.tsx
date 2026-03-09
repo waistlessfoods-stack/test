@@ -43,7 +43,7 @@ export default function StripeTestContent() {
 
   return (
     <main className="min-h-screen bg-[#F8F6F2] px-6 py-16 text-[#1C1C1C]">
-      <div className="mx-auto w-full max-w-xl rounded-2xl border border-[#E3DDD3] bg-white p-8 shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
+      <div className="mx-auto w-full max-w-xl rounded-md border border-[#E3DDD3] bg-white p-8 shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
         <h1 className="text-3xl font-semibold tracking-tight">
           Stripe Checkout Test
         </h1>
@@ -52,19 +52,19 @@ export default function StripeTestContent() {
         </p>
 
         {isSuccess && (
-          <div className="mt-6 rounded-xl border border-[#CDE7D6] bg-[#EFFAF3] px-4 py-3 text-sm text-[#1B5E3C]">
+          <div className="mt-6 rounded-lg border border-[#CDE7D6] bg-[#EFFAF3] px-4 py-3 text-sm text-[#1B5E3C]">
             Payment succeeded. You can run another test.
           </div>
         )}
 
         {isCanceled && (
-          <div className="mt-6 rounded-xl border border-[#F4D0C6] bg-[#FFF5F2] px-4 py-3 text-sm text-[#8B3E2B]">
+          <div className="mt-6 rounded-lg border border-[#F4D0C6] bg-[#FFF5F2] px-4 py-3 text-sm text-[#8B3E2B]">
             Checkout was canceled. Try again when ready.
           </div>
         )}
 
         {errorMessage && (
-          <div className="mt-6 rounded-xl border border-[#F4D0C6] bg-[#FFF5F2] px-4 py-3 text-sm text-[#8B3E2B]">
+          <div className="mt-6 rounded-lg border border-[#F4D0C6] bg-[#FFF5F2] px-4 py-3 text-sm text-[#8B3E2B]">
             {errorMessage}
           </div>
         )}
@@ -73,7 +73,7 @@ export default function StripeTestContent() {
           type="button"
           onClick={startCheckout}
           disabled={isLoading}
-          className="mt-8 w-full rounded-xl bg-[#1B5E3C] px-5 py-3 text-base font-semibold text-white shadow-md transition hover:bg-[#174E33] disabled:cursor-not-allowed disabled:bg-[#A7B4A9]"
+          className="mt-8 w-full rounded-lg bg-[#1B5E3C] px-5 py-3 text-base font-semibold text-white shadow-md transition hover:bg-[#174E33] disabled:cursor-not-allowed disabled:bg-[#A7B4A9]"
         >
           {isLoading ? "Redirecting..." : "Start Checkout"}
         </button>

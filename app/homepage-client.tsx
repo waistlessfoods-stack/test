@@ -277,12 +277,12 @@ export default function HomepageClient({ data }: HomepageClientProps) {
             opts={{ align: "start", loop: true }}
             className="relative w-full"
           >
-            <div className="hidden md:block absolute -top-8 -right-8 w-full h-full border-4 border-[#16B0B9] rounded-xl z-50 pointer-events-none" />
+            <div className="hidden md:block absolute -top-8 -right-8 w-full h-full border-4 border-[#16B0B9] rounded-lg z-50 pointer-events-none" />
 
             <CarouselContent className="z-10">
               {data.testimonials.map((item: Testimonial) => (
                 <CarouselItem key={item.id}>
-                  <div className="w-full min-h-[450px] md:min-h-[409px] bg-white/85 backdrop-blur-[10px] shadow-lg flex items-center justify-center border border-white/20 rounded-xl p-6 md:p-12">
+                  <div className="w-full min-h-[450px] md:min-h-[409px] bg-white/85 backdrop-blur-[10px] shadow-lg flex items-center justify-center border border-white/20 rounded-lg p-6 md:p-12">
                     <div className="w-full max-w-[997px] flex flex-col items-center gap-6">
                       <h3
                         className="text-[24px] md:text-[30px] font-normal leading-tight tracking-tight text-[#5B5B5B] text-center uppercase"

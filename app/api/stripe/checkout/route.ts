@@ -1,5 +1,8 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { orders } from "@/lib/db/schema";
 
 const stripeSecretKey =
     process.env.sandbox_secret_key_stripe || process.env.STRIPE_SECRET_KEY;
@@ -17,6 +20,18 @@ export async function POST(request: Request) {
   }
 
   try {
+    // Check authentication
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
+
+    if (!session) {
+      return NextResponse.json(
+        { error: "You must be signed in to checkout. Please sign in or create an account." },
+        { status: 401 },
+      );
+    }
+
     const origin = request.headers.get("origin") || "http://localhost:3000";
     const body = await request.json();
     const { items } = body;
@@ -48,15 +63,39 @@ export async function POST(request: Request) {
           },
         ];
 
-    const session = await stripe.checkout.sessions.create({
+    // Calculate total amount
+    const totalAmount = lineItems.reduce(
+      (sum, item) => sum + item.quantity * item.price_data.unit_amount,
+      0
+    );
+
+    const stripeSession = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
       line_items: lineItems,
-      success_url: `${origin}/stripe-test?success=1`,
-      cancel_url: `${origin}/stripe-test?canceled=1`,
+      customer_email: session.user.email,
+      metadata: {
+        userId: session.user.id,
+      },
+      success_url: `${origin}/orders?success=1`,
+      cancel_url: `${origin}/shop?canceled=1`,
     });
 
-    return NextResponse.json({ url: session.url });
+    // Create pending order in database
+    await db.insert(orders).values({
+      userId: session.user.id,
+      stripeSessionId: stripeSession.id,
+      status: "pending",
+      amount: totalAmount,
+      currency: "usd",
+      items: items || [],
+      customerEmail: session.user.email,
+      metadata: {
+        sessionUrl: stripeSession.url,
+      },
+    });
+
+    return NextResponse.json({ url: stripeSession.url });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Unable to create session.";
