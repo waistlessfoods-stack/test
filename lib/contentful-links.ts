@@ -1,121 +1,75 @@
-import { createClient } from "contentful-management";
+import { createClient } from "contentful";
 import { unstable_cache } from "next/cache";
 
-const DEFAULT_LOCALE = "en-US";
+// --- Config ---
 
 type ContentfulConfig = {
   accessToken: string;
   spaceId: string;
-  environmentId: string;
 };
 
-const environmentPromiseCache = new Map<string, Promise<ContentfulEnvironment>>();
-
-type ContentfulEnvironment = {
-  getEntries: (query: Record<string, unknown>) => Promise<{ items: any[] }>;
-  getAsset: (id: string) => Promise<{
-    fields?: {
-      file?: Record<string, { url?: string } | undefined>;
-    };
-  }>;
-};
-
-const normalizeAssetUrl = (url: string): string =>
-  url.startsWith("//") ? `https:${url}` : url;
-
-const extractAssetUrl = (asset: {
-  fields?: {
-    file?: Record<string, { url?: string } | undefined>;
-  };
-}): string | null => {
-  const fileByLocale = asset.fields?.file;
-  const url = fileByLocale?.[DEFAULT_LOCALE]?.url;
-
-  if (typeof url !== "string" || url.length === 0) {
-    return null;
-  }
-
-  return normalizeAssetUrl(url);
-};
-
-const resolveAssetUrl = async (
-  value: unknown,
-  environment: ContentfulEnvironment
-): Promise<string | null> => {
-  if (!value || typeof value !== "object") {
-    return null;
-  }
-
-  const asset = value as {
-    sys?: { id?: string };
-    fields?: {
-      file?: Record<string, { url?: string } | undefined>;
-    };
-  };
-
-  const directUrl = extractAssetUrl(asset);
-  if (directUrl) {
-    return directUrl;
-  }
-
-  const assetId = asset.sys?.id;
-  if (!assetId) {
-    return null;
-  }
-
-  try {
-    const fetchedAsset = await environment.getAsset(assetId);
-    return extractAssetUrl(fetchedAsset);
-  } catch {
-    return null;
-  }
-};
-
-function getContentfulConfig() {
-  const accessToken = process.env.CMA_CONTENTFUL;
+function getContentfulConfig(): ContentfulConfig | null {
+  const accessToken =
+    process.env.CONTENTFUL_DELIVERY_TOKEN ||
+    process.env.NEXT_PUBLIC_CONTENTFUL_DELIVERY_TOKEN;
   const spaceId =
     process.env.Contentful_space_id || process.env.CONTENTFUL_SPACE_ID;
-  const environmentId =
-    process.env.Contentful_environment ||
-    process.env.CONTENTFUL_ENVIRONMENT ||
-    "master";
 
   if (!accessToken || !spaceId) {
     return null;
   }
 
-  return { accessToken, spaceId, environmentId };
+  return { accessToken, spaceId };
 }
 
-function getEnvironmentCacheKey(config: ContentfulConfig): string {
-  return `${config.spaceId}:${config.environmentId}:${config.accessToken.slice(0, 8)}`;
+function createContentfulClient(config: ContentfulConfig) {
+  return createClient({ space: config.spaceId, accessToken: config.accessToken });
 }
 
-async function getContentfulEnvironment(
-  config: ContentfulConfig
-): Promise<ContentfulEnvironment> {
-  const cacheKey = getEnvironmentCacheKey(config);
-  const existingPromise = environmentPromiseCache.get(cacheKey);
+// --- Asset URL helper ---
 
-  if (existingPromise) {
-    return existingPromise;
+function getAssetUrl(asset: any): string {
+  const url = asset?.fields?.file?.url;
+  if (!url || typeof url !== "string") return "";
+  return url.startsWith("//") ? `https:${url}` : url;
+}
+
+// --- Error handling ---
+
+const contentfulWarningsShown = new Set<string>();
+
+function logContentfulFetchError(context: string, error: unknown): void {
+  if (!error || typeof error !== "object") {
+    console.error(context, error);
+    return;
   }
 
-  const environmentPromise = (async () => {
-    const client = createClient({ accessToken: config.accessToken });
-    const space = await client.getSpace(config.spaceId);
-    return (await space.getEnvironment(config.environmentId)) as ContentfulEnvironment;
-  })();
+  const maybeError = error as { message?: unknown; status?: unknown };
+  const status = maybeError.status;
+  const message = typeof maybeError.message === "string" ? maybeError.message : "";
 
-  environmentPromiseCache.set(cacheKey, environmentPromise);
-
-  try {
-    return await environmentPromise;
-  } catch (error) {
-    environmentPromiseCache.delete(cacheKey);
-    throw error;
+  if (
+    status === 401 ||
+    status === 403 ||
+    message.includes("AccessTokenInvalid") ||
+    message.includes("invalid_token")
+  ) {
+    const key = "contentful-auth";
+    if (!contentfulWarningsShown.has(key)) {
+      contentfulWarningsShown.add(key);
+      console.warn(
+        "Contentful Delivery API token is invalid or missing. " +
+          "Set CONTENTFUL_DELIVERY_TOKEN in your .env. " +
+          "Falling back to default links page content."
+      );
+    }
+    return;
   }
+
+  console.error(context, error);
 }
+
+// ===== TYPES =====
 
 export type LinksPageLink = {
   id: string;
@@ -148,131 +102,68 @@ export type LinksPageData = {
   footerText: string;
 };
 
-const mapLinksPageData = (entry: {
-  sys: { id: string };
-  fields: Record<string, Record<string, unknown>>;
-}): LinksPageData => {
-  const fields = entry.fields;
-  const primaryLinksReferences = fields.primaryLinksReferences?.[
-    DEFAULT_LOCALE
-  ] as Array<{ sys?: { id: string } }> | undefined;
-
-  return {
-    profileName: String(fields.profileName?.[DEFAULT_LOCALE] ?? ""),
-    profileTagline: String(fields.profileTagline?.[DEFAULT_LOCALE] ?? ""),
-    profileDescription: String(
-      fields.profileDescription?.[DEFAULT_LOCALE] ?? ""
-    ),
-    profilePhone: String(fields.profilePhone?.[DEFAULT_LOCALE] ?? ""),
-    profileEmail: String(fields.profileEmail?.[DEFAULT_LOCALE] ?? ""),
-    profileImageUrl: "",
-    conferenceHeading: String(fields.conferenceHeading?.[DEFAULT_LOCALE] ?? ""),
-    conferenceSubheading: String(
-      fields.conferenceSubheading?.[DEFAULT_LOCALE] ?? ""
-    ),
-    primaryLinks:
-      primaryLinksReferences?.map((link) => ({
-        id: link.sys?.id ?? "",
-        title: "",
-        description: "",
-        href: "",
-        highlight: false,
-        icon: "",
-        sortOrder: 0,
-      })) || [],
-    socialLinks: (fields.socialLinks?.[DEFAULT_LOCALE] as SocialLink[]) || [],
-    footerText: String(fields.footerText?.[DEFAULT_LOCALE] ?? ""),
-  };
-};
+// ===== FETCHER =====
 
 async function fetchLinksPageFromContentfulRaw(): Promise<LinksPageData | null> {
+  console.log("[Contentful] fetchLinksPage: start");
   const config = getContentfulConfig();
   if (!config) {
+    console.log("[Contentful] fetchLinksPage: no config, skipping");
     return null;
   }
 
   try {
-    const environment = await getContentfulEnvironment(config);
-
-    // Fetch the links page entry
-    const entries = await environment.getEntries({
+    const client = createContentfulClient(config);
+    // include:2 resolves profileImage (asset) and primaryLinksReferences (entries) in one request
+    const entries = await client.getEntries({
       content_type: "linksPage",
+      include: 2,
       limit: 1,
-    });
-
-    const linksPageEntry = entries.items[0];
-    if (!linksPageEntry) {
+    } as any);
+    const entry = entries.items[0];
+    if (!entry) {
+      console.log("[Contentful] fetchLinksPage: no entry found");
       return null;
     }
+    console.log("[Contentful] fetchLinksPage: entry found", entry.sys.id);
 
-    const linksPageData = mapLinksPageData(
-      linksPageEntry as {
-        sys: { id: string };
-        fields: Record<string, Record<string, unknown>>;
-      }
-    );
+    const f = entry.fields as any;
 
-    const profileImageAsset = linksPageEntry.fields.profileImage?.[
-      DEFAULT_LOCALE
-    ] as unknown;
+    const primaryLinks: LinksPageLink[] = ((f.primaryLinksReferences as any[]) || [])
+      .map((e: any) => ({
+        id: e.sys.id,
+        title: String(e.fields?.title ?? ""),
+        description: String(e.fields?.description ?? ""),
+        href: String(e.fields?.href ?? ""),
+        highlight: Boolean(e.fields?.highlight ?? false),
+        icon: String(e.fields?.icon ?? ""),
+        sortOrder: Number(e.fields?.sortOrder ?? 0),
+        hidden: Boolean(e.fields?.hidden ?? false),
+      }))
+      .sort((a, b) => a.sortOrder - b.sortOrder);
 
-    const profileImageUrl = await resolveAssetUrl(
-      profileImageAsset,
-      environment as ContentfulEnvironment
-    );
-
-    if (profileImageUrl) {
-      linksPageData.profileImageUrl = profileImageUrl;
-    }
-
-    // Fetch referenced link entries
-    const primaryLinksReferences = (
-      linksPageEntry.fields.primaryLinksReferences?.[DEFAULT_LOCALE] || []
-    ) as Array<{ sys?: { id: string } }>;
-
-    const primaryLinksIds = primaryLinksReferences
-      .map((ref) => ref.sys?.id)
-      .filter((id) => id !== undefined);
-
-    if (primaryLinksIds.length > 0) {
-      const linksEntries = await environment.getEntries({
-        content_type: "linksPageLink",
-        "sys.id[in]": primaryLinksIds.join(","),
-      });
-
-      // Map the entries and sort them
-      const primaryLinksMap = new Map<string, LinksPageLink>();
-      linksEntries.items.forEach((linkEntry) => {
-        const fields = linkEntry.fields;
-        const link: LinksPageLink = {
-          id: linkEntry.sys.id,
-          title: String(fields.title?.[DEFAULT_LOCALE] ?? ""),
-          description: String(fields.description?.[DEFAULT_LOCALE] ?? ""),
-          href: String(fields.href?.[DEFAULT_LOCALE] ?? ""),
-          highlight: Boolean(fields.highlight?.[DEFAULT_LOCALE] ?? false),
-          icon: String(fields.icon?.[DEFAULT_LOCALE] ?? ""),
-          sortOrder: Number(fields.sortOrder?.[DEFAULT_LOCALE] ?? 0),
-          hidden: Boolean(fields.hidden?.[DEFAULT_LOCALE] ?? false),
-        };
-        primaryLinksMap.set(linkEntry.sys.id, link);
-      });
-
-      // Rebuild array in reference order, sorted by sortOrder
-      linksPageData.primaryLinks = primaryLinksIds
-        .map((id) => primaryLinksMap.get(id))
-        .filter((link) => link !== undefined)
-        .sort(
-          (a, b) =>
-            (a?.sortOrder ?? 0) - (b?.sortOrder ?? 0)
-        ) as LinksPageLink[];
-    }
-
-    return linksPageData;
+    const linksResult = {
+      profileName: String(f.profileName ?? ""),
+      profileTagline: String(f.profileTagline ?? ""),
+      profileDescription: String(f.profileDescription ?? ""),
+      profilePhone: String(f.profilePhone ?? ""),
+      profileEmail: String(f.profileEmail ?? ""),
+      profileImageUrl: getAssetUrl(f.profileImage),
+      conferenceHeading: String(f.conferenceHeading ?? ""),
+      conferenceSubheading: String(f.conferenceSubheading ?? ""),
+      primaryLinks,
+      socialLinks: (f.socialLinks as SocialLink[]) || [],
+      footerText: String(f.footerText ?? ""),
+    };
+    console.log("[Contentful] fetchLinksPage: result", linksResult);
+    return linksResult;
   } catch (error) {
-    console.error("Error fetching links page from Contentful:", error);
+    logContentfulFetchError("Error fetching links page from Contentful:", error);
     return null;
   }
 }
+
+// ===== CACHED EXPORT =====
 
 export const fetchLinksPageFromContentful = unstable_cache(
   fetchLinksPageFromContentfulRaw,

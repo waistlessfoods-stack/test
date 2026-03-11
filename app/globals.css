@@ -125,3 +125,13 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Keep Clerk profile visually transparent inside our custom modal shell. */
+.clerk-profile-modal .cl-card,
+.clerk-profile-modal .cl-cardBox,
+.clerk-profile-modal .cl-navbar,
+.clerk-profile-modal .cl-pageScrollBox {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}

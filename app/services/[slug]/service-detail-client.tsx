@@ -46,6 +46,7 @@ export default function ServiceDetailClient({
   service,
 }: ServiceDetailClientProps) {
   const [visibleCount, setVisibleCount] = useState(2);
+  const [mainImage, setMainImage] = useState(service.images.main);
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-8 md:py-16 bg-white min-h-screen">
@@ -69,7 +70,7 @@ export default function ServiceDetailClient({
         <section className="w-full lg:w-[557px] flex flex-col gap-[25px]">
           <div className="relative w-full lg:w-[557px] aspect-557/642 rounded-[16px] overflow-hidden">
             <Image
-              src={service.images.main}
+              src={mainImage}
               alt={`${service.title} main image`}
               fill
               sizes="(max-width: 1024px) 100vw, 557px"
@@ -82,7 +83,10 @@ export default function ServiceDetailClient({
             {service.images.gallery.map((image, index) => (
               <div
                 key={image}
-                className="relative aspect-square rounded-[16px] overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all group"
+                onClick={() => setMainImage(image)}
+                className={`relative aspect-square rounded-[16px] overflow-hidden cursor-pointer transition-all group hover:ring-2 hover:ring-primary ${
+                  mainImage === image ? "ring-2 ring-primary" : ""
+                }`}
               >
                 <Image
                   src={image}

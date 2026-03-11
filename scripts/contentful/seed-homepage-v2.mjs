@@ -334,29 +334,29 @@ await createOrUpdateContentType("homepage", {
 // Create Feature Items
 const featureItemsData = [
   {
-    id: "feature-recipes",
-    title: "RECIPES FOR EVERY MOOD",
+    id: "feature-services",
+    title: "CHEF SERVICES",
     description:
-      "Find delicious inspiration for every occasion — from quick bites to weekend-worthy meals.",
-    imagePath: "/highlight/recipe.png",
+      "Enjoy personalized culinary experiences designed around your needs - from private dining and catering to hands-on cooking classes. Thoughtful menus, fresh ingredients, and memorable moments made simple.",
+    imagePath: "/highlight/meet-chef.png",
     buttonLabel: "More Info",
     sortOrder: 1,
   },
   {
-    id: "feature-eco-living",
-    title: "ECO LIVING TIPS",
+    id: "feature-recipes",
+    title: "RECIPES FOR EVERY MOOD",
     description:
-      "Learn simple, sustainable habits to make your kitchen and home more eco-friendly.",
-    imagePath: "/highlight/eco-living.png",
+      "Discover delicious recipes for every occasion - from quick everyday meals to nourishing dishes worth sharing. Simple ingredients, balanced flavors, and easy inspiration for your kitchen.",
+    imagePath: "/highlight/recipe.png",
     buttonLabel: "More Info",
     sortOrder: 2,
   },
   {
-    id: "feature-meet-chef",
-    title: "MEET CHEF AMBER",
+    id: "feature-blogs",
+    title: "BLOGS & ECO LIVING TIPS",
     description:
-      "Discover Chef Amber's story, her cooking philosophy, and the passion behind every flavorful dish.",
-    imagePath: "/highlight/meet-chef.png",
+      "Explore helpful articles on mindful cooking, sustainable habits, kitchen tips, and healthy living. Practical ideas to help you live well and waste less every day.",
+    imagePath: "/highlight/eco-living.png",
     buttonLabel: "More Info",
     sortOrder: 3,
   },
@@ -537,7 +537,7 @@ if (existing.items.length === 0) {
       featuresHeading: { [DEFAULT_LOCALE]: "SIMPLE. SUSTAINABLE. DELICIOUS." },
       featuresIntro: {
         [DEFAULT_LOCALE]:
-          "We make healthy, eco-conscious eating easy for everyone. Discover recipes and habits that taste as good as they feel.",
+          "We make healthy, eco-conscious eating easy for everyone through chef services, delicious recipes, and practical lifestyle inspiration.",
       },
       features: { [DEFAULT_LOCALE]: featureItemRefs },
       aboutHeading: { [DEFAULT_LOCALE]: "ABOUT CHEF AMBER" },

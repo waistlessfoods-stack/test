@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
 import { Manrope, Bebas_Neue, Playfair_Display } from "next/font/google";
+import {
+  ClerkProvider,
+  Show,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/nextjs";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart-context";
 import LayoutShell from "@/components/layout/layout-shell";
@@ -62,9 +69,20 @@ export default function RootLayout({
       <body
         className={`${metropolis.variable} ${bebasNeue.variable} ${playfair.variable} font-sans antialiased`}
       >
-        <CartProvider>
-          <LayoutShell>{children}</LayoutShell>
-        </CartProvider>
+        <ClerkProvider>
+          <header className="hidden">
+            <Show when="signed-out">
+              <SignInButton />
+              <SignUpButton />
+            </Show>
+            <Show when="signed-in">
+              <UserButton />
+            </Show>
+          </header>
+          <CartProvider>
+            <LayoutShell>{children}</LayoutShell>
+          </CartProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

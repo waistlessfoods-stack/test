@@ -1,7 +1,50 @@
 import { db } from '@/lib/db';
 import { user, orders, enquiries, subscribers } from '@/lib/db/schema';
 import { NextRequest, NextResponse } from 'next/server';
-import { desc, limit } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
+
+// Helper to detect transient database errors
+function isTransientDbError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const message = error.message.toLowerCase();
+  return (
+    message.includes("econnreset") ||
+    message.includes("etimedout") ||
+    message.includes("epipe") ||
+    message.includes("connection reset") ||
+    message.includes("timeout")
+  );
+}
+
+// Retry wrapper for database operations with exponential backoff
+async function withDbRetry<T>(
+  fn: () => Promise<T>,
+  maxAttempts: number = 2
+): Promise<T> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      
+      if (!isTransientDbError(error) || attempt >= maxAttempts - 1) {
+        throw lastError;
+      }
+
+      // Exponential backoff: 250ms, 500ms, etc.
+      const delay = 250 * Math.pow(2, attempt);
+      console.log(
+        `[DB Retry] Admin dashboard - Attempt ${attempt + 1} failed, retrying in ${delay}ms...`,
+        lastError.message
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError;
+}
 
 /**
  * POST /api/admin/dashboard
@@ -29,7 +72,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fetch all statistics in parallel
+    // Fetch all statistics in parallel with retry logic
     const [
       allUsers,
       allOrders,
@@ -40,22 +83,26 @@ export async function POST(request: NextRequest) {
       recentEnquiriesList,
     ] = await Promise.all([
       // Total counts
-      db.select().from(user),
-      db.select().from(orders),
-      db.select().from(enquiries),
-      db.select().from(subscribers),
+      withDbRetry(() => db.select().from(user)),
+      withDbRetry(() => db.select().from(orders)),
+      withDbRetry(() => db.select().from(enquiries)),
+      withDbRetry(() => db.select().from(subscribers)),
       // Recent items (10 most recent)
-      db.select().from(user).orderBy(desc(user.createdAt)).limit(10),
-      db
-        .select()
-        .from(orders)
-        .orderBy(desc(orders.createdAt))
-        .limit(10),
-      db
-        .select()
-        .from(enquiries)
-        .orderBy(desc(enquiries.createdAt))
-        .limit(10),
+      withDbRetry(() => db.select().from(user).orderBy(desc(user.createdAt)).limit(10)),
+      withDbRetry(() =>
+        db
+          .select()
+          .from(orders)
+          .orderBy(desc(orders.createdAt))
+          .limit(10)
+      ),
+      withDbRetry(() =>
+        db
+          .select()
+          .from(enquiries)
+          .orderBy(desc(enquiries.createdAt))
+          .limit(10)
+      ),
     ]);
 
     // Calculate revenue
@@ -94,6 +141,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ stats }, { status: 200 });
   } catch (error) {
+    if (error instanceof Error && error.message.includes("Temporary database")) {
+      return NextResponse.json(
+        { error: "Database connection issue. Please try again in a few seconds." },
+        { status: 503 }
+      );
+    }
+
     console.error('Error fetching dashboard stats:', error);
     return NextResponse.json(
       { error: 'Failed to fetch dashboard statistics' },

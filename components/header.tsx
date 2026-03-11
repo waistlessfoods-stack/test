@@ -7,9 +7,11 @@ import { Container } from "@/components/ui/container";
 import { Menu, ShoppingCart, ChevronDown, X, User, LogOut, Package, BadgeCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useClerk } from "@clerk/nextjs";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/lib/cart-context";
-import { useSession, signOut } from "@/lib/auth-client";
+import EnquiryDialog from "@/components/enquiry-dialog";
+import { useSession } from "@/lib/auth-client";
 import { getIconPath } from "@/lib/social-links";
 import type { SocialLink } from "@/lib/contentful-links";
 import type { HeaderSettings } from "@/lib/contentful-management";
@@ -28,6 +30,7 @@ export default function Header({
   headerSettings?: HeaderSettings | null;
 }) {
   const router = useRouter();
+  const { signOut } = useClerk();
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -35,6 +38,7 @@ export default function Header({
   const [isVerificationSending, setIsVerificationSending] = useState(false);
   const [verificationMessage, setVerificationMessage] = useState("");
   const [verificationError, setVerificationError] = useState("");
+  const [isEnquiryDialogOpen, setIsEnquiryDialogOpen] = useState(false);
   const pathname = usePathname();
   const { items, totalItems, totalPrice, removeItem, updateQuantity } =
     useCart();
@@ -100,22 +104,11 @@ export default function Header({
     setVerificationError("");
 
     try {
-      const response = await fetch("/api/account/verify-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: session.user.email }),
-      });
-
-      const payload = await response.json();
-
-      if (!response.ok) {
-        setVerificationError(payload?.error || "Failed to send verification email.");
-        return;
-      }
-
-      setVerificationMessage("Verification email sent. Please check your inbox.");
+      setVerificationMessage(
+        "Please complete email verification in your Clerk account flow."
+      );
     } catch {
-      setVerificationError("Failed to send verification email.");
+      setVerificationError("Unable to load verification guidance.");
     } finally {
       setIsVerificationSending(false);
     }
@@ -263,6 +256,7 @@ export default function Header({
             <Button
               size="sm"
               className="bg-[#00676E] hover:bg-[#00575e] text-white whitespace-nowrap"
+              onClick={() => setIsEnquiryDialogOpen(true)}
             >
               Complimentary Consultation
             </Button>
@@ -766,7 +760,13 @@ export default function Header({
               </div>
             </div>
 
-            <Button className="bg-[#00676E] w-full mt-4 py-6 text-lg uppercase">
+            <Button 
+              className="bg-[#00676E] w-full mt-4 py-6 text-lg uppercase"
+              onClick={() => {
+                setIsEnquiryDialogOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
+            >
               Consultation
             </Button>
 
@@ -792,6 +792,14 @@ export default function Header({
           </nav>
         </SheetContent>
       </Sheet>
+
+      <EnquiryDialog
+        isOpen={isEnquiryDialogOpen}
+        onOpenChange={setIsEnquiryDialogOpen}
+        enquiryType="private_chef"
+        title="Book a Complimentary Consultation"
+        description="Let's discuss how Chef Amber can create a personalized culinary experience for you. Fill out the form below and we'll get back to you soon."
+      />
     </header>
   );
 }

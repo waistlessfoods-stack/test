@@ -24,9 +24,7 @@ export type NewSubscriber = typeof subscribers.$inferInsert;
 
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id),
+  userId: text("user_id").notNull(),
   stripeSessionId: text("stripe_session_id").notNull().unique(),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
   status: text("status").notNull().default("pending"), // 'pending', 'completed', 'failed', 'refunded'

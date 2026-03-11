@@ -75,7 +75,7 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
             </div>
 
             <div className="relative z-10 px-8 md:px-20 lg:px-12 2xl:px-12 flex flex-col md:flex-row items-center justify-between w-full h-full">
-              <div className="flex-1 max-w-3xl flex flex-col gap-4 lg:gap-2.5 2xl:gap-3 mt-10 md:mt-0">
+              <div className="flex-1 max-w-xl flex flex-col gap-4 lg:gap-2.5 2xl:gap-3 mt-10 md:mt-0">
                 <h1 className="font-bold text-white text-4xl md:text-5xl lg:text-4xl 2xl:text-5xl leading-[1.1] drop-shadow-lg">
                   {data.bannerTitle.split(/\n|<br>/).map((line, index, arr) => (
                     <span key={index}>
