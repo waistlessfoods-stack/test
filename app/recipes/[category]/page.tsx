@@ -50,13 +50,15 @@ export default async function RecipesPage({ params, searchParams }: RecipesPageP
             {/* Left Side - Image */}
             <div className="w-full lg:w-1/2 flex items-center">
               <div className="relative w-full aspect-square lg:aspect-auto lg:h-[642px] rounded-lg 2xl:rounded-lg overflow-hidden bg-[#E9E9E9] shadow-lg">
-                <Image
-                  src={recipeData.imagePath}
-                  alt={recipeData.title}
-                  fill
-                  className="object-cover"
-                  priority
-                />
+                {recipeData.imagePath && (
+                  <Image
+                    src={recipeData.imagePath}
+                    alt={recipeData.title}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                )}
               </div>
             </div>
 

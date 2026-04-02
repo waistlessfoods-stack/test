@@ -55,6 +55,14 @@ async function readLocalTaxRate(): Promise<number | null> {
     if (data.salesTaxRate === undefined || data.salesTaxRate === null) {
       return null;
     }
+
+    if (
+      typeof data.salesTaxRate !== "number" &&
+      typeof data.salesTaxRate !== "string"
+    ) {
+      return null;
+    }
+
     return normalizeSalesTaxRate(data.salesTaxRate, DEFAULT_SALES_TAX_RATE);
   } catch {
     return null;

@@ -55,7 +55,7 @@ interface ProfileData {
   description: string;
   phone: string;
   email: string;
-  image: string;
+  image: string | null;
 }
 
 function trackLink(title: string, section: string, href: string) {

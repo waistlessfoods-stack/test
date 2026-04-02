@@ -9,7 +9,7 @@ type Service = {
   title: string;
   description: string;
   benefits: string[];
-  image: string;
+  image: string | null;
 };
 
 export default function ServicesClientPage({
@@ -68,12 +68,14 @@ export default function ServicesClientPage({
                 </div>
 
                 <div className="relative w-full h-36 overflow-hidden rounded-[16px]">
-                  <Image
-                    src={service.image}
-                    alt={service.title}
-                    fill
-                    className="object-cover transition-transform duration-700 hover:scale-110"
-                  />
+                  {service.image && (
+                    <Image
+                      src={service.image}
+                      alt={service.title}
+                      fill
+                      className="object-cover transition-transform duration-700 hover:scale-110"
+                    />
+                  )}
                 </div>
               </div>
             ))}

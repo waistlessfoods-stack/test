@@ -23,6 +23,42 @@ type CheckoutItem = {
   imagePath?: string;
 };
 
+function toCheckoutItem(item: unknown): CheckoutItem | null {
+  if (!item || typeof item !== "object") return null;
+
+  const maybeItem = item as {
+    id?: unknown;
+    name?: unknown;
+    slug?: unknown;
+    price?: unknown;
+    quantity?: unknown;
+    imagePath?: unknown;
+  };
+
+  const name = typeof maybeItem.name === "string" ? maybeItem.name : "";
+  const slug =
+    typeof maybeItem.slug === "string" && maybeItem.slug.trim().length > 0
+      ? maybeItem.slug.trim()
+      : name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+
+  return {
+    id: typeof maybeItem.id === "string" ? maybeItem.id : crypto.randomUUID(),
+    name,
+    slug,
+    price: Number(maybeItem.price) || 0,
+    quantity: Number(maybeItem.quantity) || 0,
+    imagePath:
+      typeof maybeItem.imagePath === "string" ? maybeItem.imagePath : undefined,
+  };
+}
+
+function isCheckoutItem(item: CheckoutItem | null): item is CheckoutItem {
+  return Boolean(item && item.name && item.quantity > 0);
+}
+
 // Helper to detect transient database errors
 function isTransientDbError(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
@@ -123,31 +159,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const rawItems = body?.items;
     const items: CheckoutItem[] = Array.isArray(rawItems)
-      ? rawItems
-          .map((item: any) => {
-            if (!item || typeof item !== "object") return null;
-            const name = typeof item.name === "string" ? item.name : "";
-            const slug =
-              typeof item.slug === "string" && item.slug.trim().length > 0
-                ? item.slug.trim()
-                : name
-                    .toLowerCase()
-                    .replace(/[^a-z0-9]+/g, "-")
-                    .replace(/^-+|-+$/g, "");
-
-            return {
-              id: typeof item.id === "string" ? item.id : crypto.randomUUID(),
-              name,
-              slug,
-              price: Number(item.price) || 0,
-              quantity: Number(item.quantity) || 0,
-              imagePath:
-                typeof item.imagePath === "string" ? item.imagePath : undefined,
-            } satisfies CheckoutItem;
-          })
-          .filter((item: CheckoutItem | null): item is CheckoutItem =>
-            Boolean(item && item.name && item.quantity > 0)
-          )
+      ? rawItems.map(toCheckoutItem).filter(isCheckoutItem)
       : [];
     console.log(`[Checkout] Body parsed in ${Date.now() - bodyStart}ms`, {
       itemCount: items?.length || 0,
