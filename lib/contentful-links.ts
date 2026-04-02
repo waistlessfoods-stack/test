@@ -22,15 +22,27 @@ function getContentfulConfig(): ContentfulConfig | null {
   return { accessToken, spaceId };
 }
 
+function getRequiredContentfulConfig(): ContentfulConfig {
+  const config = getContentfulConfig();
+
+  if (!config) {
+    throw new Error(
+      "Missing Contentful delivery credentials. Set CONTENTFUL_DELIVERY_TOKEN and CONTENTFUL_SPACE_ID."
+    );
+  }
+
+  return config;
+}
+
 function createContentfulClient(config: ContentfulConfig) {
   return createClient({ space: config.spaceId, accessToken: config.accessToken });
 }
 
 // --- Asset URL helper ---
 
-function getAssetUrl(asset: any): string {
+function getAssetUrl(asset: any): string | null {
   const url = asset?.fields?.file?.url;
-  if (!url || typeof url !== "string") return "";
+  if (!url || typeof url !== "string") return null;
   return url.startsWith("//") ? `https:${url}` : url;
 }
 
@@ -59,8 +71,7 @@ function logContentfulFetchError(context: string, error: unknown): void {
       contentfulWarningsShown.add(key);
       console.warn(
         "Contentful Delivery API token is invalid or missing. " +
-          "Set CONTENTFUL_DELIVERY_TOKEN in your .env. " +
-          "Falling back to default links page content."
+          "Set CONTENTFUL_DELIVERY_TOKEN in your .env."
       );
     }
     return;
@@ -94,7 +105,7 @@ export type LinksPageData = {
   profileDescription: string;
   profilePhone: string;
   profileEmail: string;
-  profileImageUrl: string;
+  profileImageUrl: string | null;
   conferenceHeading: string;
   conferenceSubheading: string;
   primaryLinks: LinksPageLink[];
@@ -104,13 +115,9 @@ export type LinksPageData = {
 
 // ===== FETCHER =====
 
-async function fetchLinksPageFromContentfulRaw(): Promise<LinksPageData | null> {
+async function fetchLinksPageFromContentfulRaw(): Promise<LinksPageData> {
   console.log("[Contentful] fetchLinksPage: start");
-  const config = getContentfulConfig();
-  if (!config) {
-    console.log("[Contentful] fetchLinksPage: no config, skipping");
-    return null;
-  }
+  const config = getRequiredContentfulConfig();
 
   try {
     const client = createContentfulClient(config);
@@ -122,8 +129,7 @@ async function fetchLinksPageFromContentfulRaw(): Promise<LinksPageData | null> 
     } as any);
     const entry = entries.items[0];
     if (!entry) {
-      console.log("[Contentful] fetchLinksPage: no entry found");
-      return null;
+      throw new Error("No links page entry found in Contentful.");
     }
     console.log("[Contentful] fetchLinksPage: entry found", entry.sys.id);
 
@@ -159,7 +165,7 @@ async function fetchLinksPageFromContentfulRaw(): Promise<LinksPageData | null> 
     return linksResult;
   } catch (error) {
     logContentfulFetchError("Error fetching links page from Contentful:", error);
-    return null;
+    throw new Error("Unable to fetch links page data from Contentful.");
   }
 }
 

@@ -31,7 +31,7 @@ const toServiceSlug = (title: string) => {
 export default async function ServicesPage() {
   const servicesFromContentful = await fetchServicesFromContentful();
 
-  const services = (servicesFromContentful ?? []).map((service) => ({
+  const services = servicesFromContentful.map((service) => ({
     slug: service.slug?.trim() ? service.slug : toServiceSlug(service.title),
     title: service.title,
     description: service.description,

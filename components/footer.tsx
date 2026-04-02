@@ -82,6 +82,9 @@ export default function Footer({ socialLinks = [] }: { socialLinks?: SocialLink[
               <Link href="/about" className="block mb-2">
                 About
               </Link>
+              <Link href="/blog" className="block mb-2">
+                Blog
+              </Link>
             </div>
 
             <div>

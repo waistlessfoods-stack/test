@@ -16,13 +16,15 @@ export default function AboutPageClient({ data }: AboutPageClientProps) {
       {/* --- HERO SECTION --- */}
       <section className="relative w-full h-auto min-h-[420px] md:h-[850px] overflow-hidden flex items-start md:items-center bg-[#1a1a1a]">
         <div className="absolute inset-0 z-0">
-          <Image
-            src={data.heroBackgroundImagePath}
-            fill
-            alt="Chef Amber Background"
-            className="object-cover object-top scale-110 origin-top md:scale-100 md:object-top-right"
-            priority
-          />
+          {data.heroBackgroundImagePath && (
+            <Image
+              src={data.heroBackgroundImagePath}
+              fill
+              alt="Chef Amber Background"
+              className="object-cover object-top scale-110 origin-top md:scale-100 md:object-top-right"
+              priority
+            />
+          )}
           <div className="absolute inset-0 bg-linear-to-r from-black via-black/60 to-transparent" />
         </div>
 
@@ -58,21 +60,25 @@ export default function AboutPageClient({ data }: AboutPageClientProps) {
                   ratio={1 / 1}
                   className="bg-[#D3D3D3] rounded-md overflow-hidden relative shadow-lg"
                 >
-                  <Image
-                    src={data.contentImagePath}
-                    fill
-                    alt="WaistLess Foods"
-                    className="object-cover"
-                  />
+                  {data.contentImagePath && (
+                    <Image
+                      src={data.contentImagePath}
+                      fill
+                      alt="WaistLess Foods"
+                      className="object-cover"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-white/80" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="relative w-[35%] h-[35%]">
-                      <Image
-                        src={data.logoImagePath}
-                        fill
-                        alt="Logo WaistLess"
-                        className="object-contain"
-                      />
+                      {data.logoImagePath && (
+                        <Image
+                          src={data.logoImagePath}
+                          fill
+                          alt="Logo WaistLess"
+                          className="object-contain"
+                        />
+                      )}
                     </div>
                   </div>
                 </AspectRatio>

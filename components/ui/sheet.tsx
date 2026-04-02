@@ -47,8 +47,10 @@ const sheetVariants = cva(
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content> &
-    VariantProps<typeof sheetVariants>
->(({ side = "right", className, children, ...props }, ref) => (
+    VariantProps<typeof sheetVariants> & {
+      a11yTitle?: string
+    }
+>(({ side = "right", className, children, a11yTitle = "Panel", ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content
@@ -56,6 +58,7 @@ const SheetContent = React.forwardRef<
       className={cn(sheetVariants({ side }), className)}
       {...props}
     >
+      <SheetPrimitive.Title className="sr-only">{a11yTitle}</SheetPrimitive.Title>
       {children}
       <SheetPrimitive.Close className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#D4E4E2] bg-[#F4FBFA] text-[#09686E] shadow-sm transition-all hover:bg-[#E6F4F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#09686E] focus-visible:ring-offset-2 disabled:pointer-events-none">
         <X className="h-4 w-4" />

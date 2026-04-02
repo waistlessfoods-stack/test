@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
@@ -17,24 +17,73 @@ type RecipeDetailClientProps = {
 export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) {
   const router = useRouter();
   const { addItem } = useCart();
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+
+  useEffect(() => {
+    if (isPending || !session?.user?.id) {
+      return;
+    }
+
+    let isActive = true;
+
+    const normalize = (value: string) =>
+      value.trim().toLowerCase().replace(/\s+/g, " ");
+
+    const checkUnlockedStatus = async () => {
+      try {
+        const response = await fetch("/api/orders");
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = await response.json();
+        const completedOrders = (payload.orders || []).filter(
+          (order: { status?: string }) => order.status === "completed"
+        );
+
+        const isUnlocked = completedOrders.some(
+          (order: { items?: Array<{ id?: string; slug?: string; name?: string }> }) =>
+            (order.items || []).some(
+              (item) =>
+                item.id === recipe.id ||
+                item.slug === recipe.slug ||
+                (typeof item.name === "string" &&
+                  normalize(item.name) === normalize(recipe.title))
+            )
+        );
+
+        if (isUnlocked && isActive) {
+          router.replace(`/recipes/detail/${recipe.slug}/full`);
+        }
+      } catch {
+        // Keep preview page visible if unlock check fails temporarily.
+      }
+    };
+
+    void checkUnlockedStatus();
+
+    return () => {
+      isActive = false;
+    };
+  }, [session?.user?.id, isPending, recipe.id, recipe.slug, recipe.title, router]);
 
   const handleAddToCart = () => {
     try {
       setIsAddingToCart(true);
-      // Parse price - handle both string and numeric formats
-      const priceValue = parseFloat(recipe.price.toString().replace(/[^0-9.-]+/g, ""));
+      const priceValue = parseFloat(
+        recipe.price.toString().replace(/[^0-9.-]+/g, "")
+      );
 
       addItem({
         id: recipe.id,
         name: recipe.title,
+        slug: recipe.slug,
         price: isNaN(priceValue) ? 0 : priceValue,
         quantity: 1,
         imagePath: recipe.imagePath,
       });
 
-      // Optional: Show feedback that item was added
       setTimeout(() => {
         setIsAddingToCart(false);
       }, 500);
@@ -45,25 +94,27 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
   };
 
   const handleOrderNow = () => {
-    // Check if user is signed in
     if (!session?.user) {
-      router.push(`/signin?redirect=/recipes/detail/${recipe.slug}&message=Please sign in to purchase this recipe`);
+      router.push(
+        `/signin?redirect=/recipes/detail/${recipe.slug}&message=Please sign in to purchase this recipe`
+      );
       return;
     }
 
     try {
-      // Add to cart
-      const priceValue = parseFloat(recipe.price.toString().replace(/[^0-9.-]+/g, ""));
+      const priceValue = parseFloat(
+        recipe.price.toString().replace(/[^0-9.-]+/g, "")
+      );
 
       addItem({
         id: recipe.id,
         name: recipe.title,
+        slug: recipe.slug,
         price: isNaN(priceValue) ? 0 : priceValue,
         quantity: 1,
         imagePath: recipe.imagePath,
       });
 
-      // Navigate to shop with cart open
       router.push("/shop");
     } catch (error) {
       console.error("Error in order now:", error);
@@ -74,7 +125,6 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
     <div className="w-full min-h-screen bg-white overflow-x-hidden font-metropolis">
       <section className="w-full py-16 2xl:py-12">
         <Container>
-          {/* Breadcrumb */}
           <Link href="/recipes" className="mb-8 inline-block">
             <div className="flex items-center gap-4 hover:opacity-70 transition-opacity">
               <span className="text-xl 2xl:text-lg font-medium text-[#0F8DAB]">
@@ -87,42 +137,37 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
             </div>
           </Link>
 
-          {/* Main Content */}
           <div className="flex flex-col lg:flex-row gap-14 2xl:gap-8">
-            {/* Left Side - Image */}
             <div className="w-full lg:w-1/2 flex items-center">
-              <div className="relative w-full aspect-square lg:aspect-auto lg:h-[642px] rounded-lg 2xl:rounded-lg overflow-hidden bg-[#E9E9E9] shadow-lg">
-                <Image
-                  src={recipe.imagePath}
-                  alt={recipe.title}
-                  fill
-                  className="object-cover"
-                  priority
-                />
+              <div className="relative w-full aspect-square lg:aspect-auto lg:h-[642px] rounded-lg overflow-hidden bg-[#E9E9E9] shadow-lg">
+                {recipe.imagePath && (
+                  <Image
+                    src={recipe.imagePath}
+                    alt={recipe.title}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                )}
               </div>
             </div>
 
-            {/* Right Side - Details */}
             <div className="w-full lg:w-1/2 flex flex-col gap-12 2xl:gap-8 justify-start">
-              {/* Title */}
               <h1 className="font-metropolis font-medium text-5xl 2xl:text-4xl text-black leading-tight">
                 {recipe.title}
               </h1>
 
-              {/* Description Section */}
               <div className="flex flex-col gap-5 2xl:gap-4">
                 <h3 className="font-medium text-2xl 2xl:text-xl text-black">
                   Description
                 </h3>
                 <p className="font-normal text-xl 2xl:text-lg text-gray-600 leading-relaxed">
-                  {recipe.description}
+                  {recipe.detailDescription || recipe.description}
                 </p>
               </div>
 
-              {/* Price Box */}
-              <div className="bg-[#F7F7F7] rounded-lg 2xl:rounded-lg p-5 2xl:p-4">
+              <div className="bg-[#F7F7F7] rounded-lg p-5 2xl:p-4">
                 <div className="flex flex-col gap-5 2xl:gap-4">
-                  {/* Price Row */}
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-xl 2xl:text-lg text-gray-700">
                       Price :
@@ -132,18 +177,17 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
                     </span>
                   </div>
 
-                  {/* Buttons */}
                   <div className="flex flex-col sm:flex-row gap-3 2xl:gap-2 w-full">
-                    <Button 
+                    <Button
                       onClick={handleAddToCart}
                       disabled={isAddingToCart}
-                      className="flex-1 h-14 2xl:h-12 bg-[#FB7118] hover:bg-[#E86510] text-white font-medium text-lg 2xl:text-base rounded-lg 2xl:rounded-md transition-colors disabled:opacity-50"
+                      className="flex-1 h-14 2xl:h-12 bg-[#FB7118] hover:bg-[#E86510] text-white font-medium text-lg 2xl:text-base rounded-lg transition-colors disabled:opacity-50"
                     >
                       {isAddingToCart ? "Adding..." : "Add to cart"}
                     </Button>
-                    <Button 
+                    <Button
                       onClick={handleOrderNow}
-                      className="flex-1 h-14 2xl:h-12 bg-[#388082] hover:bg-[#2F6A6B] text-white font-medium text-lg 2xl:text-base rounded-lg 2xl:rounded-md transition-colors"
+                      className="flex-1 h-14 2xl:h-12 bg-[#388082] hover:bg-[#2F6A6B] text-white font-medium text-lg 2xl:text-base rounded-lg transition-colors"
                     >
                       Order now
                     </Button>

@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { RecipesPageData, RecipeCategory, Recipe } from "@/lib/contentful-management";
+import { useSession } from "@/lib/auth-client";
 
 type RecipesPageClientProps = {
   data: RecipesPageData;
@@ -26,6 +27,8 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
   const [current, setCurrent] = useState(0);
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
+  const [unlockedRecipeIds, setUnlockedRecipeIds] = useState<Set<string>>(new Set());
+  const { data: session, isPending } = useSession();
 
   useEffect(() => {
     if (!api) return;
@@ -33,6 +36,50 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
       setCurrent(api.selectedScrollSnap());
     });
   }, [api]);
+
+  useEffect(() => {
+    if (isPending) return;
+
+    if (!session?.user?.id) {
+      setUnlockedRecipeIds(new Set());
+      return;
+    }
+
+    let isActive = true;
+
+    const loadUnlockedRecipes = async () => {
+      try {
+        const response = await fetch("/api/orders");
+        if (!response.ok) return;
+
+        const payload = await response.json();
+        const completedOrders = (payload.orders || []).filter(
+          (order: { status?: string }) => order.status === "completed"
+        );
+
+        const unlockedIds = new Set<string>();
+        for (const order of completedOrders) {
+          for (const item of order.items || []) {
+            if (item?.id && typeof item.id === "string") {
+              unlockedIds.add(item.id);
+            }
+          }
+        }
+
+        if (isActive) {
+          setUnlockedRecipeIds(unlockedIds);
+        }
+      } catch (error) {
+        console.error("Failed to load unlocked recipes:", error);
+      }
+    };
+
+    void loadUnlockedRecipes();
+
+    return () => {
+      isActive = false;
+    };
+  }, [session?.user?.id, isPending]);
 
   const toggleCategory = (categoryId: string) => {
     const newSelected = new Set(selectedCategories);
@@ -208,6 +255,12 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
                       <span className="font-bold text-3xl lg:text-xl 2xl:text-2xl text-white pt-6 lg:pt-4 2xl:pt-4 pr-6 lg:pr-4 2xl:pr-4">
                         {item.price}
                       </span>
+                    </div>
+                  )}
+
+                  {item.price !== "Free" && unlockedRecipeIds.has(item.id) && (
+                    <div className="absolute top-3 left-3 rounded-md bg-[#E8F5F5] px-2.5 py-1 text-xs font-semibold text-[#00676E]">
+                      UNLOCKED
                     </div>
                   )}
 

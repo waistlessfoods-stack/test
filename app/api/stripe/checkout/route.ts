@@ -4,6 +4,8 @@ import crypto from "crypto";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
+import { calculateCartTotals } from "@/lib/pricing";
+import { getServerSalesTaxRate } from "@/lib/tax-settings";
 
 const stripeSecretKey =
     process.env.sandbox_secret_key_stripe || process.env.STRIPE_SECRET_KEY;
@@ -11,6 +13,15 @@ const stripeSecretKey =
 const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" })
   : null;
+
+type CheckoutItem = {
+  id: string;
+  name: string;
+  slug?: string;
+  price: number;
+  quantity: number;
+  imagePath?: string;
+};
 
 // Helper to detect transient database errors
 function isTransientDbError(error: unknown): boolean {
@@ -110,28 +121,74 @@ export async function POST(request: Request) {
     const bodyStart = Date.now();
     const origin = request.headers.get("origin") || "http://localhost:3000";
     const body = await request.json();
-    const { items } = body;
+    const rawItems = body?.items;
+    const items: CheckoutItem[] = Array.isArray(rawItems)
+      ? rawItems
+          .map((item: any) => {
+            if (!item || typeof item !== "object") return null;
+            const name = typeof item.name === "string" ? item.name : "";
+            const slug =
+              typeof item.slug === "string" && item.slug.trim().length > 0
+                ? item.slug.trim()
+                : name
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/^-+|-+$/g, "");
+
+            return {
+              id: typeof item.id === "string" ? item.id : crypto.randomUUID(),
+              name,
+              slug,
+              price: Number(item.price) || 0,
+              quantity: Number(item.quantity) || 0,
+              imagePath:
+                typeof item.imagePath === "string" ? item.imagePath : undefined,
+            } satisfies CheckoutItem;
+          })
+          .filter((item: CheckoutItem | null): item is CheckoutItem =>
+            Boolean(item && item.name && item.quantity > 0)
+          )
+      : [];
     console.log(`[Checkout] Body parsed in ${Date.now() - bodyStart}ms`, {
       itemCount: items?.length || 0,
       totalPrice: items?.reduce((sum: number, i: any) => sum + (i.price * i.quantity), 0) || 0,
     });
 
+    const taxRate = await getServerSalesTaxRate();
+    const totals = calculateCartTotals(items, taxRate);
+
     // If no items provided, use test item (for stripe-test page)
     console.log("[Checkout] Building line items...");
     const lineItemsStart = Date.now();
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
-      items && items.length > 0
-        ? items.map((item: any) => ({
-            quantity: item.quantity,
-            price_data: {
-              currency: "usd",
-              unit_amount: Math.round(item.price * 100), // Convert to cents
-              product_data: {
-                name: item.name,
-                ...(item.imagePath && { images: [item.imagePath] }),
+      items.length > 0
+        ? [
+            ...items.map((item) => ({
+              quantity: item.quantity,
+              price_data: {
+                currency: "usd",
+                unit_amount: Math.round(item.price * 100), // Convert to cents
+                product_data: {
+                  name: item.name,
+                  ...(item.imagePath && { images: [item.imagePath] }),
+                },
               },
-            },
-          }))
+            })),
+            ...(totals.taxCents > 0
+              ? [
+                  {
+                    quantity: 1,
+                    price_data: {
+                      currency: "usd",
+                      unit_amount: totals.taxCents,
+                      product_data: {
+                        name: `Sales Tax (${(taxRate * 100).toFixed(2)}%)`,
+                      },
+                    },
+                  } satisfies Stripe.Checkout.SessionCreateParams.LineItem,
+                ]
+              : []),
+          ]
         : [
             {
               quantity: 1,
@@ -150,13 +207,13 @@ export async function POST(request: Request) {
     });
 
     // Calculate total amount
-    const totalAmount = items && items.length > 0
-      ? items.reduce(
-          (sum: number, item: any) => sum + Math.round(item.price * 100) * item.quantity,
-          0
-        )
-      : 500;
-    console.log("[Checkout] Total amount:", totalAmount, "cents");
+    const totalAmount = items.length > 0 ? totals.totalCents : 500;
+    console.log("[Checkout] Amount breakdown:", {
+      subtotal: totals.subtotalCents,
+      tax: totals.taxCents,
+      total: totalAmount,
+      taxRate,
+    });
 
     // Generate idempotency key from user + items to prevent duplicate charges on retries
     console.log("[Checkout] Generating idempotency key...");
@@ -180,6 +237,8 @@ export async function POST(request: Request) {
         customer_email: customerEmail,
         metadata: {
           userId,
+          subtotalCents: String(totals.subtotalCents),
+          taxCents: String(totals.taxCents),
         },
         success_url: `${origin}/orders?success=1`,
         cancel_url: `${origin}/shop?canceled=1`,

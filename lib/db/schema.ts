@@ -90,3 +90,32 @@ export const verification = pgTable("verification", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+export const bookings = pgTable("bookings", {
+  id: serial("id").primaryKey(),
+  serviceSlug: text("service_slug").notNull(),
+  serviceTitle: text("service_title").notNull(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  guests: integer("guests").notNull(),
+  preferredDate: text("preferred_date").notNull(),
+  alternativeDate: text("alternative_date"),
+  notes: text("notes").notNull(),
+  status: text("status").notNull().default("pending"), // 'pending', 'confirmed', 'cancelled'
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type Booking = typeof bookings.$inferSelect;
+export type NewBooking = typeof bookings.$inferInsert;
+
+export const appSettings = pgTable("app_settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type AppSetting = typeof appSettings.$inferSelect;
+export type NewAppSetting = typeof appSettings.$inferInsert;

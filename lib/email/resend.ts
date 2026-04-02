@@ -1,15 +1,23 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import { render } from '@react-email/render';
 import React from 'react';
 
-const apiKey = process.env.RESEND_API_KEY;
+const gmailUser = process.env.Email;
+const gmailAppPassword = process.env.AppPassword;
 
-if (!apiKey) {
-  console.warn('⚠️  RESEND_API_KEY is not set. Email functionality will be disabled.');
+if (!gmailUser || !gmailAppPassword) {
+  console.warn('⚠️  Email or AppPassword env vars are not set. Email functionality will be disabled.');
 }
 
-export const resend = new Resend(apiKey);
-export const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: gmailUser,
+    pass: gmailAppPassword,
+  },
+});
+
+export const fromEmail = gmailUser || 'no-reply@gmail.com';
 
 // Email sending helper following the { data, error } pattern
 export async function sendEmail({
@@ -25,8 +33,8 @@ export async function sendEmail({
   react?: React.ReactElement;
   replyTo?: string | string[];
 }) {
-  if (!apiKey) {
-    console.error('❌ RESEND_API_KEY is not configured');
+  if (!gmailUser || !gmailAppPassword) {
+    console.error('❌ Gmail credentials (Email / AppPassword) are not configured');
     return {
       data: null,
       error: { message: 'Email service not configured', name: 'ConfigError' },
@@ -47,19 +55,27 @@ export async function sendEmail({
     };
   }
 
-  const { data, error } = await resend.emails.send({
-    from: fromEmail,
-    to,
-    subject,
-    html: emailHtml,
-    replyTo: replyTo || fromEmail,
-  });
+  const toAddresses = Array.isArray(to) ? to.join(',') : to;
+  const replyToAddresses = replyTo
+    ? Array.isArray(replyTo) ? replyTo.join(',') : replyTo
+    : fromEmail;
 
-  if (error) {
-    console.error('❌ Failed to send email:', error);
-    return { data: null, error };
+  try {
+    const info = await transporter.sendMail({
+      from: fromEmail,
+      to: toAddresses,
+      subject,
+      html: emailHtml,
+      replyTo: replyToAddresses,
+    });
+
+    console.log('✅ Email sent successfully:', info.messageId);
+    return { data: { id: info.messageId }, error: null };
+  } catch (err) {
+    console.error('❌ Failed to send email:', err);
+    return {
+      data: null,
+      error: { message: (err as Error).message, name: 'SendError' },
+    };
   }
-
-  console.log('✅ Email sent successfully:', data?.id);
-  return { data, error: null };
 }

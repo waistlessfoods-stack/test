@@ -22,15 +22,27 @@ function getContentfulConfig(): ContentfulConfig | null {
   return { accessToken, spaceId };
 }
 
+function getRequiredContentfulConfig(): ContentfulConfig {
+  const config = getContentfulConfig();
+
+  if (!config) {
+    throw new Error(
+      "Missing Contentful delivery credentials. Set CONTENTFUL_DELIVERY_TOKEN and CONTENTFUL_SPACE_ID."
+    );
+  }
+
+  return config;
+}
+
 function createContentfulClient(config: ContentfulConfig) {
   return createClient({ space: config.spaceId, accessToken: config.accessToken });
 }
 
 // --- Asset URL helper ---
 
-function getAssetUrl(asset: any): string {
+function getAssetUrl(asset: any): string | null {
   const url = asset?.fields?.file?.url;
-  if (!url || typeof url !== "string") return "";
+  if (!url || typeof url !== "string") return null;
   return url.startsWith("//") ? `https:${url}` : url;
 }
 
@@ -59,8 +71,7 @@ function logContentfulFetchError(context: string, error: unknown): void {
       contentfulWarningsShown.add(key);
       console.warn(
         "Contentful Delivery API token is invalid or missing. " +
-          "Set CONTENTFUL_DELIVERY_TOKEN in your .env. " +
-          "Falling back to local/default page content."
+          "Set CONTENTFUL_DELIVERY_TOKEN in your .env."
       );
     }
     return;
@@ -77,7 +88,7 @@ export type ServiceEntry = {
   title: string;
   description: string;
   benefits: string[];
-  imagePath: string;
+  imagePath: string | null;
   sortOrder: number;
 };
 
@@ -99,7 +110,7 @@ export type ServiceDetailEntry = ServiceEntry & {
   priceText: string;
   includes: string[];
   howToBook: string[];
-  mainImagePath: string;
+  mainImagePath: string | null;
   galleryImagePaths: string[];
   reviews: ServiceReviews | null;
 };
@@ -108,7 +119,7 @@ export type FeatureItem = {
   id: string;
   title: string;
   description: string;
-  imagePath: string;
+  imagePath: string | null;
   buttonLabel?: string;
   buttonHref?: string;
   sortOrder: number;
@@ -119,7 +130,7 @@ export type FeaturedRecipe = {
   title: string;
   slug: string;
   description: string;
-  imagePath: string;
+  imagePath: string | null;
   sortOrder: number;
 };
 
@@ -134,7 +145,7 @@ export type Testimonial = {
 export type HomepageData = {
   heroTitle: string;
   heroSubtitle: string;
-  heroImagePath: string;
+  heroImagePath: string | null;
   heroPrimaryCtaLabel: string;
   heroPrimaryCtaHref: string;
   heroSecondaryCtaLabel: string;
@@ -149,10 +160,10 @@ export type HomepageData = {
   aboutBullets: string[];
   aboutButtonLabel: string;
   aboutButtonHref?: string;
-  aboutImagePath: string;
+  aboutImagePath: string | null;
   featuredHeading: string;
   featuredRecipes: FeaturedRecipe[];
-  testimonialBackgroundPath: string;
+  testimonialBackgroundPath: string | null;
   testimonials: Testimonial[];
 };
 
@@ -166,11 +177,11 @@ export type HeaderSettings = {
 
 export type AboutPageData = {
   heroTitle: string;
-  heroBackgroundImagePath: string;
+  heroBackgroundImagePath: string | null;
   heroParagraph1: string;
   heroParagraph2: string;
-  contentImagePath: string;
-  logoImagePath: string;
+  contentImagePath: string | null;
+  logoImagePath: string | null;
   contentHeading: string;
   contentParagraph1: string;
   contentParagraph2: string;
@@ -180,7 +191,7 @@ export type AboutPageData = {
 export type RecipeCategory = {
   id: string;
   name: string;
-  imagePath: string;
+  imagePath: string | null;
   sortOrder: number;
 };
 
@@ -190,18 +201,29 @@ export type Recipe = {
   title: string;
   price: string;
   description: string;
-  imagePath: string;
+  imagePath: string | null;
   sortOrder: number;
   categoryId?: string;
   featured?: boolean;
+  detailDescription?: string;
+  ingredients?: string[];
+  tools?: string[];
+  heroImagePath?: string | null;
+  ingredientsImagePath?: string | null;
+  toolsImagePath?: string | null;
+  instructionSteps?: {
+    title: string;
+    description: string;
+    imagePath?: string | null;
+  }[];
 };
 
 export type RecipesPageData = {
-  bannerImagePath: string;
+  bannerImagePath: string | null;
   bannerTitle: string;
   bannerDescription: string;
-  bannerFeaturedImage1Path: string;
-  bannerFeaturedImage2Path: string;
+  bannerFeaturedImage1Path: string | null;
+  bannerFeaturedImage2Path: string | null;
   categories: RecipeCategory[];
   recipes: Recipe[];
 };
@@ -215,6 +237,78 @@ function generateSlug(title: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function toStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .filter((item): item is string => typeof item === "string")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  if (typeof value === "string") {
+    return value
+      .split(/\r?\n/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function parseInstructionSteps(
+  value: unknown
+): {
+  title: string;
+  description: string;
+  imagePath?: string;
+}[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.reduce<
+    {
+      title: string;
+      description: string;
+      imagePath?: string;
+    }[]
+  >((acc, item) => {
+      if (!item || typeof item !== "object") {
+        return acc;
+      }
+
+      const raw = item as Record<string, unknown>;
+      const title =
+        typeof raw.title === "string"
+          ? raw.title
+          : typeof raw.stepTitle === "string"
+            ? raw.stepTitle
+            : "";
+      const description =
+        typeof raw.description === "string"
+          ? raw.description
+          : typeof raw.body === "string"
+            ? raw.body
+            : "";
+      const imagePath =
+        typeof raw.imagePath === "string"
+          ? raw.imagePath
+          : getAssetUrl(raw.image as any);
+
+      if (!title && !description) {
+        return acc;
+      }
+
+      acc.push({
+        title: title.trim(),
+        description: description.trim(),
+        imagePath: imagePath || undefined,
+      });
+
+      return acc;
+    }, []);
 }
 
 function mapServiceFields(entry: any) {
@@ -252,16 +346,29 @@ function mapRecipesOrShopPage(entry: any): RecipesPageData {
   const recipes: Recipe[] = ((f.recipes as any[]) || [])
     .map((e: any) => {
       const title = String(e.fields?.title ?? "");
+      const imagePath = getAssetUrl(e.fields?.image);
       return {
         id: e.sys.id,
         slug: generateSlug(title),
         title,
         price: String(e.fields?.price ?? ""),
         description: String(e.fields?.description ?? ""),
-        imagePath: getAssetUrl(e.fields?.image),
+        imagePath,
         sortOrder: Number(e.fields?.sortOrder ?? 0),
         categoryId: (e.fields?.category as any)?.sys?.id,
         featured: Boolean(e.fields?.featured ?? false),
+        detailDescription: String(
+          e.fields?.detailDescription ?? e.fields?.description ?? ""
+        ),
+        ingredients: toStringArray(e.fields?.ingredients),
+        tools: toStringArray(e.fields?.tools),
+        heroImagePath: getAssetUrl(e.fields?.heroImage) || imagePath,
+        ingredientsImagePath:
+          getAssetUrl(e.fields?.ingredientsImage) || imagePath,
+        toolsImagePath: getAssetUrl(e.fields?.toolsImage) || imagePath,
+        instructionSteps: parseInstructionSteps(
+          e.fields?.instructionSteps ?? e.fields?.instructions
+        ),
       };
     })
     .sort((a, b) => a.sortOrder - b.sortOrder);
@@ -279,13 +386,9 @@ function mapRecipesOrShopPage(entry: any): RecipesPageData {
 
 // ===== FETCHERS =====
 
-async function fetchServicesFromContentfulRaw(): Promise<ServiceEntry[] | null> {
+async function fetchServicesFromContentfulRaw(): Promise<ServiceEntry[]> {
   console.log("[Contentful] fetchServices: start");
-  const config = getContentfulConfig();
-  if (!config) {
-    console.log("[Contentful] fetchServices: no config, skipping");
-    return null;
-  }
+  const config = getRequiredContentfulConfig();
 
   try {
     const client = createContentfulClient(config);
@@ -297,11 +400,16 @@ async function fetchServicesFromContentfulRaw(): Promise<ServiceEntry[] | null> 
     const result = entries.items
       .map((e) => mapServiceFields(e))
       .filter((item) => item.title && item.description && item.imagePath);
+
+    if (!result.length) {
+      throw new Error("No services found in Contentful.");
+    }
+
     console.log("[Contentful] fetchServices: result", result);
     return result;
   } catch (error) {
     logContentfulFetchError("Error fetching services from Contentful:", error);
-    return null;
+    throw new Error("Unable to fetch services from Contentful.");
   }
 }
 
@@ -309,11 +417,7 @@ async function fetchServiceDetailFromContentfulRaw(
   slug: string
 ): Promise<ServiceDetailEntry | null> {
   console.log(`[Contentful] fetchServiceDetail: start, slug=${slug}`);
-  const config = getContentfulConfig();
-  if (!config) {
-    console.log("[Contentful] fetchServiceDetail: no config, skipping");
-    return null;
-  }
+  const config = getRequiredContentfulConfig();
 
   try {
     const client = createContentfulClient(config);
@@ -332,17 +436,13 @@ async function fetchServiceDetailFromContentfulRaw(
     return result;
   } catch (error) {
     logContentfulFetchError("Error fetching service detail from Contentful:", error);
-    return null;
+    throw new Error("Unable to fetch service detail from Contentful.");
   }
 }
 
-async function fetchHomepageFromContentfulRaw(): Promise<HomepageData | null> {
+async function fetchHomepageFromContentfulRaw(): Promise<HomepageData> {
   console.log("[Contentful] fetchHomepage: start");
-  const config = getContentfulConfig();
-  if (!config) {
-    console.log("[Contentful] fetchHomepage: no config, skipping");
-    return null;
-  }
+  const config = getRequiredContentfulConfig();
 
   try {
     const client = createContentfulClient(config);
@@ -354,8 +454,7 @@ async function fetchHomepageFromContentfulRaw(): Promise<HomepageData | null> {
     } as any);
     const entry = entries.items[0];
     if (!entry) {
-      console.log("[Contentful] fetchHomepage: no entry found");
-      return null;
+      throw new Error("No homepage entry found in Contentful.");
     }
     console.log("[Contentful] fetchHomepage: entry found", entry.sys.id);
     const f = entry.fields as any;
@@ -421,17 +520,13 @@ async function fetchHomepageFromContentfulRaw(): Promise<HomepageData | null> {
     return homepageResult;
   } catch (error) {
     logContentfulFetchError("Error fetching homepage from Contentful:", error);
-    return null;
+    throw new Error("Unable to fetch homepage data from Contentful.");
   }
 }
 
-async function fetchAboutPageFromContentfulRaw(): Promise<AboutPageData | null> {
+async function fetchAboutPageFromContentfulRaw(): Promise<AboutPageData> {
   console.log("[Contentful] fetchAboutPage: start");
-  const config = getContentfulConfig();
-  if (!config) {
-    console.log("[Contentful] fetchAboutPage: no config, skipping");
-    return null;
-  }
+  const config = getRequiredContentfulConfig();
 
   try {
     const client = createContentfulClient(config);
@@ -442,8 +537,7 @@ async function fetchAboutPageFromContentfulRaw(): Promise<AboutPageData | null> 
     } as any);
     const entry = entries.items[0];
     if (!entry) {
-      console.log("[Contentful] fetchAboutPage: no entry found");
-      return null;
+      throw new Error("No about page entry found in Contentful.");
     }
     console.log("[Contentful] fetchAboutPage: entry found", entry.sys.id);
     const f = entry.fields as any;
@@ -464,17 +558,13 @@ async function fetchAboutPageFromContentfulRaw(): Promise<AboutPageData | null> 
     return aboutResult;
   } catch (error) {
     logContentfulFetchError("Error fetching about page from Contentful:", error);
-    return null;
+    throw new Error("Unable to fetch about page data from Contentful.");
   }
 }
 
-async function fetchRecipesPageFromContentfulRaw(): Promise<RecipesPageData | null> {
+async function fetchRecipesPageFromContentfulRaw(): Promise<RecipesPageData> {
   console.log("[Contentful] fetchRecipesPage: start");
-  const config = getContentfulConfig();
-  if (!config) {
-    console.log("[Contentful] fetchRecipesPage: no config, skipping");
-    return null;
-  }
+  const config = getRequiredContentfulConfig();
 
   try {
     const client = createContentfulClient(config);
@@ -485,8 +575,7 @@ async function fetchRecipesPageFromContentfulRaw(): Promise<RecipesPageData | nu
     } as any);
     const entry = entries.items[0];
     if (!entry) {
-      console.log("[Contentful] fetchRecipesPage: no entry found");
-      return null;
+      throw new Error("No recipes page entry found in Contentful.");
     }
     console.log("[Contentful] fetchRecipesPage: entry found", entry.sys.id);
     const result = mapRecipesOrShopPage(entry);
@@ -494,17 +583,13 @@ async function fetchRecipesPageFromContentfulRaw(): Promise<RecipesPageData | nu
     return result;
   } catch (error) {
     logContentfulFetchError("Error fetching recipes page from Contentful:", error);
-    return null;
+    throw new Error("Unable to fetch recipes page data from Contentful.");
   }
 }
 
-async function fetchShopPageFromContentfulRaw(): Promise<ShopPageData | null> {
+async function fetchShopPageFromContentfulRaw(): Promise<ShopPageData> {
   console.log("[Contentful] fetchShopPage: start");
-  const config = getContentfulConfig();
-  if (!config) {
-    console.log("[Contentful] fetchShopPage: no config, skipping");
-    return null;
-  }
+  const config = getRequiredContentfulConfig();
 
   try {
     const client = createContentfulClient(config);
@@ -515,8 +600,7 @@ async function fetchShopPageFromContentfulRaw(): Promise<ShopPageData | null> {
     } as any);
     const entry = entries.items[0];
     if (!entry) {
-      console.log("[Contentful] fetchShopPage: no entry found");
-      return null;
+      throw new Error("No shop page entry found in Contentful.");
     }
     console.log("[Contentful] fetchShopPage: entry found", entry.sys.id);
     const result = mapRecipesOrShopPage(entry);
@@ -524,17 +608,13 @@ async function fetchShopPageFromContentfulRaw(): Promise<ShopPageData | null> {
     return result;
   } catch (error) {
     logContentfulFetchError("Error fetching shop page from Contentful:", error);
-    return null;
+    throw new Error("Unable to fetch shop page data from Contentful.");
   }
 }
 
 async function fetchHeaderSettingsFromContentfulRaw(): Promise<HeaderSettings | null> {
   console.log("[Contentful] fetchHeaderSettings: start");
-  const config = getContentfulConfig();
-  if (!config) {
-    console.log("[Contentful] fetchHeaderSettings: no config, skipping");
-    return null;
-  }
+  const config = getRequiredContentfulConfig();
 
   try {
     const client = createContentfulClient(config);
@@ -563,7 +643,7 @@ async function fetchHeaderSettingsFromContentfulRaw(): Promise<HeaderSettings | 
     return headerResult;
   } catch (error) {
     logContentfulFetchError("Error fetching header settings from Contentful:", error);
-    return null;
+    throw new Error("Unable to fetch header settings from Contentful.");
   }
 }
 
@@ -587,11 +667,19 @@ export const fetchHomepageFromContentful = unstable_cache(
   { revalidate: 300, tags: ["homepage"] }
 );
 
-export const fetchAboutPageFromContentful = unstable_cache(
+const fetchAboutPageFromContentfulCached = unstable_cache(
   fetchAboutPageFromContentfulRaw,
   ["contentful-about-page"],
   { revalidate: 300, tags: ["about-page"] }
 );
+
+export async function fetchAboutPageFromContentful(): Promise<AboutPageData> {
+  if (process.env.NODE_ENV !== "production") {
+    return fetchAboutPageFromContentfulRaw();
+  }
+
+  return fetchAboutPageFromContentfulCached();
+}
 
 export const fetchRecipesPageFromContentful = unstable_cache(
   fetchRecipesPageFromContentfulRaw,

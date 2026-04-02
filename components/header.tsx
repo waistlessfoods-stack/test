@@ -40,7 +40,16 @@ export default function Header({
   const [verificationError, setVerificationError] = useState("");
   const [isEnquiryDialogOpen, setIsEnquiryDialogOpen] = useState(false);
   const pathname = usePathname();
-  const { items, totalItems, totalPrice, removeItem, updateQuantity } =
+  const {
+    items,
+    totalItems,
+    subtotalPrice,
+    taxAmount,
+    taxRate,
+    totalPrice,
+    removeItem,
+    updateQuantity,
+  } =
     useCart();
   const { data: session, isPending } = useSession();
 
@@ -49,7 +58,10 @@ export default function Header({
     currency: "USD",
   });
 
+  const formattedSubtotal = currencyFormatter.format(subtotalPrice);
+  const formattedTax = currencyFormatter.format(taxAmount);
   const formattedTotal = currencyFormatter.format(totalPrice);
+  const taxLabel = `Tax (${(taxRate * 100).toFixed(2)}%)`;
 
   const handleCheckout = async () => {
     // Check if user is signed in
@@ -117,9 +129,9 @@ export default function Header({
   const navLinks = [
     { label: "Home", href: "/" },
     { label: "About", href: "/about" },
+    { label: "Blogs", href: "/blog" },
     { label: "Shop", href: "/shop" },
     { label: "Recipes", href: "/recipes" },
-    { label: "Gallery", href: "/gallery" },
   ];
 
   const isLinkActive = (href: string) => {
@@ -472,9 +484,19 @@ export default function Header({
                           </div>
                         </div>
                       ))}
-                      <div className="flex items-center justify-between text-sm font-semibold text-[#1C1C1C]">
-                        <span>Total</span>
-                        <span>{formattedTotal}</span>
+                      <div className="rounded-lg border border-[#EEF2F1] bg-[#F8FCFB] p-3 text-sm text-[#1C1C1C]">
+                        <div className="flex items-center justify-between">
+                          <span>Subtotal</span>
+                          <span>{formattedSubtotal}</span>
+                        </div>
+                        <div className="mt-1 flex items-center justify-between text-[#4D5A59]">
+                          <span>{taxLabel}</span>
+                          <span>{formattedTax}</span>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between border-t border-[#D4E4E2] pt-2 font-semibold">
+                          <span>Total</span>
+                          <span>{formattedTotal}</span>
+                        </div>
                       </div>
                       <Button 
                         className="bg-[#00676E] hover:bg-[#00575e]"
@@ -681,9 +703,19 @@ export default function Header({
                           </div>
                         </div>
                       ))}
-                      <div className="flex items-center justify-between text-sm font-semibold text-[#1C1C1C]">
-                        <span>Total</span>
-                        <span>{formattedTotal}</span>
+                      <div className="rounded-lg border border-[#EEF2F1] bg-[#F8FCFB] p-3 text-sm text-[#1C1C1C]">
+                        <div className="flex items-center justify-between">
+                          <span>Subtotal</span>
+                          <span>{formattedSubtotal}</span>
+                        </div>
+                        <div className="mt-1 flex items-center justify-between text-[#4D5A59]">
+                          <span>{taxLabel}</span>
+                          <span>{formattedTax}</span>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between border-t border-[#D4E4E2] pt-2 font-semibold">
+                          <span>Total</span>
+                          <span>{formattedTotal}</span>
+                        </div>
                       </div>
                       <Button 
                         className="bg-[#00676E] hover:bg-[#00575e]"

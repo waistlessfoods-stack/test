@@ -46,13 +46,15 @@ export default function HomepageClient({ data }: HomepageClientProps) {
     <div className="flex flex-col w-full">
       {/* Hero Section */}
       <section className="relative w-full min-h-[700px] md:h-[707px] flex items-center justify-center overflow-hidden">
-        <Image
-          src={data.heroImagePath}
-          alt="Hero Background"
-          fill
-          className="object-cover"
-          priority
-        />
+        {data.heroImagePath && (
+          <Image
+            src={data.heroImagePath}
+            alt="Hero Background"
+            fill
+            className="object-cover"
+            priority
+          />
+        )}
 
         <div className="absolute inset-0 bg-black/20 md:bg-transparent" />
 
@@ -111,12 +113,14 @@ export default function HomepageClient({ data }: HomepageClientProps) {
           {data.features.map((item: FeatureItem) => (
             <div key={item.id} className="flex flex-col w-full h-full">
               <div className="relative w-full aspect-387/257">
-                <Image
-                  src={item.imagePath}
-                  alt={item.title}
-                  fill
-                  className="object-cover"
-                />
+                {item.imagePath && (
+                  <Image
+                    src={item.imagePath}
+                    alt={item.title}
+                    fill
+                    className="object-cover"
+                  />
+                )}
               </div>
 
               <div className="flex flex-col bg-[#F2F2F2] px-[25px] py-[34px] gap-6 grow md:min-h-[314px]">
@@ -130,9 +134,17 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                 </div>
 
                 <div className="w-full flex justify-center">
-                  <Button className="w-[142px] h-14 rounded-lg bg-[#388082] px-6 py-4 text-[20px] md:text-[22px] font-medium text-white hover:bg-[#2f6e70] transition-colors">
-                    {item.buttonLabel || "More Info"}
-                  </Button>
+                  {item.buttonHref ? (
+                    <Link href={item.buttonHref}>
+                      <Button className="w-[142px] h-14 rounded-lg bg-[#388082] px-6 py-4 text-[20px] md:text-[22px] font-medium text-white hover:bg-[#2f6e70] transition-colors">
+                        {item.buttonLabel || "More Info"}
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button className="w-[142px] h-14 rounded-lg bg-[#388082] px-6 py-4 text-[20px] md:text-[22px] font-medium text-white hover:bg-[#2f6e70] transition-colors">
+                      {item.buttonLabel || "More Info"}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -224,12 +236,14 @@ export default function HomepageClient({ data }: HomepageClientProps) {
               className="relative w-full max-w-[292px] h-[369px] group overflow-hidden"
             >
               <Link href={`/recipes/${item.slug}`}>
-                <Image
-                  src={item.imagePath}
-                  alt={item.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                {item.imagePath && (
+                  <Image
+                    src={item.imagePath}
+                    alt={item.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                )}
 
                 <div className="absolute inset-0 bg-black/60 transition-all duration-300 group-hover:bg-black/25" />
 
@@ -264,12 +278,14 @@ export default function HomepageClient({ data }: HomepageClientProps) {
 
       {/* Testimonial Section */}
       <section className="relative w-full min-h-[650px] md:h-[619px] overflow-visible flex items-center justify-center py-12">
-        <Image
-          src={data.testimonialBackgroundPath}
-          alt="Background"
-          fill
-          className="object-cover"
-        />
+        {data.testimonialBackgroundPath && (
+          <Image
+            src={data.testimonialBackgroundPath}
+            alt="Background"
+            fill
+            className="object-cover"
+          />
+        )}
 
         <div className="relative z-10 w-full max-w-[1252px] px-8 md:px-12">
           <Carousel

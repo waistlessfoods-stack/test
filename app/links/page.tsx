@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import LinksPageComponent from "@/components/links/links-page";
 import { fetchLinksPageFromContentful } from "@/lib/contentful-links";
 
@@ -14,10 +13,6 @@ export const revalidate = 300;
 
 export default async function LinksPage() {
   const linksData = await fetchLinksPageFromContentful();
-  console.log(linksData, "linksData")
-  return (
-    <Suspense fallback={<LinksPageComponent linksData={null} />}>
-      <LinksPageComponent linksData={linksData} />
-    </Suspense>
-  );
+
+  return <LinksPageComponent linksData={linksData} />;
 }

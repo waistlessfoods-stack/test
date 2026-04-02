@@ -20,7 +20,7 @@ function isTransientDbError(error: unknown): boolean {
 // Retry wrapper for database operations with exponential backoff
 async function withDbRetry<T>(
   fn: () => Promise<T>,
-  maxAttempts: number = 2
+  maxAttempts: number = 4
 ): Promise<T> {
   let lastError: Error | null = null;
 
@@ -34,8 +34,8 @@ async function withDbRetry<T>(
         throw lastError;
       }
 
-      // Exponential backoff: 250ms, 500ms, etc.
-      const delay = 250 * Math.pow(2, attempt);
+      // Exponential backoff: 500ms, 1000ms, 2000ms, etc.
+      const delay = 500 * Math.pow(2, attempt);
       console.log(
         `[DB Retry] Orders endpoint - Attempt ${attempt + 1} failed, retrying in ${delay}ms...`,
         lastError.message
@@ -68,8 +68,31 @@ export async function GET(request: Request) {
         .orderBy(desc(orders.createdAt))
     );
 
+    console.log("[Orders API] Fetched user orders", {
+      userId: userId.slice(0, 8),
+      count: userOrders.length,
+      orders: userOrders,
+    });
+
     return NextResponse.json({ orders: userOrders });
   } catch (error) {
+    const errorWithCause = error as Error & {
+      cause?: { code?: string };
+      code?: string;
+    };
+
+    const timeoutLike =
+      (error instanceof Error && isTransientDbError(error)) ||
+      errorWithCause?.code === "ETIMEDOUT" ||
+      errorWithCause?.cause?.code === "ETIMEDOUT";
+
+    if (timeoutLike) {
+      return NextResponse.json(
+        { error: "Database connection timeout. Please try again in a few seconds." },
+        { status: 503 }
+      );
+    }
+
     if (error instanceof Error && error.message.includes("Temporary database")) {
       return NextResponse.json(
         { error: "Database connection issue. Please try again in a few seconds." },
@@ -79,7 +102,11 @@ export async function GET(request: Request) {
 
     const message =
       error instanceof Error ? error.message : "Failed to fetch orders";
-    console.error("Orders fetch error:", message);
+    console.error("Orders fetch error:", {
+      message,
+      stack: error instanceof Error ? error.stack : undefined,
+      cause: errorWithCause?.cause,
+    });
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

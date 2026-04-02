@@ -69,13 +69,15 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
         <Container>
           <div className="relative w-full aspect-16/5 min-h-[400px] lg:min-h-[280px] 2xl:min-h-[300px] overflow-hidden rounded-[16px] lg:rounded-[16px] 2xl:rounded-[16px] flex items-center">
             <div className="absolute inset-0">
-              <Image
-                src={data.bannerImagePath}
-                alt="Background"
-                fill
-                className="object-cover"
-                priority
-              />
+              {data.bannerImagePath && (
+                <Image
+                  src={data.bannerImagePath}
+                  alt="Background"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              )}
               <div className="absolute inset-0 bg-black/50" />
             </div>
 
@@ -163,12 +165,14 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
                         selectedCategories.has(cat.id) ? 'ring-4 lg:ring-3 ring-[#0F8DAB] scale-95' : 'hover:scale-105'
                       }`}
                     >
-                      <Image
-                        src={cat.imagePath}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                        alt={cat.name}
-                      />
+                      {cat.imagePath && (
+                        <Image
+                          src={cat.imagePath}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                          alt={cat.name}
+                        />
+                      )}
                       <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-all duration-300 ease-in-out" />
                       <h3 className="absolute inset-0 flex items-center justify-center font-bebas text-4xl lg:text-2xl 2xl:text-3xl text-white">
                         {cat.name}
@@ -195,12 +199,14 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
                 >
                   <div className="relative aspect-square w-full rounded-[16px] lg:rounded-[16px] 2xl:rounded-[16px] overflow-hidden bg-white shadow-lg group-hover:shadow-2xl transition-shadow duration-300 mb-8 lg:mb-5 2xl:mb-5">
                     <Link href={`/recipes/detail/${item.slug}`}>
-                      <Image
-                        src={item.imagePath}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        alt={item.title}
-                      />
+                      {item.imagePath && (
+                        <Image
+                          src={item.imagePath}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                          alt={item.title}
+                        />
+                      )}
 
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300" />
 

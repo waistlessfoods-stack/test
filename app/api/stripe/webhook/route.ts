@@ -45,12 +45,17 @@ export async function POST(request: Request) {
       );
     }
 
+    console.log("[Stripe Webhook] Event received:", event.type);
+
     // Handle the checkout.session.completed event
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
+      const metadataOrderId = Number(session.metadata?.orderId);
 
-      // Update order status to completed
-      await db
+      let updated: Array<{ id: number }> = [];
+
+      // Primary match by session id.
+      updated = await db
         .update(orders)
         .set({
           status: "completed",
@@ -60,17 +65,51 @@ export async function POST(request: Request) {
             paymentStatus: session.payment_status,
             amountTotal: session.amount_total,
             customerDetails: session.customer_details,
+            checkoutSessionId: session.id,
           },
         })
-        .where(eq(orders.stripeSessionId, session.id));
+        .where(eq(orders.stripeSessionId, session.id))
+        .returning({ id: orders.id });
 
-      console.log(`Order completed for session: ${session.id}`);
+      // Fallback match by explicit orderId metadata when session id did not match.
+      if (updated.length === 0 && Number.isInteger(metadataOrderId) && metadataOrderId > 0) {
+        updated = await db
+          .update(orders)
+          .set({
+            status: "completed",
+            stripeSessionId: session.id,
+            stripePaymentIntentId: session.payment_intent as string,
+            updatedAt: new Date(),
+            metadata: {
+              paymentStatus: session.payment_status,
+              amountTotal: session.amount_total,
+              customerDetails: session.customer_details,
+              checkoutSessionId: session.id,
+            },
+          })
+          .where(eq(orders.id, metadataOrderId))
+          .returning({ id: orders.id });
+      }
+
+      if (updated.length === 0) {
+        console.warn("[Stripe Webhook] No order row matched checkout.session.completed", {
+          sessionId: session.id,
+          metadataOrderId: session.metadata?.orderId,
+        });
+      } else {
+        console.log("[Stripe Webhook] Order marked completed", {
+          orderIds: updated.map((row) => row.id),
+          sessionId: session.id,
+        });
+      }
     }
 
     // Handle payment_intent.succeeded event
     if (event.type === "payment_intent.succeeded") {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
-      console.log(`Payment succeeded: ${paymentIntent.id}`);
+      console.log("[Stripe Webhook] Payment intent succeeded", {
+        paymentIntentId: paymentIntent.id,
+      });
     }
 
     // Handle payment_intent.payment_failed event
@@ -78,16 +117,20 @@ export async function POST(request: Request) {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
       // Update order status to failed
-      await db
+      const updated = await db
         .update(orders)
         .set({
           status: "failed",
           stripePaymentIntentId: paymentIntent.id,
           updatedAt: new Date(),
         })
-        .where(eq(orders.stripePaymentIntentId, paymentIntent.id));
+        .where(eq(orders.stripePaymentIntentId, paymentIntent.id))
+        .returning({ id: orders.id });
 
-      console.log(`Payment failed: ${paymentIntent.id}`);
+      console.log("[Stripe Webhook] Payment failed", {
+        paymentIntentId: paymentIntent.id,
+        affectedOrders: updated.map((row) => row.id),
+      });
     }
 
     return NextResponse.json({ received: true });

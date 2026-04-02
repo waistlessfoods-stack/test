@@ -1,24 +1,5 @@
 import { fetchLinksPageFromContentful, type SocialLink } from "./contentful-links";
 
-// Default social links as fallback
-const defaultSocialLinks: SocialLink[] = [
-  {
-    title: "Instagram",
-    href: "https://www.instagram.com/waistlessfoods/?hl=en",
-    icon: "Instagram",
-  },
-  {
-    title: "Facebook",
-    href: "https://www.facebook.com/WaistLessFoods/",
-    icon: "Facebook",
-  },
-  {
-    title: "Yelp",
-    href: "https://www.yelp.com/biz/waistless-foods-houston-2",
-    icon: "Star",
-  },
-];
-
 // Map Contentful icon names to SVG file paths
 export function getIconPath(iconName: string): string {
   const iconMap: Record<string, string> = {
@@ -48,7 +29,7 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
 
   try {
     const linksData = await fetchLinksPageFromContentful();
-    const socialLinks = linksData?.socialLinks || defaultSocialLinks;
+    const socialLinks = linksData.socialLinks;
 
     // Update cache
     cachedSocialLinks = socialLinks;
@@ -57,6 +38,6 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
     return socialLinks;
   } catch (error) {
     console.error("Error fetching social links:", error);
-    return defaultSocialLinks;
+    throw new Error("Unable to fetch social links from Contentful.");
   }
 }

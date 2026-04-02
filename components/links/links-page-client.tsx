@@ -167,14 +167,16 @@ export default function LinksPageClient({
         <section className="rounded-lg border border-[#d7e3e2] bg-white/90 p-6 shadow-[0_20px_60px_-40px_rgba(0,0,0,0.35)] backdrop-blur">
           <div className="flex flex-col items-center gap-6 text-center">
             <div className="relative h-28 w-28 overflow-hidden rounded-full border-4 border-white shadow-xl">
-              <Image
-                src={profile.image}
-                alt="Chef Amber"
-                fill
-                className="object-cover object-center"
-                sizes="112px"
-                priority
-              />
+              {profile.image && (
+                <Image
+                  src={profile.image}
+                  alt="Chef Amber"
+                  fill
+                  className="object-cover object-center"
+                  sizes="112px"
+                  priority
+                />
+              )}
             </div>
 
             <div className="space-y-2">

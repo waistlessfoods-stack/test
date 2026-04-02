@@ -3,6 +3,7 @@ import Link from "next/link";
 import {
   fetchRecipesPageFromContentful,
 } from "@/lib/contentful-management";
+import { redirect } from "next/navigation";
 import RecipeDetailClient from "./recipe-detail-client";
 
 export const revalidate = 300;
@@ -15,14 +16,20 @@ type RecipeDetailPageProps = {
 
 export async function generateStaticParams() {
   const data = await fetchRecipesPageFromContentful();
-  
-  if (!data?.recipes) {
-    return [];
-  }
 
   return data.recipes.map((recipe) => ({
     slug: recipe.slug,
   }));
+}
+
+function isFreeRecipe(price: string): boolean {
+  const normalized = price.trim().toLowerCase();
+  if (!normalized || normalized === "free") {
+    return true;
+  }
+
+  const numericPrice = parseFloat(normalized.replace(/[^0-9.-]+/g, ""));
+  return !Number.isNaN(numericPrice) && numericPrice <= 0;
 }
 
 export default async function RecipeDetailPage({
@@ -30,19 +37,13 @@ export default async function RecipeDetailPage({
 }: RecipeDetailPageProps) {
   const { slug } = await params;
 
-  console.log("Looking for recipe with slug:", slug);
-
   // Fetch all recipes data
   const data = await fetchRecipesPageFromContentful();
 
-  console.log("Available recipes:", data?.recipes.map(r => ({ title: r.title, slug: r.slug })));
-
   // Find the specific recipe by slug
-  const recipe = data?.recipes.find((r) => r.slug === slug);
+  const recipe = data.recipes.find((r) => r.slug === slug);
 
-  console.log("Found recipe:", recipe ? recipe.title : "not found");
-
-  if (!recipe || !data) {
+  if (!recipe) {
     return (
       <div className="w-full min-h-screen bg-white overflow-x-hidden font-metropolis">
         <section className="w-full py-16 2xl:py-12">
@@ -59,6 +60,10 @@ export default async function RecipeDetailPage({
         </section>
       </div>
     );
+  }
+
+  if (isFreeRecipe(recipe.price)) {
+    redirect(`/recipes/detail/${slug}/full`);
   }
 
   return <RecipeDetailClient recipe={recipe} />;

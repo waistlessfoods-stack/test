@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Container } from "@/components/ui/container";
@@ -13,6 +13,7 @@ import Link from "next/link";
 type OrderItem = {
   id: string;
   name: string;
+  slug?: string;
   price: number;
   quantity: number;
   imagePath?: string;
@@ -36,21 +37,44 @@ export default function OrdersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, isPending } = useSession();
+  const userId = session?.user.id;
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [payingOrderId, setPayingOrderId] = useState<number | null>(null);
+  const [isReconciling, setIsReconciling] = useState(false);
+  const hasReconciledSuccessRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const showSuccess = searchParams.get("success") === "1";
 
   useEffect(() => {
-    if (!isPending && !session) {
+    if (!isPending && !userId) {
       router.push("/signin?redirect=/orders");
       return;
     }
 
-    if (session) {
+    if (userId) {
       fetchOrders();
     }
-  }, [session, isPending, router]);
+  }, [userId, isPending, router]);
+
+  useEffect(() => {
+    if (!userId || !showSuccess || hasReconciledSuccessRef.current) {
+      return;
+    }
+
+    const reconcile = async () => {
+      try {
+        hasReconciledSuccessRef.current = true;
+        setIsReconciling(true);
+        await fetch("/api/orders/reconcile", { method: "POST" });
+        await fetchOrders();
+      } finally {
+        setIsReconciling(false);
+      }
+    };
+
+    void reconcile();
+  }, [userId, showSuccess]);
 
   const fetchOrders = async () => {
     try {
@@ -67,6 +91,34 @@ export default function OrdersPage() {
       setError(err instanceof Error ? err.message : "Failed to load orders");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const continuePayment = async (orderId: number) => {
+    try {
+      setError(null);
+      setPayingOrderId(orderId);
+
+      const response = await fetch(`/api/orders/${orderId}/checkout`, {
+        method: "POST",
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || "Failed to continue payment");
+      }
+
+      if (!data?.url) {
+        throw new Error("Checkout URL not found");
+      }
+
+      window.location.href = data.url;
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to continue payment"
+      );
+    } finally {
+      setPayingOrderId(null);
     }
   };
 
@@ -113,6 +165,12 @@ export default function OrdersPage() {
     }
   };
 
+  const toSlug = (value: string) =>
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
   if (isPending || loading) {
     return (
       <div className="w-full min-h-screen bg-white font-metropolis">
@@ -143,6 +201,11 @@ export default function OrdersPage() {
                 <p className="text-green-700">
                   Your order has been placed successfully. You'll receive a confirmation email shortly.
                 </p>
+                {isReconciling && (
+                  <p className="text-green-700 text-sm mt-1">
+                    Confirming payment status...
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -234,6 +297,14 @@ export default function OrdersPage() {
                               Quantity: {item.quantity} × $
                               {item.price.toFixed(2)}
                             </p>
+                            {order.status === "completed" && (
+                              <Link
+                                href={`/recipes/detail/${item.slug || toSlug(item.name)}/full`}
+                                className="inline-flex mt-2 text-sm font-medium text-[#0F8DAB] hover:underline"
+                              >
+                                Open full recipe
+                              </Link>
+                            )}
                           </div>
                           <div className="font-semibold text-black">
                             ${(item.price * item.quantity).toFixed(2)}
@@ -262,6 +333,20 @@ export default function OrdersPage() {
                             </span>
                           </p>
                         )}
+                      </div>
+                    )}
+
+                    {order.status === "pending" && (
+                      <div className="border-t pt-4">
+                        <Button
+                          onClick={() => continuePayment(order.id)}
+                          disabled={payingOrderId === order.id}
+                          className="bg-[#0F8DAB] hover:bg-[#0d7a94]"
+                        >
+                          {payingOrderId === order.id
+                            ? "Opening Checkout..."
+                            : "Continue Payment"}
+                        </Button>
                       </div>
                     )}
                   </div>
