@@ -175,6 +175,13 @@ export type HeaderSettings = {
   promotionBannerLink: string;
 };
 
+export type FooterSettings = {
+  brandDescription: string;
+  newsletterDescription: string;
+  quickMenuDescription: string;
+  followUsDescription: string;
+};
+
 export type AboutPageData = {
   heroTitle: string;
   heroBackgroundImagePath: string | null;
@@ -203,6 +210,7 @@ export type Recipe = {
   description: string;
   imagePath: string | null;
   sortOrder: number;
+  categoryIds?: string[];
   categoryId?: string;
   featured?: boolean;
   detailDescription?: string;
@@ -347,6 +355,19 @@ function mapRecipesOrShopPage(entry: any): RecipesPageData {
     .map((e: any) => {
       const title = String(e.fields?.title ?? "");
       const imagePath = getAssetUrl(e.fields?.image);
+      const multiCategoryIds = Array.isArray(e.fields?.categories)
+        ? (e.fields.categories as any[])
+            .map((categoryRef: any) => categoryRef?.sys?.id)
+            .filter((id: unknown): id is string => typeof id === "string" && id.length > 0)
+        : [];
+      const singleCategoryId = (e.fields?.category as any)?.sys?.id;
+      const categoryIds =
+        multiCategoryIds.length > 0
+          ? multiCategoryIds
+          : typeof singleCategoryId === "string" && singleCategoryId.length > 0
+            ? [singleCategoryId]
+            : [];
+
       return {
         id: e.sys.id,
         slug: generateSlug(title),
@@ -355,7 +376,8 @@ function mapRecipesOrShopPage(entry: any): RecipesPageData {
         description: String(e.fields?.description ?? ""),
         imagePath,
         sortOrder: Number(e.fields?.sortOrder ?? 0),
-        categoryId: (e.fields?.category as any)?.sys?.id,
+        categoryIds,
+        categoryId: categoryIds[0],
         featured: Boolean(e.fields?.featured ?? false),
         detailDescription: String(
           e.fields?.detailDescription ?? e.fields?.description ?? ""
@@ -647,12 +669,67 @@ async function fetchHeaderSettingsFromContentfulRaw(): Promise<HeaderSettings | 
   }
 }
 
+async function fetchFooterSettingsFromContentfulRaw(): Promise<FooterSettings | null> {
+  console.log("[Contentful] fetchFooterSettings: start");
+  const config = getRequiredContentfulConfig();
+
+  try {
+    const client = createContentfulClient(config);
+    const entries = await client.getEntries({
+      content_type: "footerSettings",
+      limit: 1,
+    } as any);
+    const entry = entries.items[0];
+    if (!entry) {
+      console.log("[Contentful] fetchFooterSettings: no entry found");
+      return null;
+    }
+    console.log("[Contentful] fetchFooterSettings: entry found", entry.sys.id);
+    const f = entry.fields as any;
+
+    const footerResult = {
+      brandDescription: String(f.brandDescription ?? ""),
+      newsletterDescription: String(f.newsletterDescription ?? ""),
+      quickMenuDescription: String(f.quickMenuDescription ?? ""),
+      followUsDescription: String(f.followUsDescription ?? ""),
+    };
+
+    console.log("[Contentful] fetchFooterSettings: result", footerResult);
+    return footerResult;
+  } catch (error) {
+    const contentfulError = error as {
+      details?: { errors?: { name?: string }[] };
+      status?: number;
+    };
+    const isUnknownContentType =
+      contentfulError?.status === 400 &&
+      Array.isArray(contentfulError?.details?.errors) &&
+      contentfulError.details.errors.some((item) => item?.name === "unknownContentType");
+
+    if (isUnknownContentType) {
+      console.warn(
+        "Content type 'footerSettings' is missing in Contentful. Using default footer copy."
+      );
+      return null;
+    }
+
+    logContentfulFetchError("Error fetching footer settings from Contentful:", error);
+    throw new Error("Unable to fetch footer settings from Contentful.");
+  }
+}
+
 // ===== CACHED EXPORTS =====
 
 export const fetchHeaderSettingsFromContentful = unstable_cache(
   fetchHeaderSettingsFromContentfulRaw,
   ["contentful-header-settings"],
   { revalidate: 300, tags: ["header-settings"] }
+);
+
+export const fetchFooterSettingsFromContentful = unstable_cache(
+  fetchFooterSettingsFromContentfulRaw,
+  ["contentful-footer-settings"],
+  { revalidate: 300, tags: ["footer-settings"] }
 );
 
 export const fetchServicesFromContentful = unstable_cache(

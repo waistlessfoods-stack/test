@@ -6,17 +6,41 @@ import { useState } from "react";
 import Image from "next/image";
 import { getIconPath } from "@/lib/social-links";
 import type { SocialLink } from "@/lib/contentful-links";
+import type { FooterSettings } from "@/lib/contentful-management";
 import Link from "next/link";
 
-export default function Footer({ socialLinks = [] }: { socialLinks?: SocialLink[] }) {
+type FooterProps = {
+  socialLinks?: SocialLink[];
+  footerSettings?: FooterSettings | null;
+};
+
+const DEFAULT_BRAND_DESCRIPTION =
+  "Nourishing recipes and practical wellness support for your healthy lifestyle.";
+const DEFAULT_NEWSLETTER_DESCRIPTION =
+  "Get recipes, product updates, and wellness tips straight to your inbox.";
+const DEFAULT_QUICK_MENU_DESCRIPTION = "Explore our most visited pages.";
+const DEFAULT_FOLLOW_US_DESCRIPTION = "Stay connected for daily inspiration.";
+
+export default function Footer({ socialLinks = [], footerSettings }: FooterProps) {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
+
+  const brandDescription =
+    footerSettings?.brandDescription || DEFAULT_BRAND_DESCRIPTION;
+  const newsletterDescription =
+    footerSettings?.newsletterDescription || DEFAULT_NEWSLETTER_DESCRIPTION;
+  const quickMenuDescription =
+    footerSettings?.quickMenuDescription || DEFAULT_QUICK_MENU_DESCRIPTION;
+  const followUsDescription =
+    footerSettings?.followUsDescription || DEFAULT_FOLLOW_US_DESCRIPTION;
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage("");
+    setMessageType(null);
 
     try {
       const response = await fetch('/api/newsletter', {
@@ -31,77 +55,113 @@ export default function Footer({ socialLinks = [] }: { socialLinks?: SocialLink[
 
       if (!response.ok) {
         setMessage(data.error || "Something went wrong. Please try again.");
+        setMessageType("error");
         return;
       }
 
       setMessage("Thank you for subscribing!");
+      setMessageType("success");
       setEmail("");
     } catch (error) {
       setMessage("Something went wrong. Please try again.");
+      setMessageType("error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <footer className="py-18 bg-[#00676E]">
+    <footer className="relative overflow-hidden bg-[#00676E] py-20">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,rgba(255,255,255,0.14),transparent_38%),radial-gradient(circle_at_90%_90%,rgba(255,255,255,0.1),transparent_42%)]" />
       <Container>
-        <div className="flex flex-col md:flex-row justify-between gap-12 mb-8">
-          <div className="flex flex-col gap-6 max-w-md">
-            <h3 className="text-2xl text-white">WaistLess Foods</h3>
+        <div className="relative z-10 px-2 py-2 sm:px-0 sm:py-0">
+          <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr] lg:items-start">
+            <div className="flex flex-col gap-6">
+              <h3 className="text-3xl font-semibold tracking-tight text-white">WaistLess Foods</h3>
+              <p className="max-w-xl text-base leading-7 text-white/90">{brandDescription}</p>
+              <p className="max-w-xl text-sm leading-7 text-white/80">{newsletterDescription}</p>
 
-            <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
-              <div className="flex items-center px-4 py-4 bg-white rounded">
-                <input
-                  type="email"
-                  placeholder="Enter Your Email"
-                  className="flex-1 outline-none"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Subscribing..." : "Subscribe"}
-                </Button>
-              </div>
-              {message && (
-                <p className="text-sm text-white">{message}</p>
-              )}
-            </form>
-          </div>
-
-          <div className="flex gap-10 text-white">
-            <div>
-              <h4 className="font-medium mb-4">Quick Menu</h4>
-              <Link href="/" className="block mb-2">
-                Home
-              </Link>
-              <Link href="/recipes" className="block mb-2">
-                Recipes
-              </Link>
-              <Link href="/about" className="block mb-2">
-                About
-              </Link>
-              <Link href="/blog" className="block mb-2">
-                Blog
-              </Link>
+              <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2 rounded-xl border border-white/25 bg-white p-2 sm:flex-row sm:items-center">
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="h-11 flex-1 rounded-md border border-transparent px-4 text-[#0A4E53] outline-none transition focus:border-[#00676E]/40 focus:bg-[#f8ffff]"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="h-11 rounded-md bg-[#00676E] px-6 text-white hover:bg-[#055a60]"
+                  >
+                    {isSubmitting ? "Subscribing..." : "Subscribe"}
+                  </Button>
+                </div>
+                {message && (
+                  <p
+                    className={`text-sm ${
+                      messageType === "error" ? "text-red-200" : "text-emerald-200"
+                    }`}
+                  >
+                    {message}
+                  </p>
+                )}
+              </form>
             </div>
 
             <div>
-              <h4 className="font-medium mb-4">Follow Us</h4>
-              <div className="flex flex-col gap-3">
+              <h4 className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
+                Quick Menu
+              </h4>
+              <p className="mb-5 max-w-xs text-sm leading-6 text-white/80">{quickMenuDescription}</p>
+              <nav className="space-y-2">
+                <Link
+                  href="/"
+                  className="block w-fit text-base text-white/95 transition hover:translate-x-1 hover:text-white"
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/recipes"
+                  className="block w-fit text-base text-white/95 transition hover:translate-x-1 hover:text-white"
+                >
+                  Recipes
+                </Link>
+                <Link
+                  href="/about"
+                  className="block w-fit text-base text-white/95 transition hover:translate-x-1 hover:text-white"
+                >
+                  About
+                </Link>
+                <Link
+                  href="/blog"
+                  className="block w-fit text-base text-white/95 transition hover:translate-x-1 hover:text-white"
+                >
+                  Blog
+                </Link>
+              </nav>
+            </div>
+
+            <div>
+              <h4 className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
+                Follow Us
+              </h4>
+              <p className="mb-5 max-w-xs text-sm leading-6 text-white/80">{followUsDescription}</p>
+              <div className="flex flex-col gap-2">
                 {socialLinks.map((social) => (
                   <a
                     key={social.title}
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                    className="flex w-fit items-center gap-2 rounded-md px-2 py-1 text-white/95 transition hover:bg-white/10 hover:text-white"
                   >
                     <Image
                       alt={social.title}
-                      width={20}
-                      height={20}
+                      width={18}
+                      height={18}
                       src={getIconPath(social.icon)}
                       className="brightness-0 invert"
                     />
@@ -111,11 +171,11 @@ export default function Footer({ socialLinks = [] }: { socialLinks?: SocialLink[
               </div>
             </div>
           </div>
-        </div>
 
-        <p className="text-sm text-white text-center">
-          © {new Date().getFullYear()} waistlessfoods.com. All rights reserved.
-        </p>
+          <p className="mt-10 border-t border-white/15 pt-6 text-center text-sm text-white/75">
+            © {new Date().getFullYear()} waistlessfoods.com. All rights reserved.
+          </p>
+        </div>
       </Container>
     </footer>
   );

@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const normalizeDevOrigin = (value: string): string =>
   value
@@ -12,6 +13,9 @@ const allowedDevOrigins = process.env.ALLOWED_DEV_ORIGINS?.split(",")
   .filter(Boolean);
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
   allowedDevOrigins: allowedDevOrigins?.length
     ? allowedDevOrigins
     : ["localhost", "127.0.0.1", "192.168.0.192"],

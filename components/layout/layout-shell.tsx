@@ -3,7 +3,10 @@ import { headers } from "next/headers";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { getSocialLinks } from "@/lib/social-links";
-import { fetchHeaderSettingsFromContentful } from "@/lib/contentful-management";
+import {
+  fetchFooterSettingsFromContentful,
+  fetchHeaderSettingsFromContentful,
+} from "@/lib/contentful-management";
 import SiteAccessGate from "@/components/layout/site-access-gate";
 
 export default async function LayoutShell({ children }: { children: ReactNode }) {
@@ -17,12 +20,13 @@ export default async function LayoutShell({ children }: { children: ReactNode })
 
   const socialLinks = await getSocialLinks();
   const headerSettings = await fetchHeaderSettingsFromContentful();
+  const footerSettings = await fetchFooterSettingsFromContentful();
 
   return (
     <SiteAccessGate>
       <Header socialLinks={socialLinks} headerSettings={headerSettings} />
       {children}
-      <Footer socialLinks={socialLinks} />
+      <Footer socialLinks={socialLinks} footerSettings={footerSettings} />
     </SiteAccessGate>
   );
 }

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Check, Search } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import {
   Carousel,
@@ -94,7 +94,9 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
   // Filter recipes based on selected categories and search query
   const filteredRecipes = data.recipes.filter((recipe) => {
     // Filter by category
-    const categoryMatch = selectedCategories.size === 0 || (recipe.categoryId && selectedCategories.has(recipe.categoryId));
+    const categoryMatch =
+      selectedCategories.size === 0 ||
+      (recipe.categoryIds ?? []).some((categoryId) => selectedCategories.has(categoryId));
     
     // Filter by search query
     const searchMatch = searchQuery === "" || 
@@ -199,29 +201,63 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
           <div className="w-full mb-20 lg:mb-12 2xl:mb-14 relative px-4">
             <Carousel setApi={setApi} opts={{ align: "start", loop: true }}>
               <CarouselContent className="-ml-4">
-                {data.categories.map((cat: RecipeCategory) => (
-                  <CarouselItem key={cat.id} className="pl-4 basis-1/2 md:basis-1/5 lg:basis-1/6 2xl:basis-1/6">
-                    <div 
-                      onClick={() => toggleCategory(cat.id)}
-                      className={`relative h-[140px] md:h-[160px] lg:h-[115px] 2xl:h-[130px] rounded-lg lg:rounded-md 2xl:rounded-lg overflow-hidden group cursor-pointer shadow-sm transition-all duration-300 ease-in-out ${
-                        selectedCategories.has(cat.id) ? 'ring-4 lg:ring-3 ring-[#0F8DAB] scale-95' : 'hover:scale-105'
-                      }`}
-                    >
-                      {cat.imagePath && (
-                        <Image
-                          src={cat.imagePath}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                          alt={cat.name}
+                {data.categories.map((cat: RecipeCategory) => {
+                  const isSelected = selectedCategories.has(cat.id);
+
+                  return (
+                    <CarouselItem key={cat.id} className="pl-4 basis-1/2 md:basis-1/5 lg:basis-1/6 2xl:basis-1/6">
+                      <button
+                        type="button"
+                        onClick={() => toggleCategory(cat.id)}
+                        aria-pressed={isSelected}
+                        aria-label={`Toggle ${cat.name} category`}
+                        className={`relative h-[140px] md:h-[160px] lg:h-[115px] 2xl:h-[130px] w-full rounded-lg lg:rounded-md 2xl:rounded-lg overflow-hidden group cursor-pointer shadow-sm transition-all duration-300 ease-in-out text-left ${
+                          isSelected
+                            ? "shadow-[0_8px_22px_rgba(15,141,171,0.35)]"
+                            : "hover:scale-105"
+                        }`}
+                      >
+                        {cat.imagePath && (
+                          <Image
+                            src={cat.imagePath}
+                            fill
+                            className={`object-cover transition-transform duration-500 ease-out ${
+                              isSelected ? "scale-[1.1]" : "scale-[1.02] group-hover:scale-105"
+                            }`}
+                            alt={cat.name}
+                          />
+                        )}
+                        <div
+                          className={`absolute inset-0 transition-all duration-300 ease-in-out ${
+                            isSelected
+                              ? "bg-gradient-to-t from-black/2 via-black/0 to-transparent"
+                              : "bg-gradient-to-t from-black/88 via-black/66 to-black/38 group-hover:from-black/82 group-hover:via-black/60"
+                          }`}
                         />
-                      )}
-                      <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-all duration-300 ease-in-out" />
-                      <h3 className="absolute inset-0 flex items-center justify-center font-bebas text-4xl lg:text-2xl 2xl:text-3xl text-white">
-                        {cat.name}
-                      </h3>
-                    </div>
-                  </CarouselItem>
-                ))}
+                        {isSelected && (
+                          <>
+                            <div className="pointer-events-none absolute inset-[2px] rounded-[inherit] border-2 border-[#0F8DAB]" />
+                            <div className="pointer-events-none absolute inset-[5px] rounded-[inherit] border border-white/80" />
+                          </>
+                        )}
+                        <h3
+                          className={`absolute inset-0 flex items-center justify-center font-bebas text-4xl lg:text-2xl 2xl:text-3xl tracking-wide transition-colors duration-300 ${
+                            isSelected
+                              ? "text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.65)]"
+                              : "text-white/95"
+                          }`}
+                        >
+                          {cat.name}
+                        </h3>
+                        {isSelected && (
+                          <div className="absolute top-2 right-2 lg:top-1.5 lg:right-1.5 flex h-6 w-6 lg:h-5 lg:w-5 items-center justify-center rounded-full border border-[#0F8DAB] bg-[#00676E] text-white shadow-[0_2px_8px_rgba(0,103,110,0.45)]">
+                            <Check className="h-3.5 w-3.5 lg:h-3 lg:w-3" />
+                          </div>
+                        )}
+                      </button>
+                    </CarouselItem>
+                  );
+                })}
               </CarouselContent>
               <CarouselPrevious className="absolute -left-5 w-12 h-12 border-none shadow-xl" />
               <CarouselNext className="absolute -right-5 w-12 h-12 border-none shadow-xl" />
