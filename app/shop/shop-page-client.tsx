@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useSession } from "@/lib/auth-client";
 import type { ShopPageData, RecipeCategory, Recipe } from "@/lib/contentful-management";
 
 type ShopPageClientProps = {
@@ -26,6 +27,8 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
   const [current, setCurrent] = useState(0);
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
+  const [unlockedRecipeIds, setUnlockedRecipeIds] = useState<Set<string>>(new Set());
+  const { data: session, isPending } = useSession();
 
   useEffect(() => {
     if (!api) return;
@@ -33,6 +36,50 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
       setCurrent(api.selectedScrollSnap());
     });
   }, [api]);
+
+  useEffect(() => {
+    if (isPending) return;
+
+    if (!session?.user?.id) {
+      setUnlockedRecipeIds(new Set());
+      return;
+    }
+
+    let isActive = true;
+
+    const loadUnlockedRecipes = async () => {
+      try {
+        const response = await fetch("/api/orders");
+        if (!response.ok) return;
+
+        const payload = await response.json();
+        const completedOrders = (payload.orders || []).filter(
+          (order: { status?: string }) => order.status === "completed"
+        );
+
+        const unlockedIds = new Set<string>();
+        for (const order of completedOrders) {
+          for (const item of order.items || []) {
+            if (item?.id && typeof item.id === "string") {
+              unlockedIds.add(item.id);
+            }
+          }
+        }
+
+        if (isActive) {
+          setUnlockedRecipeIds(unlockedIds);
+        }
+      } catch (error) {
+        console.error("Failed to load unlocked recipes:", error);
+      }
+    };
+
+    void loadUnlockedRecipes();
+
+    return () => {
+      isActive = false;
+    };
+  }, [session?.user?.id, isPending]);
 
   const toggleCategory = (categoryId: string) => {
     const newSelected = new Set(selectedCategories);
@@ -228,13 +275,18 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-10 lg:gap-x-5 2xl:gap-x-6 gap-y-16 lg:gap-y-10 2xl:gap-y-10 w-full">
-              {filteredRecipes.map((item: Recipe) => (
+              {filteredRecipes.map((item: Recipe) => {
+                const recipeHref = unlockedRecipeIds.has(item.id)
+                  ? `/recipes/detail/${item.slug}/full`
+                  : `/recipes/detail/${item.slug}`;
+
+                return (
                 <div
                   key={item.id}
                   className="group block transition-transform duration-300 hover:-translate-y-2"
                 >
                   <div className="relative aspect-square w-full rounded-[16px] lg:rounded-[16px] 2xl:rounded-[16px] overflow-hidden bg-white shadow-lg group-hover:shadow-2xl transition-shadow duration-300 mb-8 lg:mb-5 2xl:mb-5">
-                    <Link href={`/recipes/detail/${item.slug}`}>
+                    <Link href={recipeHref}>
                       {item.imagePath && (
                         <Image
                           src={item.imagePath}
@@ -262,6 +314,12 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
                       </span>
                     </div>
 
+                    {unlockedRecipeIds.has(item.id) && (
+                      <div className="absolute top-3 left-3 rounded-md bg-[#E8F5F5] px-2.5 py-1 text-xs font-semibold text-[#00676E]">
+                        UNLOCKED
+                      </div>
+                    )}
+
                     {item.featured && (
                       <div className="absolute bottom-0 left-0 right-0 flex justify-center">
                         <Button className="w-[90%] h-16 lg:h-12 2xl:h-12 bg-[#0F8DAB] hover:bg-[#0d7a94] text-xl lg:text-base 2xl:text-base font-bold tracking-widest rounded-t-[10px] lg:rounded-t-[8px] 2xl:rounded-t-[8px] rounded-b-none pointer-events-none">
@@ -272,7 +330,7 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
                   </div>
 
                   <div className="flex flex-col gap-3 lg:gap-1.5 2xl:gap-2 px-4 lg:px-2 2xl:px-3">
-                    <Link href={`/recipes/detail/${item.slug}`}>
+                    <Link href={recipeHref}>
                       <h4 className="font-bold text-3xl lg:text-xl 2xl:text-2xl text-black leading-tight transition-colors duration-300 group-hover:text-[#0F8DAB]">
                         {item.title}
                       </h4>
@@ -282,7 +340,8 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
                     </p>
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
           )}
         </Container>

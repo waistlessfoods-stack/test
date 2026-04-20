@@ -14,6 +14,30 @@ import {
 const SALES_TAX_RATE_KEY = "sales_tax_rate";
 const LOCAL_SETTINGS_DIR = path.join(process.cwd(), ".runtime");
 const LOCAL_SETTINGS_PATH = path.join(LOCAL_SETTINGS_DIR, "tax-settings.json");
+const TAX_RATE_CACHE_TTL_MS = 60_000;
+const DB_READ_COOLDOWN_MS = 30_000;
+
+let cachedTaxRate: number | null = null;
+let cachedTaxRateAt = 0;
+let dbReadBlockedUntil = 0;
+let dbReadFailureLogged = false;
+
+function isTaxRateCacheFresh(now = Date.now()) {
+  return cachedTaxRate !== null && now - cachedTaxRateAt < TAX_RATE_CACHE_TTL_MS;
+}
+
+function cacheTaxRate(rate: number) {
+  cachedTaxRate = rate;
+  cachedTaxRateAt = Date.now();
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return String(error);
+}
 
 function isTransientDbError(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
@@ -79,7 +103,19 @@ async function writeLocalTaxRate(rate: number) {
 }
 
 export async function getServerSalesTaxRate(): Promise<number> {
+  const now = Date.now();
+  if (isTaxRateCacheFresh(now)) {
+    return cachedTaxRate as number;
+  }
+
   const fallback = getSalesTaxRate();
+
+  if (now < dbReadBlockedUntil) {
+    const localRate = await readLocalTaxRate();
+    const resolved = localRate ?? fallback;
+    cacheTaxRate(resolved);
+    return resolved;
+  }
 
   try {
     const rows = await withDbRetry(() =>
@@ -93,15 +129,27 @@ export async function getServerSalesTaxRate(): Promise<number> {
     const value = rows[0]?.value;
     const normalized = normalizeSalesTaxRate(value, fallback);
     await writeLocalTaxRate(normalized);
+    cacheTaxRate(normalized);
+    dbReadBlockedUntil = 0;
+    dbReadFailureLogged = false;
     return normalized;
   } catch (error) {
-    console.error("[TaxSettings] Failed to load tax rate from DB:", error);
+    dbReadBlockedUntil = Date.now() + DB_READ_COOLDOWN_MS;
+    if (!dbReadFailureLogged) {
+      const message = getErrorMessage(error);
+      console.warn(
+        `[TaxSettings] DB unavailable, using fallback tax rate sources. Reason: ${message}`,
+      );
+      dbReadFailureLogged = true;
+    }
 
     const localRate = await readLocalTaxRate();
     if (localRate !== null) {
+      cacheTaxRate(localRate);
       return localRate;
     }
 
+    cacheTaxRate(fallback);
     return fallback;
   }
 }
@@ -125,6 +173,9 @@ export async function setServerSalesTaxRate(rawRate: number | string) {
     );
 
     await writeLocalTaxRate(normalizedRate);
+    cacheTaxRate(normalizedRate);
+    dbReadBlockedUntil = 0;
+    dbReadFailureLogged = false;
   } catch (error) {
     console.error("[TaxSettings] Failed to persist tax rate to DB:", error);
     throw new Error("Failed to persist tax rate to database.");

@@ -36,6 +36,36 @@ export default function Footer({ socialLinks = [], footerSettings }: FooterProps
   const followUsDescription =
     footerSettings?.followUsDescription || DEFAULT_FOLLOW_US_DESCRIPTION;
 
+  const isFacebookLink = (social: SocialLink) => {
+    const value = `${social.title} ${social.icon} ${social.href}`.toLowerCase();
+    return value.includes("facebook");
+  };
+
+  const isTikTokLink = (social: SocialLink) => {
+    const value = `${social.title} ${social.icon} ${social.href}`.toLowerCase();
+    return value.includes("tiktok") || social.icon === "Music";
+  };
+
+  const fallbackTikTokLink: SocialLink = {
+    title: "TikTok",
+    href: "https://www.tiktok.com/@waistlessfoods",
+    icon: "Music",
+  };
+
+  const footerSocialLinks = (() => {
+    const withoutFacebook = socialLinks.filter((social) => !isFacebookLink(social));
+
+    if (withoutFacebook.some(isTikTokLink)) {
+      return withoutFacebook;
+    }
+
+    if (socialLinks.some(isFacebookLink)) {
+      return [...withoutFacebook, fallbackTikTokLink];
+    }
+
+    return withoutFacebook;
+  })();
+
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -150,7 +180,7 @@ export default function Footer({ socialLinks = [], footerSettings }: FooterProps
               </h4>
               <p className="mb-5 max-w-xs text-sm leading-6 text-white/80">{followUsDescription}</p>
               <div className="flex flex-col gap-2">
-                {socialLinks.map((social) => (
+                {footerSocialLinks.map((social) => (
                   <a
                     key={social.title}
                     href={social.href}

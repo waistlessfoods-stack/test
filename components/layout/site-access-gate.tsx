@@ -19,8 +19,18 @@ type SiteAccessGateProps = {
 
 export default function SiteAccessGate({ children }: SiteAccessGateProps) {
   const pathname = usePathname();
+  const isAuthRoute =
+    pathname === "/signin" ||
+    pathname.startsWith("/signin/") ||
+    pathname === "/signup" ||
+    pathname.startsWith("/signup/") ||
+    pathname === "/sso-callback" ||
+    pathname.startsWith("/sso-callback/");
   const isPublicRoute =
-    pathname === "/" || pathname === "/links" || pathname.startsWith("/links/");
+    pathname === "/" ||
+    pathname === "/links" ||
+    pathname.startsWith("/links/") ||
+    isAuthRoute;
 
   const [password, setPassword] = useState("");
   const [isUnlocked, setIsUnlocked] = useState(false);

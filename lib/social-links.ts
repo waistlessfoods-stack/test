@@ -7,7 +7,8 @@ export function getIconPath(iconName: string): string {
     Facebook: "/FB.svg",
     Star: "/STAR.svg",
     Yelp: "/STAR.svg",
-    Music: "/IG.svg", // TikTok - using IG as placeholder until tiktok.svg is added
+    Music: "/TT.svg",
+    TikTok: "/TT.svg",
     MapPin: "/globe.svg", // Google Business - using globe icon
   };
 

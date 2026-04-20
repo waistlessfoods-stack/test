@@ -224,6 +224,12 @@ export type Recipe = {
     description: string;
     imagePath?: string | null;
   }[];
+  cookTime?: string;
+  servingSize?: string;
+  // Rich Text fields (new, editor-friendly)
+  ingredientsRichText?: any;
+  toolsRichText?: any;
+  instructionsRichText?: any;
 };
 
 export type RecipesPageData = {
@@ -391,6 +397,11 @@ function mapRecipesOrShopPage(entry: any): RecipesPageData {
         instructionSteps: parseInstructionSteps(
           e.fields?.instructionSteps ?? e.fields?.instructions
         ),
+        cookTime: e.fields?.cookTime ? String(e.fields.cookTime) : undefined,
+        servingSize: e.fields?.servingSize ? String(e.fields.servingSize) : undefined,
+        ingredientsRichText: e.fields?.ingredientsRichText ?? null,
+        toolsRichText: e.fields?.toolsRichText ?? null,
+        instructionsRichText: e.fields?.instructionsRichText ?? null,
       };
     })
     .sort((a, b) => a.sortOrder - b.sortOrder);
@@ -592,7 +603,7 @@ async function fetchRecipesPageFromContentfulRaw(): Promise<RecipesPageData> {
     const client = createContentfulClient(config);
     const entries = await client.getEntries({
       content_type: "recipesPage",
-      include: 2,
+      include: 10,
       limit: 1,
     } as any);
     const entry = entries.items[0];
@@ -617,7 +628,7 @@ async function fetchShopPageFromContentfulRaw(): Promise<ShopPageData> {
     const client = createContentfulClient(config);
     const entries = await client.getEntries({
       content_type: "shopPage",
-      include: 2,
+      include: 10,
       limit: 1,
     } as any);
     const entry = entries.items[0];

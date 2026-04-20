@@ -75,20 +75,20 @@ export default function HomepageClient({ data }: HomepageClientProps) {
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Link href={data.heroPrimaryCtaHref}>
+            <div className="flex w-full max-w-[980px] flex-col gap-4 sm:flex-row sm:items-stretch">
+              <Link href={data.heroPrimaryCtaHref} className="w-full sm:flex-1">
                 <Button
                   size="lg"
-                  className="px-6 py-4 text-lg md:text-xl h-auto w-full sm:w-auto"
+                  className="h-auto min-h-[72px] w-full px-6 py-4 text-lg md:text-xl"
                 >
                   {data.heroPrimaryCtaLabel}
                 </Button>
               </Link>
-              <Link href={data.heroSecondaryCtaHref}>
+              <Link href={data.heroSecondaryCtaHref} className="w-full sm:flex-1">
                 <Button
                   variant="outline"
                   size="lg"
-                  className="px-6 py-4 border-2 border-white bg-transparent text-white text-lg md:text-xl h-auto hover:bg-white/10 w-full sm:w-auto"
+                  className="h-auto min-h-[72px] w-full border-2 border-white bg-transparent px-6 py-4 text-lg text-white hover:bg-white/10 md:text-xl"
                 >
                   {data.heroSecondaryCtaLabel}
                 </Button>
@@ -225,54 +225,89 @@ export default function HomepageClient({ data }: HomepageClientProps) {
       </section>
 
       {/* Featured Recipes Section */}
-      <section className="w-full max-w-[1246px] mx-auto px-6 lg:px-0 py-20 bg-white">
-        <h2 className="text-[50px] md:text-[80px] font-semibold text-black text-center mb-14 tracking-[-0.02em] leading-[86px] font-[family-name:--font-schibsted)]">
-          {data.featuredHeading}
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[26px] justify-items-center">
-          {data.featuredRecipes.map((item: FeaturedRecipe) => (
-            <div
-              key={item.id}
-              className="relative w-full max-w-[292px] h-[369px] group overflow-hidden"
-            >
-              <Link href={`/recipes/${item.slug}`}>
-                {item.imagePath && (
-                  <Image
-                    src={item.imagePath}
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                )}
+      <section className="w-full py-16 md:py-20 bg-[#F4F4F4]">
+        <div className="w-full max-w-[1246px] mx-auto px-6 lg:px-0 border-y border-dashed border-[#73B9C4] py-14 md:py-16">
+          <h2 className="text-[44px] md:text-[64px] text-black text-center mb-12 md:mb-14 leading-[0.95] tracking-wide uppercase font-['Bebas_Neue']">
+            {data.featuredHeading || "Featured Recipes"}
+          </h2>
 
-                <div className="absolute inset-0 bg-black/60 transition-all duration-300 group-hover:bg-black/25" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 justify-items-center">
+            {data.featuredRecipes.map((item: FeaturedRecipe, index) => {
+              const rawCategorySlug = (item.slug || item.title || "")
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-+|-+$/g, "");
+              const normalizedTitleSlug = (item.title || "")
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-+|-+$/g, "");
+              const categorySlugAliases: Record<string, string> = {
+                lunch: "pasta",
+                dinner: "vegan",
+              };
+              const titleAliases: Record<string, string> = {
+                lunch: "PASTA",
+                dinner: "VEGAN",
+              };
+              const categorySlug =
+                normalizedTitleSlug === "chef-spotlight"
+                  ? "chef-spotlight"
+                  : categorySlugAliases[rawCategorySlug] ?? rawCategorySlug;
+              const displayTitle =
+                titleAliases[rawCategorySlug] || item.title || "Recipe";
+              const cardHref = categorySlug
+                ? `/recipes?category=${encodeURIComponent(categorySlug)}`
+                : "/recipes";
 
-                <div className="absolute top-[67px] left-1/2 -translate-x-1/2 w-[183px] h-[235px] flex flex-col items-center justify-between">
-                  <div className="flex flex-col items-center gap-5 w-full shrink-0">
-                    <h3 className="text-[55.88px] text-white text-center uppercase tracking-[-0.02em] font-(family-name:--font-bebas-neue) leading-[38px] font-normal">
-                      {item.title}
-                    </h3>
-                    <div className="w-[161px] border-t border-white" />
-                  </div>
-
-                  <div className="flex items-center grow">
-                    <p className="text-[16px] text-white text-center font-medium tracking-[-0.02em] leading-5 font-sans">
-                      {item.description}
-                    </p>
-                  </div>
-
-                  <Button
-                    variant="outline"
-                    className="w-[170px] h-10 shrink-0 border border-white bg-transparent rounded-lg flex items-center justify-center py-2.5 px-3.5 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-white/10 text-white"
+              return (
+                <div
+                  key={item.id}
+                  className="relative w-full max-w-[292px] h-[356px] group overflow-hidden transition-all duration-300 group-hover:shadow-[0_0_42px_rgba(115,185,196,0.45)]"
+                >
+                  <Link
+                    href={cardHref}
+                    className="block w-full h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#73B9C4]"
                   >
-                    <span className="text-[16px] text-white text-center leading-5 uppercase font-sans">
-                      CLICK FOR MORE
-                    </span>
-                  </Button>
+                    {item.imagePath && (
+                      <Image
+                        src={item.imagePath}
+                        alt={item.title || displayTitle}
+                        fill
+                        className="object-cover transition-[transform,filter] duration-500 group-hover:scale-105 group-hover:brightness-110"
+                      />
+                    )}
+
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/40 to-black/70 transition-all duration-300 group-hover:from-black/35 group-hover:to-black/60" />
+
+                    <div className="pointer-events-none absolute inset-0 bg-[#A6E2EA]/0 transition-all duration-300 group-hover:bg-[#A6E2EA]/10" />
+
+                    <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+                      <div className="flex flex-col items-center gap-4 w-full transition-transform duration-300 group-hover:-translate-y-4">
+                        <h3 className="text-[48px] leading-[0.8] text-white uppercase tracking-wide font-['Bebas_Neue']">
+                          {displayTitle}
+                        </h3>
+                        <div className="w-[150px] border-t border-white/90" />
+                        <p className="text-[14px] md:text-[15px] text-white/90 leading-5 font-medium line-clamp-2 max-w-[220px]">
+                          {item.description || "Click below to explore this recipe collection."}
+                        </p>
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[170px] h-10 border border-white/80 bg-white/5 rounded-md flex items-center justify-center py-2.5 px-3.5 text-white opacity-0 translate-y-2 pointer-events-none transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto group-hover:border-white group-hover:bg-white/20 group-hover:shadow-[0_0_18px_rgba(255,255,255,0.75)]"
+                      >
+                        <span className="text-[13px] md:text-[14px] text-white text-center leading-5 uppercase tracking-[0.08em] font-semibold transition-colors duration-300 group-hover:text-white">
+                          Click For More
+                        </span>
+                      </Button>
+                    </div>
+                  </Link>
                 </div>
-              </Link>
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -320,13 +355,59 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                   </div>
                 </CarouselItem>
               ))}
+
+              {/* Dedicated Review Links Slide */}
+              <CarouselItem key="review-links">
+                <div className="w-full min-h-[450px] md:min-h-[409px] bg-white/85 backdrop-blur-[10px] shadow-lg flex items-center justify-center border border-white/20 rounded-lg p-6 md:p-12">
+                  <div className="w-full max-w-[900px] flex flex-col items-center gap-8">
+                    <div className="flex flex-col items-center gap-3 text-center">
+                      <h3
+                        className="text-[24px] md:text-[32px] font-normal leading-tight tracking-tight text-[#5B5B5B] uppercase"
+                        style={{ fontFamily: "Royale Couture, sans-serif" }}
+                      >
+                        Loved the experience?
+                      </h3>
+                      <p className="text-[15px] md:text-[18px] text-[#7a7a7a] font-sans">
+                        Share your review and help others discover WaistLess Foods.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
+                      <a
+                        href="https://www.yelp.com/biz_photos/waistless-foods-houston-2"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center justify-center gap-3 bg-[#388082] hover:bg-[#2d6b6d] active:scale-95 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 w-full sm:w-auto min-w-[200px] shadow-sm"
+                      >
+                        <img src="https://cdn.simpleicons.org/yelp/ffffff" alt="Yelp" className="w-6 h-6 shrink-0" />
+                        <span className="text-base md:text-lg">See more on Yelp</span>
+                      </a>
+
+                      <a
+                        href="https://www.google.com/search?kgmid=/g/11yxy_rgvn&q=WaistLess+Foods"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center justify-center gap-3 bg-[#388082] hover:bg-[#2d6b6d] active:scale-95 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 w-full sm:w-auto min-w-[200px] shadow-sm"
+                      >
+                        <svg className="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#fff"/>
+                          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#fff"/>
+                          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#fff"/>
+                          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#fff"/>
+                        </svg>
+                        <span className="text-base md:text-lg">See more on Google</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
             </CarouselContent>
 
-            <CarouselPrevious className="absolute -left-4 md:-left-12 top-1/2 -translate-y-1/2 w-10 h-10 md:w-[70px] md:h-[70px] bg-[#0F8DAB] hover:bg-[#0c768f] border-0 rounded-full z-40 shadow-xl opacity-100! flex items-center justify-center [&_svg]:text-white [&_svg]:w-3.5 [&_svg]:h-4 md:[&_svg]:w-[21.16px] md:[&_svg]:h-[24.69px] [&_svg]:stroke-[3.53px]" />
-            <CarouselNext className="absolute -right-4 md:-right-12 top-1/2 -translate-y-1/2 w-10 h-10 md:w-[70px] md:h-[70px] bg-[#0F8DAB] hover:bg-[#0c768f] border-0 rounded-full z-40 shadow-xl opacity-100! flex items-center justify-center [&_svg]:text-white [&_svg]:w-3.5 [&_svg]:h-4 md:[&_svg]:w-[21.16px] md:[&_svg]:h-[24.69px] [&_svg]:stroke-[3.53px]" />
+            <CarouselPrevious className="absolute -left-4 md:-left-12 top-1/2 -translate-y-1/2 w-10 h-10 md:w-[70px] md:h-[70px] bg-[#0F8DAB] hover:bg-[#0c768f] border-0 rounded-full z-40 shadow-xl opacity-100! flex items-center justify-center [&_svg]:text-white [&_svg]:fill-white [&_svg]:w-3.5 [&_svg]:h-4 md:[&_svg]:w-[21.16px] md:[&_svg]:h-[24.69px] [&_svg]:stroke-[3.53px]" />
+            <CarouselNext className="absolute -right-4 md:-right-12 top-1/2 -translate-y-1/2 w-10 h-10 md:w-[70px] md:h-[70px] bg-[#0F8DAB] hover:bg-[#0c768f] border-0 rounded-full z-40 shadow-xl opacity-100! flex items-center justify-center [&_svg]:text-white [&_svg]:fill-white [&_svg]:w-3.5 [&_svg]:h-4 md:[&_svg]:w-[21.16px] md:[&_svg]:h-[24.69px] [&_svg]:stroke-[3.53px]" />
 
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-50">
-              {data.testimonials.map((_, index) => (
+              {[...data.testimonials, { id: "review-links" }].map((_, index) => (
                 <button
                   key={index}
                   onClick={() => api?.scrollTo(index)}
@@ -335,7 +416,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                       ? "bg-[#16B0B9] scale-125"
                       : "bg-white/50"
                   }`}
-                  aria-label={`Go to testimonial ${index + 1}`}
+                  aria-label={`Go to slide ${index + 1}`}
                 />
               ))}
             </div>

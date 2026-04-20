@@ -5,8 +5,15 @@ import RecipesPageClient from "./recipes-page-client";
 
 export const revalidate = 300;
 
-export default async function Recipes() {
-  const data = await fetchRecipesPageFromContentful();
+type RecipesPageProps = {
+  searchParams: Promise<{
+    category?: string;
+  }>;
+};
 
-  return <RecipesPageClient data={data} />;
+export default async function Recipes({ searchParams }: RecipesPageProps) {
+  const data = await fetchRecipesPageFromContentful();
+  const { category } = await searchParams;
+
+  return <RecipesPageClient data={data} initialCategorySlug={category} />;
 }

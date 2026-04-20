@@ -166,6 +166,44 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
                 </p>
               </div>
 
+              {(recipe.cookTime || recipe.servingSize) && (
+                <div className="flex items-stretch gap-0 rounded-2xl overflow-hidden border border-[#D4EEEE] bg-gradient-to-r from-[#F0FAFA] to-[#E8F7F7] w-fit">
+                  {recipe.cookTime && (
+                    <div className="flex items-center gap-3 px-5 py-4">
+                      <div className="w-10 h-10 rounded-full bg-[#388082] flex items-center justify-center shrink-0 shadow-sm">
+                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <circle cx="12" cy="12" r="10" />
+                          <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-semibold text-[#388082] uppercase tracking-widest">Cook Time</span>
+                        <span className="text-base font-bold text-[#1a1a1a] leading-tight">{recipe.cookTime}</span>
+                      </div>
+                    </div>
+                  )}
+                  {recipe.cookTime && recipe.servingSize && (
+                    <div className="w-px bg-[#C5E8EA] my-3" />
+                  )}
+                  {recipe.servingSize && (
+                    <div className="flex items-center gap-3 px-5 py-4">
+                      <div className="w-10 h-10 rounded-full bg-[#388082] flex items-center justify-center shrink-0 shadow-sm">
+                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                          <circle cx="9" cy="7" r="4" />
+                          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-semibold text-[#388082] uppercase tracking-widest">Serving Size</span>
+                        <span className="text-base font-bold text-[#1a1a1a] leading-tight">{recipe.servingSize}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="bg-[#F7F7F7] rounded-lg p-5 2xl:p-4">
                 <div className="flex flex-col gap-5 2xl:gap-4">
                   <div className="flex items-center justify-between">

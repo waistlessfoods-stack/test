@@ -2,22 +2,222 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useSignUp } from "@clerk/nextjs";
-import * as Clerk from "@clerk/elements/common";
-import * as SignUp from "@clerk/elements/sign-up";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useClerk, useSignUp } from "@clerk/nextjs";
+
+type SignUpStep = "credentials" | "verify";
+
+type BrowserClerk = {
+  loaded?: boolean;
+  setActive?: (params: { session: string }) => Promise<void>;
+  client?: {
+    signUp?: {
+      create: (params: { emailAddress: string; password: string }) => Promise<{
+        status: string;
+        createdSessionId?: string;
+      }>;
+      authenticateWithRedirect?: (params: {
+        strategy: "oauth_google";
+        redirectUrl: string;
+        redirectUrlComplete: string;
+      }) => Promise<void>;
+      authenticateWithRedirectOrPopup?: (params: {
+        strategy: "oauth_google";
+        redirectUrl: string;
+        redirectUrlComplete: string;
+      }) => Promise<void>;
+      prepareEmailAddressVerification: (params: {
+        strategy: "email_code";
+      }) => Promise<void>;
+      attemptEmailAddressVerification: (params: {
+        code: string;
+      }) => Promise<{
+        status: string;
+        createdSessionId?: string;
+      }>;
+    };
+  };
+};
+
+function getBrowserClerk(): BrowserClerk | null {
+  if (typeof window === "undefined") return null;
+  return ((window as unknown as { Clerk?: BrowserClerk }).Clerk ?? null);
+}
+
+function getSafeRedirect(value: string | null) {
+  if (!value || !value.startsWith("/")) {
+    return "/";
+  }
+
+  return value;
+}
+
+function getClerkErrorMessage(error: unknown) {
+  const firstError =
+    typeof error === "object" &&
+    error !== null &&
+    "errors" in error &&
+    Array.isArray((error as { errors?: unknown[] }).errors)
+      ? (error as { errors: Array<{ longMessage?: string; message?: string }> })
+          .errors[0]
+      : null;
+
+  if (firstError?.longMessage) return firstError.longMessage;
+  if (firstError?.message) return firstError.message;
+  if (error instanceof Error) return error.message;
+
+  return "Something went wrong. Please try again.";
+}
 
 export default function SignUpPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { isLoaded, signUp } = useSignUp();
+  const { setActive } = useClerk();
+  const [step, setStep] = useState<SignUpStep>("credentials");
+  const [emailAddress, setEmailAddress] = useState("");
+  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const redirectTo = useMemo(
+    () => getSafeRedirect(searchParams.get("redirect")),
+    [searchParams]
+  );
   const isGoogleEnabled = process.env.NEXT_PUBLIC_ENABLE_GOOGLE_AUTH === "true";
-  const { signUp, fetchStatus } = useSignUp();
+  const browserClerk = getBrowserClerk();
+  const signUpResource =
+    browserClerk?.client?.signUp &&
+    typeof browserClerk.client.signUp.create === "function"
+      ? browserClerk.client.signUp
+      : signUp && typeof (signUp as unknown as BrowserClerk["client"]["signUp"]).create === "function"
+        ? (signUp as unknown as BrowserClerk["client"]["signUp"])
+        : null;
+  const isAuthReady = Boolean(browserClerk?.loaded && signUpResource);
+
+  useEffect(() => {
+    if (isAuthReady) {
+      setErrorMessage((previous) =>
+        previous === "Sign-up is still loading. Please try again." ? "" : previous
+      );
+    }
+  }, [isAuthReady]);
 
   const handleGoogleSignUp = async () => {
-    if (fetchStatus === "fetching") return;
+    if (!signUpResource || !isAuthReady) {
+      return;
+    }
 
-    await signUp.sso({
-      strategy: "oauth_google",
-      redirectUrl: "/",
-      redirectCallbackUrl: "/sso-callback",
-    });
+    setErrorMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const oauthSignUp =
+        signUpResource.authenticateWithRedirect ??
+        signUpResource.authenticateWithRedirectOrPopup;
+
+      if (!oauthSignUp) {
+        setErrorMessage("Google sign-up is not available right now. Please refresh and try again.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      await oauthSignUp({
+        strategy: "oauth_google",
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete: redirectTo,
+      });
+    } catch (error) {
+      setErrorMessage(getClerkErrorMessage(error));
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCreateAccount = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!signUpResource || !isAuthReady) {
+      return;
+    }
+
+    setErrorMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const signUpAttempt = await signUpResource.create({
+        emailAddress,
+        password,
+      });
+
+      if (signUpAttempt.status === "complete" && signUpAttempt.createdSessionId) {
+        if (setActive) {
+          await setActive({ session: signUpAttempt.createdSessionId });
+        } else if (browserClerk?.setActive) {
+          await browserClerk.setActive({ session: signUpAttempt.createdSessionId });
+        }
+        router.replace(redirectTo);
+        return;
+      }
+
+      await signUpResource.prepareEmailAddressVerification({ strategy: "email_code" });
+      setStep("verify");
+    } catch (error) {
+      setErrorMessage(getClerkErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleVerifyCode = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!signUpResource || !isAuthReady) {
+      setErrorMessage("Verification is still loading. Please try again.");
+      return;
+    }
+
+    setErrorMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const result = await signUpResource.attemptEmailAddressVerification({ code });
+
+      if (result.status === "complete" && result.createdSessionId) {
+        if (setActive) {
+          await setActive({ session: result.createdSessionId });
+        } else if (browserClerk?.setActive) {
+          await browserClerk.setActive({ session: result.createdSessionId });
+        }
+        router.replace(redirectTo);
+        return;
+      }
+
+      setErrorMessage("Verification is not complete yet. Please check your code.");
+    } catch (error) {
+      setErrorMessage(getClerkErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!signUpResource || !isAuthReady) {
+      setErrorMessage("Verification is still loading. Please try again.");
+      return;
+    }
+
+    setErrorMessage("");
+    setIsSubmitting(true);
+
+    try {
+      await signUpResource.prepareEmailAddressVerification({ strategy: "email_code" });
+    } catch (error) {
+      setErrorMessage(getClerkErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -46,21 +246,37 @@ export default function SignUpPage() {
       {/* Right Side - Sign Up Form */}
       <div className="flex w-full items-center justify-center bg-gradient-to-br from-gray-50 to-white px-6 py-12 lg:w-1/2">
         <div className="w-full max-w-md">
-          <SignUp.Root>
-            <SignUp.Step name="start">
-              <div className="mb-8">
-                <h1 className="mb-2 font-['Bebas_Neue'] text-5xl uppercase tracking-wide text-[#00676E]">
-                  Create Account
-                </h1>
-                <p className="text-gray-600">Start your journey to mindful, delicious cooking</p>
-              </div>
+          <div className="mb-8">
+            <h1 className="mb-2 font-['Bebas_Neue'] text-5xl uppercase tracking-wide text-[#00676E]">
+              {step === "credentials" ? "Create Account" : "Verify Email"}
+            </h1>
+            <p className="text-gray-600">
+              {step === "credentials"
+                ? "Start your journey to mindful, delicious cooking"
+                : `Enter the verification code sent to ${emailAddress}`}
+            </p>
+          </div>
 
+          {errorMessage && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errorMessage}
+            </div>
+          )}
+
+          {!isAuthReady && (
+            <div className="mb-4 rounded-lg border border-[#98d0d4] bg-[#edf8f9] px-4 py-3 text-sm text-[#0b4f54]">
+              Initializing secure sign-up...
+            </div>
+          )}
+
+          {step === "credentials" && (
+            <>
               {isGoogleEnabled && (
                 <>
                   <button
                     type="button"
                     onClick={handleGoogleSignUp}
-                    disabled={fetchStatus === "fetching"}
+                    disabled={isSubmitting || !isAuthReady}
                     className="mb-6 flex h-14 w-full items-center justify-center gap-3 rounded-lg border-2 border-gray-300 bg-white text-gray-700 transition-all hover:border-gray-400 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     <svg className="h-6 w-6" viewBox="0 0 24 24">
@@ -83,114 +299,105 @@ export default function SignUpPage() {
                 </>
               )}
 
-              <Clerk.Field name="emailAddress" className="mb-6 block">
-                <Clerk.Label className="mb-2 block text-sm font-semibold uppercase tracking-wide text-gray-700">
-                  Email Address
-                </Clerk.Label>
-                <Clerk.Input className="h-14 w-full rounded-lg border-2 border-gray-200 px-4 transition-colors focus:border-[#00676E] focus:outline-none" />
-                <Clerk.FieldError className="mt-2 block text-sm text-red-600" />
-              </Clerk.Field>
+              <form onSubmit={handleCreateAccount} className="space-y-6">
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold uppercase tracking-wide text-gray-700">
+                    Email Address
+                  </span>
+                  <input
+                    type="email"
+                    name="email"
+                    autoComplete="email"
+                    required
+                    value={emailAddress}
+                    onChange={(event) => setEmailAddress(event.target.value)}
+                    className="h-14 w-full rounded-lg border-2 border-gray-200 px-4 transition-colors focus:border-[#00676E] focus:outline-none"
+                  />
+                </label>
 
-              <Clerk.Field name="password" className="mb-6 block">
-                <Clerk.Label className="mb-2 block text-sm font-semibold uppercase tracking-wide text-gray-700">
-                  Password
-                </Clerk.Label>
-                <Clerk.Input
-                  type="password"
-                  className="h-14 w-full rounded-lg border-2 border-gray-200 px-4 transition-colors focus:border-[#00676E] focus:outline-none"
-                />
-                <Clerk.FieldError className="mt-2 block text-sm text-red-600" />
-              </Clerk.Field>
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold uppercase tracking-wide text-gray-700">
+                    Password
+                  </span>
+                  <input
+                    type="password"
+                    name="password"
+                    autoComplete="new-password"
+                    required
+                    minLength={8}
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    className="h-14 w-full rounded-lg border-2 border-gray-200 px-4 transition-colors focus:border-[#00676E] focus:outline-none"
+                  />
+                </label>
 
-              <SignUp.Captcha className="mb-6" />
-
-              <SignUp.Action
-                submit
-                className="h-14 w-full rounded-lg bg-[#00676E] text-lg font-bold uppercase tracking-wide text-white transition-all hover:bg-[#00575e] hover:shadow-lg"
-              >
-                Create Account
-              </SignUp.Action>
-
-              <div className="mt-8 text-center">
-                <p className="text-sm text-gray-600">
-                  Already have an account?{" "}
-                  <Link href="/signin" className="font-bold text-[#00676E] hover:underline">
-                    Sign in
-                  </Link>
-                </p>
-              </div>
-            </SignUp.Step>
-
-            <SignUp.Step name="continue">
-              <div className="mb-8">
-                <h1 className="mb-2 font-['Bebas_Neue'] text-5xl uppercase tracking-wide text-[#00676E]">
-                  Complete Profile
-                </h1>
-                <p className="text-gray-600">Just one more step to get started</p>
-              </div>
-
-              <Clerk.Field name="username" className="mb-6 block">
-                <Clerk.Label className="mb-2 block text-sm font-semibold uppercase tracking-wide text-gray-700">
-                  Username
-                </Clerk.Label>
-                <Clerk.Input className="h-14 w-full rounded-lg border-2 border-gray-200 px-4 transition-colors focus:border-[#00676E] focus:outline-none" />
-                <Clerk.FieldError className="mt-2 block text-sm text-red-600" />
-              </Clerk.Field>
-
-              <SignUp.Action
-                submit
-                className="h-14 w-full rounded-lg bg-[#00676E] text-lg font-bold uppercase tracking-wide text-white transition-all hover:bg-[#00575e] hover:shadow-lg"
-              >
-                Continue
-              </SignUp.Action>
-
-              <div className="mt-8 text-center">
-                <p className="text-sm text-gray-600">
-                  Already have an account?{" "}
-                  <Link href="/signin" className="font-bold text-[#00676E] hover:underline">
-                    Sign in
-                  </Link>
-                </p>
-              </div>
-            </SignUp.Step>
-
-            <SignUp.Step name="verifications">
-              <SignUp.Strategy name="email_code">
-                <div className="mb-8">
-                  <h1 className="mb-2 font-['Bebas_Neue'] text-5xl uppercase tracking-wide text-[#00676E]">
-                    Verify Email
-                  </h1>
-                  <p className="text-gray-600">
-                    Enter the verification code we sent to your email
-                  </p>
-                </div>
-
-                <Clerk.Field name="code" className="mb-6 block">
-                  <Clerk.Label className="mb-2 block text-sm font-semibold uppercase tracking-wide text-gray-700">
-                    Verification Code
-                  </Clerk.Label>
-                  <Clerk.Input className="h-14 w-full rounded-lg border-2 border-gray-200 px-4 text-center text-2xl tracking-widest transition-colors focus:border-[#00676E] focus:outline-none" />
-                  <Clerk.FieldError className="mt-2 block text-sm text-red-600" />
-                </Clerk.Field>
-
-                <SignUp.Action
-                  submit
-                  className="h-14 w-full rounded-lg bg-[#00676E] text-lg font-bold uppercase tracking-wide text-white transition-all hover:bg-[#00575e] hover:shadow-lg"
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !isAuthReady}
+                  className="h-14 w-full rounded-lg bg-[#00676E] text-lg font-bold uppercase tracking-wide text-white transition-all hover:bg-[#00575e] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  Verify & Complete
-                </SignUp.Action>
+                  {isSubmitting ? "Creating Account..." : "Create Account"}
+                </button>
+              </form>
+            </>
+          )}
 
-                <div className="mt-8 text-center">
-                  <p className="text-sm text-gray-600">
-                    Already have an account?{" "}
-                    <Link href="/signin" className="font-bold text-[#00676E] hover:underline">
-                      Sign in
-                    </Link>
-                  </p>
-                </div>
-              </SignUp.Strategy>
-            </SignUp.Step>
-          </SignUp.Root>
+          {step === "verify" && (
+            <form onSubmit={handleVerifyCode} className="space-y-6">
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold uppercase tracking-wide text-gray-700">
+                  Verification Code
+                </span>
+                <input
+                  type="text"
+                  name="verificationCode"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  required
+                  value={code}
+                  onChange={(event) => setCode(event.target.value)}
+                  className="h-14 w-full rounded-lg border-2 border-gray-200 px-4 text-center text-2xl tracking-widest transition-colors focus:border-[#00676E] focus:outline-none"
+                />
+              </label>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="h-14 w-full rounded-lg bg-[#00676E] text-lg font-bold uppercase tracking-wide text-white transition-all hover:bg-[#00575e] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isSubmitting ? "Verifying..." : "Verify & Complete"}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleResendCode}
+                disabled={isSubmitting}
+                className="w-full text-sm font-semibold uppercase tracking-wide text-[#00676E] transition-colors hover:text-[#00575e] disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                Resend code
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setErrorMessage("");
+                  setStep("credentials");
+                }}
+                className="w-full text-sm font-semibold uppercase tracking-wide text-[#00676E] transition-colors hover:text-[#00575e]"
+              >
+                Edit account details
+              </button>
+            </form>
+          )}
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-600">
+              Already have an account?{" "}
+              <Link href="/signin" className="font-bold text-[#00676E] hover:underline">
+                Sign in
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

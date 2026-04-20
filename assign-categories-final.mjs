@@ -60,8 +60,12 @@ async function assignCategoriesWithMigration() {
 
       // Update and then save
       const updated = await entry.update();
+      const published = updated.isUpdated?.() ? await updated.publish() : updated;
       console.log(`✅ ${currentTitle}`);
       console.log(`   → Category assigned (ID: ${categoryId})\n`);
+      if (published?.sys?.publishedVersion) {
+        console.log(`   → Published (v${published.sys.publishedVersion})\n`);
+      }
       successCount++;
     } catch (error) {
       const entry = await environment.getEntry(recipeId).catch(() => null);

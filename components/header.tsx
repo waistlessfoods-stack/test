@@ -142,6 +142,39 @@ export default function Header({
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
+  const isFacebookLink = (social: SocialLink) => {
+    const value = `${social.title} ${social.icon} ${social.href}`.toLowerCase();
+    return value.includes("facebook");
+  };
+
+  const isTikTokLink = (social: SocialLink) => {
+    const value = `${social.title} ${social.icon} ${social.href}`.toLowerCase();
+    return value.includes("tiktok") || social.icon === "Music";
+  };
+
+  const fallbackTikTokLink: SocialLink = {
+    title: "TikTok",
+    href: "https://www.tiktok.com/@waistlessfoods",
+    icon: "Music",
+  };
+
+  const headerSocialLinks = (() => {
+    const withoutFacebook = socialLinks.filter((social) => !isFacebookLink(social));
+    const tiktokLink = socialLinks.find(isTikTokLink);
+    const links = withoutFacebook.slice(0, 2);
+
+    if ((tiktokLink || socialLinks.some(isFacebookLink)) && !links.some(isTikTokLink)) {
+      const nextTikTokLink = tiktokLink ?? fallbackTikTokLink;
+      if (links.length >= 2) {
+        links[1] = nextTikTokLink;
+      } else {
+        links.push(nextTikTokLink);
+      }
+    }
+
+    return links;
+  })();
+
   return (
     <header className="w-full bg-white relative z-50">
       {/* Banner */}
@@ -275,7 +308,7 @@ export default function Header({
             <div className="flex items-center gap-4">
               <div className="h-8 w-px bg-[#19767C] shrink-0" />
               <div className="flex items-center gap-2">
-                {socialLinks.slice(0, 2).map((social) => (
+                {headerSocialLinks.map((social) => (
                   <a
                     key={social.title}
                     href={social.href}

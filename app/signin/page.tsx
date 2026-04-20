@@ -3,22 +3,174 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useSignIn } from "@clerk/nextjs";
-import * as Clerk from "@clerk/elements/common";
-import * as SignIn from "@clerk/elements/sign-in";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useClerk, useSignIn } from "@clerk/nextjs";
+
+type SignInStep = "identifier" | "password";
+
+type BrowserClerk = {
+  loaded?: boolean;
+  setActive?: (params: { session: string }) => Promise<void>;
+  client?: {
+    signIn?: {
+      create: (params: { identifier: string; password: string }) => Promise<{
+        status: string;
+        createdSessionId?: string;
+      }>;
+      authenticateWithRedirect?: (params: {
+        strategy: "oauth_google";
+        redirectUrl: string;
+        redirectUrlComplete: string;
+      }) => Promise<void>;
+      authenticateWithRedirectOrPopup?: (params: {
+        strategy: "oauth_google";
+        redirectUrl: string;
+        redirectUrlComplete: string;
+      }) => Promise<void>;
+    };
+  };
+};
+
+function getBrowserClerk(): BrowserClerk | null {
+  if (typeof window === "undefined") return null;
+  return ((window as unknown as { Clerk?: BrowserClerk }).Clerk ?? null);
+}
+
+function getSafeRedirect(value: string | null) {
+  if (!value || !value.startsWith("/")) {
+    return "/";
+  }
+
+  return value;
+}
+
+function getClerkErrorMessage(error: unknown) {
+  const firstError =
+    typeof error === "object" &&
+    error !== null &&
+    "errors" in error &&
+    Array.isArray((error as { errors?: unknown[] }).errors)
+      ? (error as { errors: Array<{ longMessage?: string; message?: string }> })
+          .errors[0]
+      : null;
+
+  if (firstError?.longMessage) return firstError.longMessage;
+  if (firstError?.message) return firstError.message;
+  if (error instanceof Error) return error.message;
+
+  return "Something went wrong. Please try again.";
+}
 
 export default function SignInPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { isLoaded, signIn } = useSignIn();
+  const { setActive } = useClerk();
+  const [step, setStep] = useState<SignInStep>("identifier");
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const redirectTo = useMemo(
+    () => getSafeRedirect(searchParams.get("redirect")),
+    [searchParams]
+  );
+  const checkoutMessage = searchParams.get("message");
   const isGoogleEnabled = process.env.NEXT_PUBLIC_ENABLE_GOOGLE_AUTH === "true";
-  const { signIn, fetchStatus } = useSignIn();
+  const browserClerk = getBrowserClerk();
+  const signInResource =
+    browserClerk?.client?.signIn &&
+    typeof browserClerk.client.signIn.create === "function"
+      ? browserClerk.client.signIn
+      : signIn && typeof (signIn as BrowserClerk["client"]["signIn"]["create"]) === "function"
+        ? (signIn as BrowserClerk["client"]["signIn"])
+        : null;
+  const isAuthReady = Boolean(browserClerk?.loaded && signInResource);
+
+  useEffect(() => {
+    if (isAuthReady) {
+      setErrorMessage((previous) =>
+        previous === "Sign-in is still loading. Please try again." ? "" : previous
+      );
+    }
+  }, [isAuthReady]);
+
+  const handleContinue = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!identifier.trim()) {
+      setErrorMessage("Please enter your email address.");
+      return;
+    }
+
+    setErrorMessage("");
+    setStep("password");
+  };
+
+  const handleEmailPasswordSignIn = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!signInResource || !isAuthReady) {
+      return;
+    }
+
+    setErrorMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const result = await signInResource.create({
+        identifier,
+        password,
+      });
+
+      if (result.status === "complete" && result.createdSessionId) {
+        if (setActive) {
+          await setActive({ session: result.createdSessionId });
+        } else if (browserClerk?.setActive) {
+          await browserClerk.setActive({ session: result.createdSessionId });
+        }
+        router.replace(redirectTo);
+        return;
+      }
+
+      setErrorMessage("Your sign-in needs an additional step. Please try again.");
+    } catch (error) {
+      setErrorMessage(getClerkErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
-    if (fetchStatus === "fetching") return;
+    if (!signInResource || !isAuthReady) {
+      return;
+    }
 
-    await signIn.sso({
-      strategy: "oauth_google",
-      redirectUrl: "/",
-      redirectCallbackUrl: "/sso-callback",
-    });
+    setErrorMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const oauthSignIn =
+        signInResource.authenticateWithRedirect ??
+        signInResource.authenticateWithRedirectOrPopup;
+
+      if (!oauthSignIn) {
+        setErrorMessage("Google sign-in is not available right now. Please refresh and try again.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      await oauthSignIn({
+        strategy: "oauth_google",
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete: redirectTo,
+      });
+    } catch (error) {
+      setErrorMessage(getClerkErrorMessage(error));
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -47,21 +199,43 @@ export default function SignInPage() {
       {/* Right Side - Sign In Form */}
       <div className="flex w-full items-center justify-center bg-gradient-to-br from-gray-50 to-white px-6 py-12 lg:w-1/2">
         <div className="w-full max-w-md">
-          <SignIn.Root>
-            <SignIn.Step name="start">
-              <div className="mb-8">
-                <h1 className="mb-2 font-['Bebas_Neue'] text-5xl uppercase tracking-wide text-[#00676E]">
-                  Welcome Back
-                </h1>
-                <p className="text-gray-600">Sign in to continue your culinary journey</p>
-              </div>
+          <div className="mb-8">
+            <h1 className="mb-2 font-['Bebas_Neue'] text-5xl uppercase tracking-wide text-[#00676E]">
+              {step === "identifier" ? "Welcome Back" : "Enter Password"}
+            </h1>
+            <p className="text-gray-600">
+              {step === "identifier"
+                ? "Sign in to continue your culinary journey"
+                : `Signing in as ${identifier}`}
+            </p>
+          </div>
 
+          {checkoutMessage && (
+            <div className="mb-4 rounded-lg border border-[#98d0d4] bg-[#edf8f9] px-4 py-3 text-sm text-[#0b4f54]">
+              {checkoutMessage}
+            </div>
+          )}
+
+          {errorMessage && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errorMessage}
+            </div>
+          )}
+
+          {!isAuthReady && (
+            <div className="mb-4 rounded-lg border border-[#98d0d4] bg-[#edf8f9] px-4 py-3 text-sm text-[#0b4f54]">
+              Initializing secure sign-in...
+            </div>
+          )}
+
+          {step === "identifier" && (
+            <>
               {isGoogleEnabled && (
                 <>
                   <button
                     type="button"
                     onClick={handleGoogleSignIn}
-                    disabled={fetchStatus === "fetching"}
+                    disabled={isSubmitting || !isAuthReady}
                     className="mb-6 flex h-14 w-full items-center justify-center gap-3 rounded-lg border-2 border-gray-300 bg-white text-gray-700 transition-all hover:border-gray-400 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     <svg className="h-6 w-6" viewBox="0 0 24 24">
@@ -84,104 +258,79 @@ export default function SignInPage() {
                 </>
               )}
 
-              <Clerk.Field name="identifier" className="mb-6 block">
-                <Clerk.Label className="mb-2 block text-sm font-semibold uppercase tracking-wide text-gray-700">
-                  Email Address
-                </Clerk.Label>
-                <Clerk.Input className="h-14 w-full rounded-lg border-2 border-gray-200 px-4 transition-colors focus:border-[#00676E] focus:outline-none" />
-                <Clerk.FieldError className="mt-2 block text-sm text-red-600" />
-              </Clerk.Field>
-
-              <SignIn.Action
-                submit
-                className="h-14 w-full rounded-lg bg-[#00676E] text-lg font-bold uppercase tracking-wide text-white transition-all hover:bg-[#00575e] hover:shadow-lg"
-              >
-                Continue
-              </SignIn.Action>
-
-              <div className="mt-8 text-center">
-                <p className="text-sm text-gray-600">
-                  Don&apos;t have an account?{" "}
-                  <Link href="/signup" className="font-bold text-[#00676E] hover:underline">
-                    Sign up
-                  </Link>
-                </p>
-              </div>
-            </SignIn.Step>
-
-            <SignIn.Step name="verifications">
-              <SignIn.Strategy name="password">
-                <div className="mb-8">
-                  <h1 className="mb-2 font-['Bebas_Neue'] text-5xl uppercase tracking-wide text-[#00676E]">
-                    Enter Password
-                  </h1>
-                  <p className="text-gray-600">Welcome back! Please enter your password</p>
-                </div>
-
-                <Clerk.Field name="password" className="mb-6 block">
-                  <Clerk.Label className="mb-2 block text-sm font-semibold uppercase tracking-wide text-gray-700">
-                    Password
-                  </Clerk.Label>
-                  <Clerk.Input
-                    type="password"
+              <form onSubmit={handleContinue} className="space-y-6">
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold uppercase tracking-wide text-gray-700">
+                    Email Address
+                  </span>
+                  <input
+                    type="email"
+                    name="email"
+                    autoComplete="email"
+                    required
+                    value={identifier}
+                    onChange={(event) => setIdentifier(event.target.value)}
                     className="h-14 w-full rounded-lg border-2 border-gray-200 px-4 transition-colors focus:border-[#00676E] focus:outline-none"
                   />
-                  <Clerk.FieldError className="mt-2 block text-sm text-red-600" />
-                </Clerk.Field>
+                </label>
 
-                <SignIn.Action
-                  submit
-                  className="h-14 w-full rounded-lg bg-[#00676E] text-lg font-bold uppercase tracking-wide text-white transition-all hover:bg-[#00575e] hover:shadow-lg"
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="h-14 w-full rounded-lg bg-[#00676E] text-lg font-bold uppercase tracking-wide text-white transition-all hover:bg-[#00575e] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  Sign In
-                </SignIn.Action>
+                  Continue
+                </button>
+              </form>
+            </>
+          )}
 
-                <div className="mt-8 text-center">
-                  <p className="text-sm text-gray-600">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="font-bold text-[#00676E] hover:underline">
-                      Sign up
-                    </Link>
-                  </p>
-                </div>
-              </SignIn.Strategy>
+          {step === "password" && (
+            <form onSubmit={handleEmailPasswordSignIn} className="space-y-6">
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold uppercase tracking-wide text-gray-700">
+                  Password
+                </span>
+                <input
+                  type="password"
+                  name="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  className="h-14 w-full rounded-lg border-2 border-gray-200 px-4 transition-colors focus:border-[#00676E] focus:outline-none"
+                />
+              </label>
 
-              <SignIn.Strategy name="email_code">
-                <div className="mb-8">
-                  <h1 className="mb-2 font-['Bebas_Neue'] text-5xl uppercase tracking-wide text-[#00676E]">
-                    Check Your Email
-                  </h1>
-                  <p className="text-gray-600">
-                    We sent a verification code to <span className="font-semibold"><SignIn.SafeIdentifier /></span>
-                  </p>
-                </div>
+              <button
+                type="submit"
+                disabled={isSubmitting || !isAuthReady}
+                className="h-14 w-full rounded-lg bg-[#00676E] text-lg font-bold uppercase tracking-wide text-white transition-all hover:bg-[#00575e] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isSubmitting ? "Signing In..." : "Sign In"}
+              </button>
 
-                <Clerk.Field name="code" className="mb-6 block">
-                  <Clerk.Label className="mb-2 block text-sm font-semibold uppercase tracking-wide text-gray-700">
-                    Verification Code
-                  </Clerk.Label>
-                  <Clerk.Input className="h-14 w-full rounded-lg border-2 border-gray-200 px-4 text-center text-2xl tracking-widest transition-colors focus:border-[#00676E] focus:outline-none" />
-                  <Clerk.FieldError className="mt-2 block text-sm text-red-600" />
-                </Clerk.Field>
+              <button
+                type="button"
+                onClick={() => {
+                  setErrorMessage("");
+                  setStep("identifier");
+                }}
+                className="w-full text-sm font-semibold uppercase tracking-wide text-[#00676E] transition-colors hover:text-[#00575e]"
+              >
+                Use a different email
+              </button>
+            </form>
+          )}
 
-                <SignIn.Action
-                  submit
-                  className="h-14 w-full rounded-lg bg-[#00676E] text-lg font-bold uppercase tracking-wide text-white transition-all hover:bg-[#00575e] hover:shadow-lg"
-                >
-                  Verify & Sign In
-                </SignIn.Action>
-
-                <div className="mt-8 text-center">
-                  <p className="text-sm text-gray-600">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="font-bold text-[#00676E] hover:underline">
-                      Sign up
-                    </Link>
-                  </p>
-                </div>
-              </SignIn.Strategy>
-            </SignIn.Step>
-          </SignIn.Root>
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-600">
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" className="font-bold text-[#00676E] hover:underline">
+                Sign up
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

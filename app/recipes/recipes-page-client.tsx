@@ -20,9 +20,18 @@ import { useSession } from "@/lib/auth-client";
 
 type RecipesPageClientProps = {
   data: RecipesPageData;
+  initialCategorySlug?: string;
 };
 
-export default function RecipesPageClient({ data }: RecipesPageClientProps) {
+function slugifyCategoryName(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export default function RecipesPageClient({ data, initialCategorySlug }: RecipesPageClientProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
@@ -36,6 +45,21 @@ export default function RecipesPageClient({ data }: RecipesPageClientProps) {
       setCurrent(api.selectedScrollSnap());
     });
   }, [api]);
+
+  useEffect(() => {
+    if (!initialCategorySlug) {
+      return;
+    }
+
+    const normalizedSlug = slugifyCategoryName(initialCategorySlug);
+    const matchedCategory = data.categories.find(
+      (category) => slugifyCategoryName(category.name) === normalizedSlug
+    );
+
+    if (matchedCategory) {
+      setSelectedCategories(new Set([matchedCategory.id]));
+    }
+  }, [data.categories, initialCategorySlug]);
 
   useEffect(() => {
     if (isPending) return;
