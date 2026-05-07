@@ -32,6 +32,8 @@ type BrowserClerk = {
   };
 };
 
+type BrowserSignInResource = NonNullable<NonNullable<BrowserClerk["client"]>["signIn"]>;
+
 function getBrowserClerk(): BrowserClerk | null {
   if (typeof window === "undefined") return null;
   return ((window as unknown as { Clerk?: BrowserClerk }).Clerk ?? null);
@@ -65,7 +67,7 @@ function getClerkErrorMessage(error: unknown) {
 export default function SignInPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isLoaded, signIn } = useSignIn();
+  const { signIn } = useSignIn();
   const { setActive } = useClerk();
   const [step, setStep] = useState<SignInStep>("identifier");
   const [identifier, setIdentifier] = useState("");
@@ -84,8 +86,8 @@ export default function SignInPage() {
     browserClerk?.client?.signIn &&
     typeof browserClerk.client.signIn.create === "function"
       ? browserClerk.client.signIn
-      : signIn && typeof (signIn as BrowserClerk["client"]["signIn"]["create"]) === "function"
-        ? (signIn as BrowserClerk["client"]["signIn"])
+      : signIn && typeof (signIn as { create?: unknown }).create === "function"
+        ? (signIn as unknown as BrowserSignInResource)
         : null;
   const isAuthReady = Boolean(browserClerk?.loaded && signInResource);
 

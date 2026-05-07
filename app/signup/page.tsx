@@ -40,6 +40,8 @@ type BrowserClerk = {
   };
 };
 
+type BrowserSignUpResource = NonNullable<NonNullable<BrowserClerk["client"]>["signUp"]>;
+
 function getBrowserClerk(): BrowserClerk | null {
   if (typeof window === "undefined") return null;
   return ((window as unknown as { Clerk?: BrowserClerk }).Clerk ?? null);
@@ -73,7 +75,7 @@ function getClerkErrorMessage(error: unknown) {
 export default function SignUpPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isLoaded, signUp } = useSignUp();
+  const { signUp } = useSignUp();
   const { setActive } = useClerk();
   const [step, setStep] = useState<SignUpStep>("credentials");
   const [emailAddress, setEmailAddress] = useState("");
@@ -92,8 +94,8 @@ export default function SignUpPage() {
     browserClerk?.client?.signUp &&
     typeof browserClerk.client.signUp.create === "function"
       ? browserClerk.client.signUp
-      : signUp && typeof (signUp as unknown as BrowserClerk["client"]["signUp"]).create === "function"
-        ? (signUp as unknown as BrowserClerk["client"]["signUp"])
+      : signUp && typeof (signUp as { create?: unknown }).create === "function"
+        ? (signUp as unknown as BrowserSignUpResource)
         : null;
   const isAuthReady = Boolean(browserClerk?.loaded && signUpResource);
 
