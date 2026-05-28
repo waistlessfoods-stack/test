@@ -21,6 +21,16 @@ const DEFAULT_NEWSLETTER_DESCRIPTION =
 const DEFAULT_QUICK_MENU_DESCRIPTION = "Explore our most visited pages.";
 const DEFAULT_FOLLOW_US_DESCRIPTION = "Stay connected for daily inspiration.";
 
+const QUICK_MENU_LINKS = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/services", label: "Chef Services" },
+  { href: "/shop", label: "Shop" },
+  { href: "/recipes", label: "Recipes" },
+  { href: "/blog", label: "Blog" },
+  { href: "/links", label: "Links" },
+];
+
 export default function Footer({ socialLinks = [], footerSettings }: FooterProps) {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -147,30 +157,15 @@ export default function Footer({ socialLinks = [], footerSettings }: FooterProps
               </h4>
               <p className="mb-5 max-w-xs text-sm leading-6 text-white/80">{quickMenuDescription}</p>
               <nav className="space-y-2">
-                <Link
-                  href="/"
-                  className="block w-fit text-base text-white/95 transition hover:translate-x-1 hover:text-white"
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/recipes"
-                  className="block w-fit text-base text-white/95 transition hover:translate-x-1 hover:text-white"
-                >
-                  Recipes
-                </Link>
-                <Link
-                  href="/about"
-                  className="block w-fit text-base text-white/95 transition hover:translate-x-1 hover:text-white"
-                >
-                  About
-                </Link>
-                <Link
-                  href="/blog"
-                  className="block w-fit text-base text-white/95 transition hover:translate-x-1 hover:text-white"
-                >
-                  Blog
-                </Link>
+                {QUICK_MENU_LINKS.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="block w-fit text-base text-white/95 transition hover:translate-x-1 hover:text-white"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
               </nav>
             </div>
 

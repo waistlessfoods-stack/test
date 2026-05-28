@@ -59,10 +59,40 @@ async function addAssetFieldsAndMigrate() {
     }
   }
 
+  // Helper to add array of assets field if it doesn't exist
+  async function addAssetArrayField(contentTypeId, fieldId, fieldName, maxItems) {
+    let contentType = await environment.getContentType(contentTypeId);
+    const existingField = contentType.fields.find((f) => f.id === fieldId);
+
+    if (!existingField) {
+      console.log(`Adding ${fieldId} to ${contentTypeId}...`);
+
+      contentType.fields.push({
+        id: fieldId,
+        name: fieldName,
+        type: "Array",
+        required: false,
+        validations: [{ size: { max: maxItems } }],
+        items: {
+          type: "Link",
+          linkType: "Asset",
+          validations: [{ linkMimetypeGroup: ["image"] }],
+        },
+      });
+
+      contentType = await contentType.update();
+      await contentType.publish();
+      console.log(`✅ Added ${fieldId} field to ${contentTypeId}`);
+    } else {
+      console.log(`✓ Field ${fieldId} already exists in ${contentTypeId}`);
+    }
+  }
+
   // Add asset fields to content types
   await addAssetField("featureItem", "image", "Image");
   await addAssetField("featuredRecipe", "image", "Image");
   await addAssetField("homepage", "heroImage", "Hero Image");
+  await addAssetArrayField("homepage", "heroImages", "Hero Images", 3);
   await addAssetField("homepage", "aboutImage", "About Image");
   await addAssetField("homepage", "testimonialBackground", "Testimonial Background");
 
@@ -124,6 +154,14 @@ async function addAssetFieldsAndMigrate() {
       [DEFAULT_LOCALE]: {
         sys: { type: "Link", linkType: "Asset", id: ASSET_IDS.hero },
       },
+    };
+
+    homepage.fields.heroImages = {
+      [DEFAULT_LOCALE]: [
+        {
+          sys: { type: "Link", linkType: "Asset", id: ASSET_IDS.hero },
+        },
+      ],
     };
 
     homepage.fields.aboutImage = {

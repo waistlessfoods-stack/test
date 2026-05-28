@@ -183,6 +183,18 @@ await createOrUpdateContentType("homepage", {
       required: true,
     },
     {
+      id: "heroImages",
+      name: "Hero Images",
+      type: "Array",
+      required: false,
+      validations: [{ size: { max: 3 } }],
+      items: {
+        type: "Link",
+        linkType: "Asset",
+        validations: [{ linkMimetypeGroup: ["image"] }],
+      },
+    },
+    {
       id: "heroPrimaryCtaLabel",
       name: "Hero Primary CTA Label",
       type: "Symbol",
@@ -290,6 +302,12 @@ await createOrUpdateContentType("homepage", {
       name: "Featured Heading",
       type: "Symbol",
       required: true,
+    },
+    {
+      id: "featuredDescription",
+      name: "Featured Description",
+      type: "Text",
+      required: false,
     },
     {
       id: "featuredRecipes",
@@ -565,6 +583,10 @@ if (existing.items.length === 0) {
       aboutButtonHref: { [DEFAULT_LOCALE]: "/about" },
       aboutImagePath: { [DEFAULT_LOCALE]: "/highlight/amber-chef.png" },
       featuredHeading: { [DEFAULT_LOCALE]: "Featured Recipes" },
+      featuredDescription: {
+        [DEFAULT_LOCALE]:
+          "Explore handpicked recipes built for flavor, balance, and everyday simplicity.",
+      },
       featuredRecipes: { [DEFAULT_LOCALE]: featuredRecipeRefs },
       testimonialBackgroundPath: { [DEFAULT_LOCALE]: "/testimonial.png" },
       testimonials: { [DEFAULT_LOCALE]: testimonialRefs },

@@ -176,7 +176,7 @@ export default function Header({
   })();
 
   return (
-    <header className="w-full bg-white relative z-50">
+    <header className="sticky top-0 w-full bg-white z-50">
       {/* Banner */}
       {headerSettings?.promotionBannerEnabled && headerSettings.promotionBannerText && (
         <div 

@@ -100,38 +100,41 @@ export default function RecipeFullClient({
             </div>
 
             {(recipe.cookTime || recipe.servingSize) && (
-              <div className="flex items-stretch gap-0 rounded-2xl overflow-hidden border border-[#D4EEEE] bg-gradient-to-r from-[#F0FAFA] to-[#E8F7F7] w-fit">
+              <div className="flex flex-wrap gap-3">
                 {recipe.cookTime && (
-                  <div className="flex items-center gap-3 px-5 py-4">
-                    <div className="w-10 h-10 rounded-full bg-[#388082] flex items-center justify-center shrink-0 shadow-sm">
-                      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <circle cx="12" cy="12" r="10" />
-                        <polyline points="12 6 12 12 16 14" />
-                      </svg>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-semibold text-[#388082] uppercase tracking-widest">Cook Time</span>
-                      <span className="text-base font-bold text-[#1a1a1a] leading-tight">{recipe.cookTime}</span>
-                    </div>
+                  <div className="inline-flex items-center gap-2 rounded-md border border-[#CBE7E8] bg-[#F3FAFA] px-3 py-2">
+                    <svg
+                      className="h-4 w-4 text-[#2F7A7E]"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <polyline points="12 7 12 12 15 14" />
+                    </svg>
+                    <span className="text-xs font-semibold uppercase tracking-wide text-[#2F7A7E]">
+                      Cook
+                    </span>
+                    <span className="text-sm font-semibold text-[#1a1a1a]">{recipe.cookTime}</span>
                   </div>
                 )}
-                {recipe.cookTime && recipe.servingSize && (
-                  <div className="w-px bg-[#C5E8EA] my-3" />
-                )}
                 {recipe.servingSize && (
-                  <div className="flex items-center gap-3 px-5 py-4">
-                    <div className="w-10 h-10 rounded-full bg-[#388082] flex items-center justify-center shrink-0 shadow-sm">
-                      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                      </svg>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-semibold text-[#388082] uppercase tracking-widest">Serving Size</span>
-                      <span className="text-base font-bold text-[#1a1a1a] leading-tight">{recipe.servingSize}</span>
-                    </div>
+                  <div className="inline-flex items-center gap-2 rounded-md border border-[#CBE7E8] bg-[#F3FAFA] px-3 py-2">
+                    <svg
+                      className="h-4 w-4 text-[#2F7A7E]"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" />
+                      <circle cx="10" cy="7" r="4" />
+                    </svg>
+                    <span className="text-xs font-semibold uppercase tracking-wide text-[#2F7A7E]">
+                      Serves
+                    </span>
+                    <span className="text-sm font-semibold text-[#1a1a1a]">{recipe.servingSize}</span>
                   </div>
                 )}
               </div>

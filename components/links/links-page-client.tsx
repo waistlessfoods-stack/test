@@ -58,6 +58,16 @@ interface ProfileData {
   image: string | null;
 }
 
+const QUICK_MENU_LINKS = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/services", label: "Chef Services" },
+  { href: "/shop", label: "Shop" },
+  { href: "/recipes", label: "Recipes" },
+  { href: "/blog", label: "Blog" },
+  { href: "/links", label: "Links" },
+];
+
 function trackLink(title: string, section: string, href: string) {
   if (typeof window === "undefined") return;
 
@@ -389,8 +399,34 @@ export default function LinksPageClient({
           </div>
         </section>
 
-        <section className="text-center text-xs uppercase tracking-[0.25em] text-[#8b9493]">
-          {footerText}
+        <section className="rounded-md border border-[#d7e3e2] bg-white/90 p-5 shadow-sm">
+          <div className="grid gap-6 sm:grid-cols-2 sm:items-start">
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.22em] text-[#5b6b69]">
+                Quick Menu
+              </h4>
+              <nav className="mt-3 grid grid-cols-1 gap-2 text-sm">
+                {QUICK_MENU_LINKS.map((item) => (
+                  <ActionLink
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => trackLink(item.label, "footer", item.href)}
+                    className="w-fit text-[#0e2f31] transition hover:text-[#0f6f73]"
+                  >
+                    {item.label}
+                  </ActionLink>
+                ))}
+              </nav>
+            </div>
+            <div className="sm:text-right">
+              <h4 className="text-xs font-semibold uppercase tracking-[0.22em] text-[#5b6b69]">
+                Licence
+              </h4>
+              <p className="mt-3 text-xs uppercase tracking-[0.25em] text-[#8b9493]">
+                {footerText}
+              </p>
+            </div>
+          </div>
         </section>
       </div>
 

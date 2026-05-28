@@ -4,7 +4,7 @@ import * as React from "react";
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
-import { ArrowLeft, ArrowRight, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -195,7 +195,7 @@ function CarouselPrevious({
       onClick={scrollPrev}
       {...props}
     >
-      <Play className="size-5 rotate-180 fill-[#0F8DAB] text-[#0F8DAB] group-hover:fill-white group-hover:text-white transition-colors" />
+      <ChevronLeft className="size-5 text-[#0F8DAB] group-hover:text-white transition-colors" />
       <span className="sr-only">Previous slide</span>
     </Button>
   );
@@ -225,7 +225,7 @@ function CarouselNext({
       onClick={scrollNext}
       {...props}
     >
-      <Play className="size-5 rotate-360 fill-[#0F8DAB] text-[#0F8DAB] group-hover:fill-white group-hover:text-white transition-colors" />
+      <ChevronRight className="size-5 text-[#0F8DAB] group-hover:text-white transition-colors" />
       <span className="sr-only">Next slide</span>
     </Button>
   );

@@ -46,6 +46,16 @@ function getAssetUrl(asset: any): string | null {
   return url.startsWith("//") ? `https:${url}` : url;
 }
 
+function getAssetUrls(assets: unknown): string[] {
+  if (!Array.isArray(assets)) {
+    return [];
+  }
+
+  return assets
+    .map((asset) => getAssetUrl(asset))
+    .filter((url): url is string => typeof url === "string" && url.length > 0);
+}
+
 // --- Error handling ---
 
 const contentfulWarningsShown = new Set<string>();
@@ -145,6 +155,7 @@ export type Testimonial = {
 export type HomepageData = {
   heroTitle: string;
   heroSubtitle: string;
+  heroImagePaths: string[];
   heroImagePath: string | null;
   heroPrimaryCtaLabel: string;
   heroPrimaryCtaHref: string;
@@ -162,6 +173,7 @@ export type HomepageData = {
   aboutButtonHref?: string;
   aboutImagePath: string | null;
   featuredHeading: string;
+  featuredDescription?: string;
   featuredRecipes: FeaturedRecipe[];
   testimonialBackgroundPath: string | null;
   testimonials: Testimonial[];
@@ -525,10 +537,21 @@ async function fetchHomepageFromContentfulRaw(): Promise<HomepageData> {
       }))
       .sort((a, b) => a.sortOrder - b.sortOrder);
 
+    const legacyHeroImagePath =
+      getAssetUrl(f.heroImage) ||
+      (typeof f.heroImagePath === "string" ? String(f.heroImagePath) : null);
+    const heroImagePaths = [
+      ...getAssetUrls(f.heroImages),
+      ...(legacyHeroImagePath ? [legacyHeroImagePath] : []),
+    ]
+      .filter((path, index, arr) => arr.indexOf(path) === index)
+      .slice(0, 3);
+
     const homepageResult = {
       heroTitle: String(f.heroTitle ?? ""),
       heroSubtitle: String(f.heroSubtitle ?? ""),
-      heroImagePath: getAssetUrl(f.heroImage),
+      heroImagePaths,
+      heroImagePath: heroImagePaths[0] || legacyHeroImagePath,
       heroPrimaryCtaLabel: String(f.heroPrimaryCtaLabel ?? ""),
       heroPrimaryCtaHref: String(f.heroPrimaryCtaHref ?? ""),
       heroSecondaryCtaLabel: String(f.heroSecondaryCtaLabel ?? ""),
@@ -545,6 +568,9 @@ async function fetchHomepageFromContentfulRaw(): Promise<HomepageData> {
       aboutButtonHref: f.aboutButtonHref ? String(f.aboutButtonHref) : undefined,
       aboutImagePath: getAssetUrl(f.aboutImage),
       featuredHeading: String(f.featuredHeading ?? ""),
+      featuredDescription: f.featuredDescription
+        ? String(f.featuredDescription)
+        : undefined,
       featuredRecipes,
       testimonialBackgroundPath: getAssetUrl(f.testimonialBackground),
       testimonials,

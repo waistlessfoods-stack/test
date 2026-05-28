@@ -31,6 +31,8 @@ async function debugHomepage() {
   console.log("\n=== HOMEPAGE ENTRY ===");
   console.log("Entry ID:", entry.sys.id);
   console.log("\n=== FIELDS ===");
+  console.log("Hero Image:", JSON.stringify(entry.fields.heroImage, null, 2));
+  console.log("Hero Images:", JSON.stringify(entry.fields.heroImages, null, 2));
   console.log("Features:", JSON.stringify(entry.fields.features, null, 2));
   console.log("Featured Recipes:", JSON.stringify(entry.fields.featuredRecipes, null, 2));
   console.log("Testimonials:", JSON.stringify(entry.fields.testimonials, null, 2));

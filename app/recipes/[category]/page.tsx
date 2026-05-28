@@ -94,10 +94,10 @@ export default async function RecipesPage({ params, searchParams }: RecipesPageP
 
                   {/* Buttons */}
                   <div className="flex flex-col sm:flex-row gap-3 2xl:gap-2 w-full">
-                    <Button className="flex-1 h-14 2xl:h-12 bg-[#FB7118] hover:bg-[#E86510] text-white font-medium text-lg 2xl:text-base rounded-lg 2xl:rounded-md transition-colors">
+                    <Button className="flex-1 h-11 2xl:h-10 bg-[#FB7118] hover:bg-[#E86510] text-white font-semibold text-base 2xl:text-sm rounded-md transition-colors">
                       Add to cart
                     </Button>
-                    <Button className="flex-1 h-14 2xl:h-12 bg-[#388082] hover:bg-[#2F6A6B] text-white font-medium text-lg 2xl:text-base rounded-lg 2xl:rounded-md transition-colors">
+                    <Button className="flex-1 h-11 2xl:h-10 bg-[#388082] hover:bg-[#2F6A6B] text-white font-semibold text-base 2xl:text-sm rounded-md transition-colors">
                       Order now
                     </Button>
                   </div>

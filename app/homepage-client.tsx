@@ -24,39 +24,111 @@ type HomepageClientProps = {
 };
 
 export default function HomepageClient({ data }: HomepageClientProps) {
-  const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
+  const [heroApi, setHeroApi] = useState<CarouselApi>();
+  const [heroCurrent, setHeroCurrent] = useState(0);
+  const [testimonialApi, setTestimonialApi] = useState<CarouselApi>();
+  const [testimonialCurrent, setTestimonialCurrent] = useState(0);
+
+  const heroSlides =
+    data.heroImagePaths?.length > 0
+      ? data.heroImagePaths.slice(0, 3)
+      : data.heroImagePath
+        ? [data.heroImagePath]
+        : [];
 
   useEffect(() => {
-    if (!api) return;
+    if (!testimonialApi) return;
 
     const onSelect = () => {
-      setCurrent(api.selectedScrollSnap());
+      setTestimonialCurrent(testimonialApi.selectedScrollSnap());
     };
 
     onSelect();
-    api.on("select", onSelect);
+    testimonialApi.on("select", onSelect);
 
     return () => {
-      api.off("select", onSelect);
+      testimonialApi.off("select", onSelect);
     };
-  }, [api]);
+  }, [testimonialApi]);
+
+  useEffect(() => {
+    if (!heroApi) return;
+
+    const onSelect = () => {
+      setHeroCurrent(heroApi.selectedScrollSnap());
+    };
+
+    onSelect();
+    heroApi.on("select", onSelect);
+
+    return () => {
+      heroApi.off("select", onSelect);
+    };
+  }, [heroApi]);
+
+  useEffect(() => {
+    if (!heroApi || heroSlides.length <= 1) return;
+
+    const intervalId = window.setInterval(() => {
+      heroApi.scrollNext();
+    }, 5000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [heroApi, heroSlides.length]);
 
   return (
     <div className="flex flex-col w-full">
       {/* Hero Section */}
       <section className="relative w-full min-h-[700px] md:h-[707px] flex items-center justify-center overflow-hidden">
-        {data.heroImagePath && (
-          <Image
-            src={data.heroImagePath}
-            alt="Hero Background"
-            fill
-            className="object-cover"
-            priority
-          />
+        {heroSlides.length > 0 && (
+          <Carousel
+            setApi={setHeroApi}
+            opts={{ align: "start", loop: heroSlides.length > 1 }}
+            className="absolute inset-0"
+          >
+            <CarouselContent className="ml-0">
+              {heroSlides.map((heroImagePath, index) => (
+                <CarouselItem
+                  key={`${heroImagePath}-${index}`}
+                  className="pl-0 min-h-[700px] md:h-[707px]"
+                >
+                  <div className="relative h-full w-full min-h-[700px] md:h-[707px]">
+                    <Image
+                      src={heroImagePath}
+                      alt={`Hero background ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      priority={index === 0}
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+
+            {heroSlides.length > 1 && (
+              <>
+                <CarouselPrevious className="z-20 left-3 md:left-6 top-1/2 -translate-y-1/2 h-14 w-14 md:h-[70px] md:w-[70px] rounded-full border-0 bg-[#0F8DAB] hover:bg-[#0c768f] shadow-xl disabled:opacity-45 [&_svg]:text-white [&_svg]:w-[18px] [&_svg]:h-[18px] md:[&_svg]:w-[22px] md:[&_svg]:h-[22px]" />
+                <CarouselNext className="z-20 right-3 md:right-6 top-1/2 -translate-y-1/2 h-14 w-14 md:h-[70px] md:w-[70px] rounded-full border-0 bg-[#0F8DAB] hover:bg-[#0c768f] shadow-xl disabled:opacity-45 [&_svg]:text-white [&_svg]:w-[18px] [&_svg]:h-[18px] md:[&_svg]:w-[22px] md:[&_svg]:h-[22px]" />
+                <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+                  {heroSlides.map((_, index) => (
+                    <button
+                      key={`hero-dot-${index}`}
+                      onClick={() => heroApi?.scrollTo(index)}
+                      className={`h-2.5 w-2.5 rounded-full transition-all ${
+                        heroCurrent === index ? "bg-white scale-125" : "bg-white/55"
+                      }`}
+                      aria-label={`Go to hero slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </Carousel>
         )}
 
-        <div className="absolute inset-0 bg-black/20 md:bg-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/55" />
 
         <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-[1200px] px-6 py-20">
           <div className="flex flex-col items-center gap-8 md:gap-12 max-w-[800px]">
@@ -225,11 +297,17 @@ export default function HomepageClient({ data }: HomepageClientProps) {
       </section>
 
       {/* Featured Recipes Section */}
-      <section className="w-full py-16 md:py-20 bg-[#F4F4F4]">
-        <div className="w-full max-w-[1246px] mx-auto px-6 lg:px-0 border-y border-dashed border-[#73B9C4] py-14 md:py-16">
-          <h2 className="text-[44px] md:text-[64px] text-black text-center mb-12 md:mb-14 leading-[0.95] tracking-wide uppercase font-['Bebas_Neue']">
-            {data.featuredHeading || "Featured Recipes"}
-          </h2>
+      <section className="w-full py-10 md:py-12 bg-[#F4F4F4]">
+        <div className="w-full max-w-[1246px] mx-auto px-6 lg:px-0 py-8 md:py-10">
+          <div className="mx-auto mb-8 md:mb-10 flex max-w-[860px] flex-col items-center gap-3 text-center">
+            <h2 className="text-[44px] md:text-[64px] text-black leading-[0.95] tracking-wide uppercase font-['Bebas_Neue']">
+              {data.featuredHeading || "Featured Recipes"}
+            </h2>
+            <p className="text-[15px] md:text-[18px] leading-relaxed text-[#5B5B5B]">
+              {data.featuredDescription ||
+                "Explore handpicked recipes built for flavor, balance, and everyday simplicity."}
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 justify-items-center">
             {data.featuredRecipes.map((item: FeaturedRecipe, index) => {
@@ -264,7 +342,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
               return (
                 <div
                   key={item.id}
-                  className="relative w-full max-w-[292px] h-[356px] group overflow-hidden transition-all duration-300 group-hover:shadow-[0_0_42px_rgba(115,185,196,0.45)]"
+                  className="relative w-full max-w-[292px] h-[356px] group overflow-hidden transition-all duration-300"
                 >
                   <Link
                     href={cardHref}
@@ -281,8 +359,6 @@ export default function HomepageClient({ data }: HomepageClientProps) {
 
                     <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/40 to-black/70 transition-all duration-300 group-hover:from-black/35 group-hover:to-black/60" />
 
-                    <div className="pointer-events-none absolute inset-0 bg-[#A6E2EA]/0 transition-all duration-300 group-hover:bg-[#A6E2EA]/10" />
-
                     <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
                       <div className="flex flex-col items-center gap-4 w-full transition-transform duration-300 group-hover:-translate-y-4">
                         <h3 className="text-[48px] leading-[0.8] text-white uppercase tracking-wide font-['Bebas_Neue']">
@@ -296,7 +372,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
 
                       <Button
                         variant="outline"
-                        className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[170px] h-10 border border-white/80 bg-white/5 rounded-md flex items-center justify-center py-2.5 px-3.5 text-white opacity-0 translate-y-2 pointer-events-none transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto group-hover:border-white group-hover:bg-white/20 group-hover:shadow-[0_0_18px_rgba(255,255,255,0.75)]"
+                        className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[170px] h-10 border border-white/80 bg-white/10 rounded-md flex items-center justify-center py-2.5 px-3.5 text-white opacity-0 translate-y-2 pointer-events-none transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto group-hover:border-white group-hover:bg-white/20"
                       >
                         <span className="text-[13px] md:text-[14px] text-white text-center leading-5 uppercase tracking-[0.08em] font-semibold transition-colors duration-300 group-hover:text-white">
                           Click For More
@@ -324,7 +400,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
 
         <div className="relative z-10 w-full max-w-[1252px] px-8 md:px-12">
           <Carousel
-            setApi={setApi}
+            setApi={setTestimonialApi}
             opts={{ align: "start", loop: true }}
             className="relative w-full"
           >
@@ -410,9 +486,9 @@ export default function HomepageClient({ data }: HomepageClientProps) {
               {[...data.testimonials, { id: "review-links" }].map((_, index) => (
                 <button
                   key={index}
-                  onClick={() => api?.scrollTo(index)}
+                  onClick={() => testimonialApi?.scrollTo(index)}
                   className={`w-2.5 h-2.5 rounded-full transition-all ${
-                    current === index
+                    testimonialCurrent === index
                       ? "bg-[#16B0B9] scale-125"
                       : "bg-white/50"
                   }`}

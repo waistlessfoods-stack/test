@@ -123,23 +123,23 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
 
   return (
     <div className="w-full min-h-screen bg-white overflow-x-hidden font-metropolis">
-      <section className="w-full py-16 2xl:py-12">
+      <section className="w-full py-12 2xl:py-10">
         <Container>
           <Link href="/recipes" className="mb-8 inline-block">
             <div className="flex items-center gap-4 hover:opacity-70 transition-opacity">
-              <span className="text-xl 2xl:text-lg font-medium text-[#0F8DAB]">
+              <span className="text-lg 2xl:text-base font-medium text-[#0F8DAB]">
                 Recipes
               </span>
-              <span className="text-xl 2xl:text-lg text-black">/</span>
-              <span className="text-xl 2xl:text-lg font-medium text-black">
+              <span className="text-lg 2xl:text-base text-black">/</span>
+              <span className="text-lg 2xl:text-base font-medium text-black">
                 Detail recipes
               </span>
             </div>
           </Link>
 
-          <div className="flex flex-col lg:flex-row gap-14 2xl:gap-8">
+          <div className="flex flex-col lg:flex-row gap-10 2xl:gap-6">
             <div className="w-full lg:w-1/2 flex items-center">
-              <div className="relative w-full aspect-square lg:aspect-auto lg:h-[642px] rounded-lg overflow-hidden bg-[#E9E9E9] shadow-lg">
+              <div className="relative w-full aspect-square lg:aspect-auto lg:h-[560px] 2xl:h-[520px] rounded-lg overflow-hidden bg-[#E9E9E9] shadow-lg">
                 {recipe.imagePath && (
                   <Image
                     src={recipe.imagePath}
@@ -152,65 +152,68 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
               </div>
             </div>
 
-            <div className="w-full lg:w-1/2 flex flex-col gap-12 2xl:gap-8 justify-start">
-              <h1 className="font-metropolis font-medium text-5xl 2xl:text-4xl text-black leading-tight">
+            <div className="w-full lg:w-1/2 flex flex-col gap-10 2xl:gap-7 justify-start">
+              <h1 className="font-metropolis font-medium text-4xl 2xl:text-3xl text-black leading-tight">
                 {recipe.title}
               </h1>
 
-              <div className="flex flex-col gap-5 2xl:gap-4">
-                <h3 className="font-medium text-2xl 2xl:text-xl text-black">
+              <div className="flex flex-col gap-4 2xl:gap-3">
+                <h3 className="font-medium text-xl 2xl:text-lg text-black">
                   Description
                 </h3>
-                <p className="font-normal text-xl 2xl:text-lg text-gray-600 leading-relaxed">
+                <p className="font-normal text-lg 2xl:text-base text-gray-600 leading-relaxed">
                   {recipe.detailDescription || recipe.description}
                 </p>
               </div>
 
               {(recipe.cookTime || recipe.servingSize) && (
-                <div className="flex items-stretch gap-0 rounded-2xl overflow-hidden border border-[#D4EEEE] bg-gradient-to-r from-[#F0FAFA] to-[#E8F7F7] w-fit">
+                <div className="flex flex-wrap gap-3">
                   {recipe.cookTime && (
-                    <div className="flex items-center gap-3 px-5 py-4">
-                      <div className="w-10 h-10 rounded-full bg-[#388082] flex items-center justify-center shrink-0 shadow-sm">
-                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <circle cx="12" cy="12" r="10" />
-                          <polyline points="12 6 12 12 16 14" />
-                        </svg>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-semibold text-[#388082] uppercase tracking-widest">Cook Time</span>
-                        <span className="text-base font-bold text-[#1a1a1a] leading-tight">{recipe.cookTime}</span>
-                      </div>
+                    <div className="inline-flex items-center gap-2 rounded-md border border-[#CBE7E8] bg-[#F3FAFA] px-3 py-2">
+                      <svg
+                        className="h-4 w-4 text-[#2F7A7E]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <circle cx="12" cy="12" r="9" />
+                        <polyline points="12 7 12 12 15 14" />
+                      </svg>
+                      <span className="text-xs font-semibold uppercase tracking-wide text-[#2F7A7E]">
+                        Cook
+                      </span>
+                      <span className="text-sm font-semibold text-[#1a1a1a]">{recipe.cookTime}</span>
                     </div>
                   )}
-                  {recipe.cookTime && recipe.servingSize && (
-                    <div className="w-px bg-[#C5E8EA] my-3" />
-                  )}
                   {recipe.servingSize && (
-                    <div className="flex items-center gap-3 px-5 py-4">
-                      <div className="w-10 h-10 rounded-full bg-[#388082] flex items-center justify-center shrink-0 shadow-sm">
-                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                          <circle cx="9" cy="7" r="4" />
-                          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                        </svg>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-semibold text-[#388082] uppercase tracking-widest">Serving Size</span>
-                        <span className="text-base font-bold text-[#1a1a1a] leading-tight">{recipe.servingSize}</span>
-                      </div>
+                    <div className="inline-flex items-center gap-2 rounded-md border border-[#CBE7E8] bg-[#F3FAFA] px-3 py-2">
+                      <svg
+                        className="h-4 w-4 text-[#2F7A7E]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" />
+                        <circle cx="10" cy="7" r="4" />
+                      </svg>
+                      <span className="text-xs font-semibold uppercase tracking-wide text-[#2F7A7E]">
+                        Serves
+                      </span>
+                      <span className="text-sm font-semibold text-[#1a1a1a]">{recipe.servingSize}</span>
                     </div>
                   )}
                 </div>
               )}
 
-              <div className="bg-[#F7F7F7] rounded-lg p-5 2xl:p-4">
-                <div className="flex flex-col gap-5 2xl:gap-4">
+              <div className="bg-[#F7F7F7] rounded-lg p-4 2xl:p-3.5">
+                <div className="flex flex-col gap-4 2xl:gap-3.5">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-xl 2xl:text-lg text-gray-700">
+                    <span className="font-medium text-lg 2xl:text-base text-gray-700">
                       Price :
                     </span>
-                    <span className="font-bold text-4xl 2xl:text-3xl text-black">
+                    <span className="font-bold text-3xl 2xl:text-2xl text-black">
                       {recipe.price}
                     </span>
                   </div>
@@ -219,13 +222,13 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
                     <Button
                       onClick={handleAddToCart}
                       disabled={isAddingToCart}
-                      className="flex-1 h-14 2xl:h-12 bg-[#FB7118] hover:bg-[#E86510] text-white font-medium text-lg 2xl:text-base rounded-lg transition-colors disabled:opacity-50"
+                      className="flex-1 h-10 bg-[#FB7118] hover:bg-[#E86510] text-white font-semibold text-sm rounded-md transition-colors disabled:opacity-50"
                     >
                       {isAddingToCart ? "Adding..." : "Add to cart"}
                     </Button>
                     <Button
                       onClick={handleOrderNow}
-                      className="flex-1 h-14 2xl:h-12 bg-[#388082] hover:bg-[#2F6A6B] text-white font-medium text-lg 2xl:text-base rounded-lg transition-colors"
+                      className="flex-1 h-10 bg-[#388082] hover:bg-[#2F6A6B] text-white font-semibold text-sm rounded-md transition-colors"
                     >
                       Order now
                     </Button>

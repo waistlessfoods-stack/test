@@ -288,64 +288,67 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
             </Carousel>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-10 lg:gap-x-5 2xl:gap-x-6 gap-y-16 lg:gap-y-10 2xl:gap-y-10 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-5 2xl:gap-6 w-full">
             {filteredRecipes.map((item: Recipe) => (
               <Link
                 key={item.id}
                 href={`/recipes/detail/${item.slug}`}
-                className="group block transition-transform duration-300 hover:-translate-y-2"
+                className="group block h-full"
               >
-                <div className="relative aspect-square w-full rounded-[16px] lg:rounded-[16px] 2xl:rounded-[16px] overflow-hidden bg-white shadow-lg group-hover:shadow-2xl transition-shadow duration-300 mb-8 lg:mb-5 2xl:mb-5">
-                  {item.imagePath && (
-                    <Image
-                      src={item.imagePath}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      alt={item.title}
-                    />
-                  )}
+                <div className="flex h-full flex-col overflow-hidden rounded-none border border-[#D8D8D8] bg-white">
+                  <div className="relative h-[250px] lg:h-[205px] 2xl:h-[220px] overflow-hidden">
+                    {item.imagePath && (
+                      <Image
+                        src={item.imagePath}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        alt={item.title}
+                        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                      />
+                    )}
 
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-300" />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/45 transition-colors duration-300" />
 
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                    <span className="text-2xl lg:text-xl 2xl:text-2xl font-bebas tracking-widest text-white">
-                      VIEW RECIPE
-                    </span>
-                  </div>
-
-                  {item.price && item.price !== "Free" && (
-                    <div
-                      className="absolute top-0 right-0 bg-[#0F8DAB] w-36 lg:w-24 2xl:w-28 h-36 lg:h-24 2xl:h-28 flex justify-end items-start"
-                      style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%)" }}
-                    >
-                      <span className="font-bold text-3xl lg:text-xl 2xl:text-2xl text-white pt-6 lg:pt-4 2xl:pt-4 pr-6 lg:pr-4 2xl:pr-4">
-                        {item.price}
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                      <span className="text-lg lg:text-base 2xl:text-lg font-bebas tracking-[0.12em] text-white">
+                        VIEW RECIPE
                       </span>
                     </div>
-                  )}
 
-                  {item.price !== "Free" && unlockedRecipeIds.has(item.id) && (
-                    <div className="absolute top-3 left-3 rounded-md bg-[#E8F5F5] px-2.5 py-1 text-xs font-semibold text-[#00676E]">
-                      UNLOCKED
-                    </div>
-                  )}
+                    {item.price && item.price !== "Free" && (
+                      <div
+                        className="absolute top-0 right-0 bg-[#0F8DAB] w-20 h-20 lg:w-16 lg:h-16 flex justify-end items-start"
+                        style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%)" }}
+                      >
+                        <span className="font-bold text-lg lg:text-base text-white pt-3 pr-3 lg:pt-2 lg:pr-2">
+                          {item.price}
+                        </span>
+                      </div>
+                    )}
 
-                  {item.featured && (
-                    <div className="absolute bottom-0 left-0 right-0 flex justify-center">
-                      <Button className="w-[90%] h-16 lg:h-12 2xl:h-12 bg-[#0F8DAB] hover:bg-[#0d7a94] text-xl lg:text-base 2xl:text-base font-bold tracking-widest rounded-t-[10px] lg:rounded-t-[8px] 2xl:rounded-t-[8px] rounded-b-none">
-                        FEATURED
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                    {item.price !== "Free" && unlockedRecipeIds.has(item.id) && (
+                      <div className="absolute top-3 left-3 rounded-none bg-[#E8F5F5] px-2 py-1 text-[11px] font-semibold text-[#00676E]">
+                        UNLOCKED
+                      </div>
+                    )}
 
-                <div className="flex flex-col gap-3 lg:gap-1.5 2xl:gap-2 px-4 lg:px-2 2xl:px-3">
-                  <h4 className="font-bold text-3xl lg:text-xl 2xl:text-2xl text-black leading-tight transition-colors duration-300 group-hover:text-[#0F8DAB]">
-                    {item.title}
-                  </h4>
-                  <p className="text-gray-700 text-lg lg:text-sm 2xl:text-base leading-relaxed line-clamp-3">
-                    {item.description}
-                  </p>
+                    {item.featured && (
+                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
+                        <span className="inline-flex items-center rounded-full border-[3px] border-[#0F8DAB] bg-white px-7 py-1.5 text-lg lg:text-sm 2xl:text-base font-semibold uppercase tracking-wide text-[#0F8DAB]">
+                          Featured
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex h-[190px] lg:h-[175px] 2xl:h-[186px] flex-col gap-3 overflow-hidden px-4 py-4">
+                    <h4 className="line-clamp-2 font-bold text-[34px] lg:text-[36px] 2xl:text-[38px] text-black leading-none uppercase transition-colors duration-300 group-hover:text-[#0F8DAB] font-['Bebas_Neue']">
+                      {item.title}
+                    </h4>
+                    <p className="text-[#5A5A5A] text-[18px] lg:text-[15px] 2xl:text-[16px] leading-relaxed line-clamp-3">
+                      {item.description}
+                    </p>
+                  </div>
                 </div>
               </Link>
             ))}

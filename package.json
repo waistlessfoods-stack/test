@@ -15,6 +15,8 @@
     "contentful:seed": "node scripts/contentful/seed-services.mjs",
     "contentful:seed-homepage": "node scripts/contentful/seed-homepage.mjs",
     "contentful:seed-footer-settings": "node scripts/contentful/seed-footer-settings.mjs",
+    "contentful:migrate-homepage-hero-carousel": "node scripts/contentful/migrate-homepage-hero-carousel.mjs",
+    "contentful:migrate-homepage-featured-description": "node scripts/contentful/migrate-homepage-featured-description.mjs",
     "contentful:migrate-recipe-detail": "node scripts/contentful/migrate-recipe-detail-fields.mjs",
     "contentful:migrate-recipe-categories": "node scripts/contentful/migrate-recipe-categories-to-multi.mjs",
     "contentful:migrate-recipe-rich-text": "node scripts/contentful/migrate-recipe-rich-text.mjs",
