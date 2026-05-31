@@ -85,6 +85,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
         {heroSlides.length > 0 && (
           <Carousel
             setApi={setHeroApi}
+            fade
             opts={{ align: "start", loop: heroSlides.length > 1 }}
             className="absolute inset-0"
           >
@@ -108,22 +109,18 @@ export default function HomepageClient({ data }: HomepageClientProps) {
             </CarouselContent>
 
             {heroSlides.length > 1 && (
-              <>
-                <CarouselPrevious className="z-20 left-3 md:left-6 top-1/2 -translate-y-1/2 h-14 w-14 md:h-[70px] md:w-[70px] rounded-full border-0 bg-[#0F8DAB] hover:bg-[#0c768f] shadow-xl disabled:opacity-45 [&_svg]:text-white [&_svg]:w-[18px] [&_svg]:h-[18px] md:[&_svg]:w-[22px] md:[&_svg]:h-[22px]" />
-                <CarouselNext className="z-20 right-3 md:right-6 top-1/2 -translate-y-1/2 h-14 w-14 md:h-[70px] md:w-[70px] rounded-full border-0 bg-[#0F8DAB] hover:bg-[#0c768f] shadow-xl disabled:opacity-45 [&_svg]:text-white [&_svg]:w-[18px] [&_svg]:h-[18px] md:[&_svg]:w-[22px] md:[&_svg]:h-[22px]" />
-                <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 gap-2">
-                  {heroSlides.map((_, index) => (
-                    <button
-                      key={`hero-dot-${index}`}
-                      onClick={() => heroApi?.scrollTo(index)}
-                      className={`h-2.5 w-2.5 rounded-full transition-all ${
-                        heroCurrent === index ? "bg-white scale-125" : "bg-white/55"
-                      }`}
-                      aria-label={`Go to hero slide ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              </>
+              <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+                {heroSlides.map((_, index) => (
+                  <button
+                    key={`hero-dot-${index}`}
+                    onClick={() => heroApi?.scrollTo(index)}
+                    className={`h-2.5 w-2.5 rounded-full transition-all ${
+                      heroCurrent === index ? "bg-white scale-125" : "bg-white/55"
+                    }`}
+                    aria-label={`Go to hero slide ${index + 1}`}
+                  />
+                ))}
+              </div>
             )}
           </Carousel>
         )}
@@ -401,6 +398,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
         <div className="relative z-10 w-full max-w-[1252px] px-8 md:px-12">
           <Carousel
             setApi={setTestimonialApi}
+            fade
             opts={{ align: "start", loop: true }}
             className="relative w-full"
           >
@@ -479,8 +477,8 @@ export default function HomepageClient({ data }: HomepageClientProps) {
               </CarouselItem>
             </CarouselContent>
 
-            <CarouselPrevious className="absolute -left-4 md:-left-12 top-1/2 -translate-y-1/2 w-10 h-10 md:w-[70px] md:h-[70px] bg-[#0F8DAB] hover:bg-[#0c768f] border-0 rounded-full z-40 shadow-xl opacity-100! flex items-center justify-center [&_svg]:text-white [&_svg]:fill-white [&_svg]:w-3.5 [&_svg]:h-4 md:[&_svg]:w-[21.16px] md:[&_svg]:h-[24.69px] [&_svg]:stroke-[3.53px]" />
-            <CarouselNext className="absolute -right-4 md:-right-12 top-1/2 -translate-y-1/2 w-10 h-10 md:w-[70px] md:h-[70px] bg-[#0F8DAB] hover:bg-[#0c768f] border-0 rounded-full z-40 shadow-xl opacity-100! flex items-center justify-center [&_svg]:text-white [&_svg]:fill-white [&_svg]:w-3.5 [&_svg]:h-4 md:[&_svg]:w-[21.16px] md:[&_svg]:h-[24.69px] [&_svg]:stroke-[3.53px]" />
+            <CarouselPrevious className="z-20 -left-6 md:-left-6 top-1/2 -translate-y-1/2 text-white" />
+            <CarouselNext className="z-20 -right-6 md:-right-6 top-1/2 -translate-y-1/2 text-white" />
 
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-50">
               {[...data.testimonials, { id: "review-links" }].map((_, index) => (

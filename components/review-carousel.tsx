@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type Review = {
   name: string;
@@ -21,18 +20,6 @@ export default function ReviewCarousel({
 }: ReviewCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const goToPrevious = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? reviews.length - 1 : prevIndex - 1
-    );
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === reviews.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
   if (!reviews || reviews.length === 0) {
     return null;
   }
@@ -47,15 +34,6 @@ export default function ReviewCarousel({
 
         {/* Main Carousel Container */}
         <div className="relative flex items-center justify-center">
-          {/* Left Arrow Button */}
-          <button
-            onClick={goToPrevious}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-14 h-14 flex items-center justify-center bg-[#0F8DAB] hover:bg-[#0D7691] rounded-full transition-colors"
-            aria-label="Previous review"
-          >
-            <ChevronLeft className="w-10 h-10 text-white transform scale-x-[-1]" />
-          </button>
-
           {/* Review Card */}
           <div className="w-full max-w-4xl mx-auto">
             {/* White Container with Border */}
@@ -139,15 +117,6 @@ export default function ReviewCarousel({
               ))}
             </div>
           </div>
-
-          {/* Right Arrow Button */}
-          <button
-            onClick={goToNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-14 h-14 flex items-center justify-center bg-[#0F8DAB] hover:bg-[#0D7691] rounded-full transition-colors"
-            aria-label="Next review"
-          >
-            <ChevronRight className="w-10 h-10 text-white" />
-          </button>
         </div>
       </div>
     </div>

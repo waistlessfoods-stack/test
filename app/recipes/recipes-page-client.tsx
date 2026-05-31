@@ -9,8 +9,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
@@ -45,6 +43,18 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
       setCurrent(api.selectedScrollSnap());
     });
   }, [api]);
+
+  useEffect(() => {
+    if (!api || data.categories.length <= 1) return;
+
+    const intervalId = window.setInterval(() => {
+      api.scrollNext();
+    }, 3500);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [api, data.categories.length]);
 
   useEffect(() => {
     if (!initialCategorySlug) {
@@ -133,62 +143,37 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
   return (
     <div className="w-full min-h-screen bg-white overflow-x-hidden font-metropolis">
       {/* --- BANNER --- */}
-      <section className="w-full py-12 lg:py-8 2xl:py-8">
-        <Container>
-          <div className="relative w-full aspect-16/5 min-h-[400px] lg:min-h-[280px] 2xl:min-h-[300px] overflow-hidden rounded-[16px] lg:rounded-[16px] 2xl:rounded-[16px] flex items-center">
-            <div className="absolute inset-0">
-              {data.bannerImagePath && (
-                <Image
-                  src={data.bannerImagePath}
-                  alt="Background"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              )}
-              <div className="absolute inset-0 bg-black/50" />
-            </div>
+      <section className="relative w-full min-h-[420px] lg:min-h-[360px] 2xl:min-h-[400px] overflow-hidden flex items-center">
+        <div className="absolute inset-0">
+          {data.bannerImagePath && (
+            <Image
+              src={data.bannerImagePath}
+              alt="Background"
+              fill
+              className="object-cover"
+              priority
+            />
+          )}
+          <div className="absolute inset-0 bg-black/52" />
+        </div>
 
-            <div className="relative z-10 px-8 md:px-20 lg:px-12 2xl:px-12 flex flex-col md:flex-row items-center justify-between w-full h-full">
-              <div className="flex-1 max-w-xl flex flex-col gap-4 lg:gap-2.5 2xl:gap-3 mt-10 md:mt-0">
-                <h1 className="font-bold text-white text-4xl md:text-5xl lg:text-4xl 2xl:text-5xl leading-[1.1] drop-shadow-lg">
-                  {data.bannerTitle.split(/\n|<br>/).map((line, index, arr) => (
-                    <span key={index}>
-                      {line}
-                      {index < arr.length - 1 && <br />}
-                    </span>
-                  ))}
-                </h1>
-                <p className="text-white text-lg md:text-xl lg:text-base 2xl:text-lg opacity-90 max-w-xl leading-snug drop-shadow-md">
-                  {data.bannerDescription}
-                </p>
-              </div>
-
-              <div className="hidden lg:flex items-center gap-6 lg:gap-3 2xl:gap-4 self-center h-full pt-10 lg:pt-5">
-                {data.bannerFeaturedImage1Path && (
-                  <div className="relative w-60 h-80 lg:w-36 lg:h-48 2xl:w-48 2xl:h-64 rounded-lg lg:rounded-lg 2xl:rounded-md overflow-hidden shadow-2xl translate-y-4 lg:translate-y-3">
-                    <Image
-                      src={data.bannerFeaturedImage1Path}
-                      fill
-                      className="object-cover"
-                      alt="Featured Recipe 1"
-                    />
-                  </div>
-                )}
-                {data.bannerFeaturedImage2Path && (
-                  <div className="relative w-[200px] h-[200px] lg:w-[130px] lg:h-[130px] 2xl:w-[160px] 2xl:h-[160px] rounded-lg lg:rounded-lg 2xl:rounded-md overflow-hidden shadow-2xl translate-y-4 lg:translate-y-3">
-                    <Image
-                      src={data.bannerFeaturedImage2Path}
-                      fill
-                      className="object-cover"
-                      alt="Featured Recipe 2"
-                    />
-                  </div>
-                )}
-              </div>
+        <div className="relative z-10 w-full py-16 lg:py-14 2xl:py-16">
+          <Container>
+            <div className="max-w-3xl flex flex-col gap-4 lg:gap-3 2xl:gap-4">
+              <h1 className="font-bold text-white text-4xl md:text-5xl lg:text-4xl 2xl:text-5xl leading-[1.1] drop-shadow-lg">
+                {data.bannerTitle.split(/\n|<br>/).map((line, index, arr) => (
+                  <span key={index}>
+                    {line}
+                    {index < arr.length - 1 && <br />}
+                  </span>
+                ))}
+              </h1>
+              <p className="text-white text-lg md:text-xl lg:text-base 2xl:text-lg opacity-90 max-w-2xl leading-snug drop-shadow-md">
+                {data.bannerDescription}
+              </p>
             </div>
-          </div>
-        </Container>
+          </Container>
+        </div>
       </section>
 
       {/* --- GALLERY SECTION --- */}
@@ -283,8 +268,6 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
                   );
                 })}
               </CarouselContent>
-              <CarouselPrevious className="absolute -left-5 w-12 h-12 border-none shadow-xl" />
-              <CarouselNext className="absolute -right-5 w-12 h-12 border-none shadow-xl" />
             </Carousel>
           </div>
 
@@ -334,7 +317,7 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
 
                     {item.featured && (
                       <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
-                        <span className="inline-flex items-center rounded-full border-[3px] border-[#0F8DAB] bg-white px-7 py-1.5 text-lg lg:text-sm 2xl:text-base font-semibold uppercase tracking-wide text-[#0F8DAB]">
+                        <span className="inline-flex items-center rounded-full border-[3px] border-white/75 bg-white/35 px-7 py-1.5 text-lg lg:text-sm 2xl:text-base font-semibold uppercase tracking-wide text-[#0F8DAB] backdrop-blur-sm shadow-[0_4px_14px_rgba(255,255,255,0.25)]">
                           Featured
                         </span>
                       </div>

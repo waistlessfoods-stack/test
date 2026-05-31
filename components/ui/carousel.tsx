@@ -4,6 +4,7 @@ import * as React from "react";
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
+import Fade from "embla-carousel-fade";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ type CarouselProps = {
   opts?: CarouselOptions;
   plugins?: CarouselPlugin;
   orientation?: "horizontal" | "vertical";
+  fade?: boolean;
   setApi?: (api: CarouselApi) => void;
 };
 
@@ -47,16 +49,25 @@ function Carousel({
   opts,
   setApi,
   plugins,
+  fade = false,
   className,
   children,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
+  const carouselPlugins = React.useMemo<CarouselPlugin>(() => {
+    if (!fade) {
+      return plugins;
+    }
+
+    return [...(plugins ?? []), Fade()];
+  }, [fade, plugins]);
+
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
       axis: orientation === "horizontal" ? "x" : "y",
     },
-    plugins,
+    carouselPlugins,
   );
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
@@ -173,7 +184,7 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
 
 function CarouselPrevious({
   className,
-  variant = "outline",
+  variant = "ghost",
   size = "icon",
   ...props
 }: React.ComponentProps<typeof Button>) {
@@ -185,7 +196,7 @@ function CarouselPrevious({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-8 rounded-full transition-all group",
+        "absolute size-12 rounded-full border-0 bg-[#16B0B9] p-0 shadow-none transition-colors group hover:bg-[#0F8DAB]",
         orientation === "horizontal"
           ? "top-1/2 -left-12 -translate-y-1/2"
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -195,7 +206,7 @@ function CarouselPrevious({
       onClick={scrollPrev}
       {...props}
     >
-      <ChevronLeft className="size-5 text-[#0F8DAB] group-hover:text-white transition-colors" />
+      <ChevronLeft className="size-7 text-white transition-colors" />
       <span className="sr-only">Previous slide</span>
     </Button>
   );
@@ -203,7 +214,7 @@ function CarouselPrevious({
 
 function CarouselNext({
   className,
-  variant = "outline",
+  variant = "ghost",
   size = "icon",
   ...props
 }: React.ComponentProps<typeof Button>) {
@@ -215,7 +226,7 @@ function CarouselNext({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-8 rounded-full transition-all group",
+        "absolute size-12 rounded-full border-0 bg-[#16B0B9] p-0 shadow-none transition-colors group hover:bg-[#0F8DAB]",
         orientation === "horizontal"
           ? "top-1/2 -right-12 -translate-y-1/2"
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -225,7 +236,7 @@ function CarouselNext({
       onClick={scrollNext}
       {...props}
     >
-      <ChevronRight className="size-5 text-[#0F8DAB] group-hover:text-white transition-colors" />
+      <ChevronRight className="size-7 text-white transition-colors" />
       <span className="sr-only">Next slide</span>
     </Button>
   );
