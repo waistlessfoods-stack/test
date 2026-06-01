@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Check, Search } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import {
   Carousel,
@@ -48,6 +48,14 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
     if (!api || data.categories.length <= 1) return;
 
     const intervalId = window.setInterval(() => {
+      const lastIndex = api.scrollSnapList().length - 1;
+      const currentIndex = api.selectedScrollSnap();
+
+      if (currentIndex >= lastIndex) {
+        api.scrollTo(0);
+        return;
+      }
+
       api.scrollNext();
     }, 3500);
 
@@ -123,6 +131,34 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
       newSelected.add(categoryId);
     }
     setSelectedCategories(newSelected);
+  };
+
+  const scrollCategoriesToNext = () => {
+    if (!api) return;
+
+    const lastIndex = api.scrollSnapList().length - 1;
+    const currentIndex = api.selectedScrollSnap();
+
+    if (currentIndex >= lastIndex) {
+      api.scrollTo(0);
+      return;
+    }
+
+    api.scrollNext();
+  };
+
+  const scrollCategoriesToPrev = () => {
+    if (!api) return;
+
+    const lastIndex = api.scrollSnapList().length - 1;
+    const currentIndex = api.selectedScrollSnap();
+
+    if (currentIndex <= 0) {
+      api.scrollTo(lastIndex);
+      return;
+    }
+
+    api.scrollPrev();
   };
 
   // Filter recipes based on selected categories and search query
@@ -269,6 +305,31 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
                 })}
               </CarouselContent>
             </Carousel>
+
+            {data.categories.length > 1 && (
+              <>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={scrollCategoriesToPrev}
+                  aria-label="Previous category"
+                  className="absolute left-1 top-1/2 hidden -translate-y-1/2 md:inline-flex size-8 rounded-full border border-black/5 bg-white/45 text-black/30 shadow-none backdrop-blur-sm transition-all hover:bg-white/70 hover:text-black/55 hover:border-black/10"
+                >
+                  <ChevronLeft className="size-3.5" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={scrollCategoriesToNext}
+                  aria-label="Next category"
+                  className="absolute right-1 top-1/2 hidden -translate-y-1/2 md:inline-flex size-8 rounded-full border border-black/5 bg-white/45 text-black/30 shadow-none backdrop-blur-sm transition-all hover:bg-white/70 hover:text-black/55 hover:border-black/10"
+                >
+                  <ChevronRight className="size-3.5" />
+                </Button>
+              </>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-5 2xl:gap-6 w-full">
