@@ -349,9 +349,12 @@ function mapServiceFields(entry: any) {
       : null;
   const assetImagePath = getAssetUrl(f.image);
   const assetMainImagePath = getAssetUrl(f.mainImage);
+  const thumbnailImagePath = getAssetUrl(f.thumbnailsImage);
   const assetGalleryImagePaths = getAssetUrls(f.galleryImages);
+  const subImagePaths = getAssetUrls(f.subImages);
   const resolvedImagePath =
     assetImagePath ||
+    thumbnailImagePath ||
     assetMainImagePath ||
     legacyImagePath ||
     legacyMainImagePath;
@@ -369,10 +372,16 @@ function mapServiceFields(entry: any) {
     includes: (f.includes as string[]) || [],
     howToBook: (f.howToBook as string[]) || [],
     mainImagePath:
-      assetMainImagePath || assetImagePath || legacyMainImagePath || legacyImagePath,
+      assetMainImagePath ||
+      thumbnailImagePath ||
+      assetImagePath ||
+      legacyMainImagePath ||
+      legacyImagePath,
     galleryImagePaths:
       assetGalleryImagePaths.length > 0
         ? assetGalleryImagePaths
+        : subImagePaths.length > 0
+          ? subImagePaths
         : (f.galleryImagePaths as string[]) || [],
     reviews: (f.reviews as ServiceReviews) ?? null,
   };

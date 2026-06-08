@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import {
   Breadcrumb,
@@ -48,6 +48,11 @@ export default function ServiceDetailClient({
 }: ServiceDetailClientProps) {
   const [visibleCount, setVisibleCount] = useState(2);
   const [mainImage, setMainImage] = useState(service.images.main);
+
+  useEffect(() => {
+    setMainImage(service.images.main);
+    setVisibleCount(2);
+  }, [service.slug, service.images.main]);
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-6 md:py-10 bg-white">
