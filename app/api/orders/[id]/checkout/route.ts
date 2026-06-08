@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
+import { syncCurrentClerkUser } from "@/lib/clerk-user-sync";
 
 type OrderItem = {
   id: string;
@@ -53,6 +54,8 @@ export async function POST(
         { status: 401 }
       );
     }
+
+    await syncCurrentClerkUser();
 
     const { id } = await context.params;
     const orderId = Number(id);

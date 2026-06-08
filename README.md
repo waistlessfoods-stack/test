@@ -30,6 +30,26 @@ Stripe's VS Code extension requires the Stripe CLI to forward webhooks and strea
 
 If the Stripe CLI is installed in a non-default location, set `stripe.cliInstallPath` in VS Code settings.
 
+## Fallow Audits
+
+Fallow is installed as a dev dependency for repo-wide cleanup and PR auditing.
+
+```bash
+npm run fallow
+npm run fallow:dead-code
+npm run fallow:dupes
+npm run fallow:health
+npm run fallow:fix:dry
+```
+
+For day-to-day review, use the changed-files audit gate:
+
+```bash
+npm run fallow:audit
+```
+
+That runs `fallow audit --gate new-only`, which keeps existing backlog from failing every branch while still catching newly introduced issues. Maintenance scripts under the repo root and `scripts/` are modeled as entry points in `.fallowrc.json` so they are not treated as dead code just because nothing imports them directly.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

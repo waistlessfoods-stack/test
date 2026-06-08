@@ -4,6 +4,7 @@ import crypto from "crypto";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
+import { syncCurrentClerkUser } from "@/lib/clerk-user-sync";
 import { calculateCartTotals } from "@/lib/pricing";
 import { getServerSalesTaxRate } from "@/lib/tax-settings";
 
@@ -150,6 +151,8 @@ export async function POST(request: Request) {
         { status: 401 },
       );
     }
+
+    await syncCurrentClerkUser();
 
     const customerEmail = user.primaryEmailAddress.emailAddress;
 

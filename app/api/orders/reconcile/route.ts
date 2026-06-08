@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
+import { syncCurrentClerkUser } from "@/lib/clerk-user-sync";
 
 const stripeSecretKey =
   process.env.sandbox_secret_key_stripe || process.env.STRIPE_SECRET_KEY;
@@ -28,6 +29,8 @@ export async function POST() {
         { status: 401 }
       );
     }
+
+    await syncCurrentClerkUser();
 
     const pendingOrders = await db
       .select()

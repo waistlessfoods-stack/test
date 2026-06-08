@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
+import { syncCurrentClerkUser } from "@/lib/clerk-user-sync";
 import { eq, desc } from "drizzle-orm";
 
 // Helper to detect transient database errors
@@ -58,6 +59,8 @@ export async function GET(request: Request) {
         { status: 401 }
       );
     }
+
+    await syncCurrentClerkUser();
 
     // Fetch user's orders with retry logic
     const userOrders = await withDbRetry(() =>
