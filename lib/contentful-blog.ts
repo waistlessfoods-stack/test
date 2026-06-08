@@ -2,15 +2,8 @@ import "server-only";
 
 import { unstable_cache } from "next/cache";
 import { createClient as createDeliveryClient } from "contentful";
-import { createClient as createManagementClient } from "contentful-management";
 
 type DeliveryConfig = {
-  accessToken: string;
-  spaceId: string;
-  environmentId: string;
-};
-
-type ManagementConfig = {
   accessToken: string;
   spaceId: string;
   environmentId: string;
@@ -38,7 +31,6 @@ export type BlogPageData = {
   readTimeOptions: number[];
 };
 
-const DEFAULT_LOCALE = "en-US";
 const warnings = new Set<string>();
 
 function warnOnce(key: string, message: string): void {
@@ -48,8 +40,6 @@ function warnOnce(key: string, message: string): void {
 }
 
 function getDeliveryConfig(): DeliveryConfig | null {
-  // Use Management space as primary (where content is created)
-  // The Management and Delivery spaces are misaligned in config, so default to the one with actual content
   const spaceId = process.env.Contentful_space_id || process.env.CONTENTFUL_SPACE_ID;
   const accessToken =
     process.env.CONTENTFUL_DELIVERY_TOKEN ||
@@ -79,26 +69,6 @@ function getRequiredDeliveryConfig(): DeliveryConfig {
 
   return config;
 }
-
-function getManagementConfig(): ManagementConfig | null {
-  const accessToken =
-    process.env.CMA_CONTENTFUL || process.env.CONTENTFUL_MANAGEMENT_TOKEN;
-  const spaceId =
-    process.env.Contentful_space_id || process.env.CONTENTFUL_SPACE_ID;
-  const environmentId =
-    process.env.Contentful_environment || process.env.CONTENTFUL_ENVIRONMENT || "master";
-
-  if (!accessToken || !spaceId) {
-    return null;
-  }
-
-  return {
-    accessToken,
-    spaceId,
-    environmentId,
-  };
-}
-
 function getAssetUrl(asset: any): string | null {
   const url = asset?.fields?.file?.url;
   if (!url || typeof url !== "string") return null;
@@ -131,75 +101,7 @@ function toPageData(posts: BlogPost[]): BlogPageData {
   };
 }
 
-async function ensureBlogPostContentType(): Promise<void> {
-  const config = getManagementConfig();
-  if (!config) {
-    warnOnce(
-      "contentful-cma-missing",
-      "[Contentful CMA] Missing CMA token or space id. Skipping blogPost content type setup."
-    );
-    return;
-  }
-
-  try {
-    const client = createManagementClient({ accessToken: config.accessToken });
-    const space = await client.getSpace(config.spaceId);
-    const environment = await space.getEnvironment(config.environmentId);
-
-    try {
-      await environment.getContentType("blogPost");
-      return;
-    } catch {
-      const contentType = await environment.createContentTypeWithId("blogPost", {
-        name: "Blog Post",
-        displayField: "title",
-        fields: [
-          { id: "title", name: "Title", type: "Symbol", required: true },
-          { id: "slug", name: "Slug", type: "Symbol", required: true },
-          { id: "excerpt", name: "Excerpt", type: "Text", required: true },
-          { id: "category", name: "Category", type: "Symbol", required: true },
-          {
-            id: "readTimeMinutes",
-            name: "Read Time Minutes",
-            type: "Integer",
-            required: true,
-          },
-          {
-            id: "coverImage",
-            name: "Cover Image",
-            type: "Link",
-            linkType: "Asset",
-            required: false,
-          },
-          {
-            id: "sortOrder",
-            name: "Sort Order",
-            type: "Integer",
-            required: false,
-          },
-          {
-            id: "publishedAt",
-            name: "Published At",
-            type: "Date",
-            required: false,
-          },
-        ],
-      } as any);
-
-      await contentType.publish();
-      console.log("[Contentful CMA] Created and published content type: blogPost");
-    }
-  } catch (error) {
-    warnOnce(
-      "contentful-cma-setup-failed",
-      `[Contentful CMA] Failed to ensure blogPost content type: ${error}`
-    );
-  }
-}
-
 async function fetchBlogPageFromContentfulRaw(): Promise<BlogPageData> {
-  await ensureBlogPostContentType();
-
   const config = getRequiredDeliveryConfig();
 
   try {

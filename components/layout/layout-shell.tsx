@@ -6,8 +6,37 @@ import { getSocialLinks } from "@/lib/social-links";
 import {
   fetchFooterSettingsFromContentful,
   fetchHeaderSettingsFromContentful,
+  type FooterSettings,
+  type HeaderSettings,
 } from "@/lib/contentful-management";
+import type { SocialLink } from "@/lib/contentful-links";
 import SiteAccessGate from "@/components/layout/site-access-gate";
+
+const FALLBACK_SOCIAL_LINKS: SocialLink[] = [
+  {
+    title: "Instagram",
+    href: "https://www.instagram.com/waistlessfoods",
+    icon: "Instagram",
+  },
+  {
+    title: "TikTok",
+    href: "https://www.tiktok.com/@waistlessfoods",
+    icon: "Music",
+  },
+];
+
+async function withContentfulFallback<T>(
+  label: string,
+  loader: () => Promise<T>,
+  fallback: T
+): Promise<T> {
+  try {
+    return await loader();
+  } catch (error) {
+    console.error(`[LayoutShell] Failed to load ${label} from Contentful`, error);
+    return fallback;
+  }
+}
 
 export default async function LayoutShell({ children }: { children: ReactNode }) {
   const headersList = await headers();
@@ -18,9 +47,19 @@ export default async function LayoutShell({ children }: { children: ReactNode })
     return <>{children}</>;
   }
 
-  const socialLinks = await getSocialLinks();
-  const headerSettings = await fetchHeaderSettingsFromContentful();
-  const footerSettings = await fetchFooterSettingsFromContentful();
+  const [socialLinks, headerSettings, footerSettings] = await Promise.all([
+    withContentfulFallback("social links", getSocialLinks, FALLBACK_SOCIAL_LINKS),
+    withContentfulFallback<HeaderSettings | null>(
+      "header settings",
+      fetchHeaderSettingsFromContentful,
+      null
+    ),
+    withContentfulFallback<FooterSettings | null>(
+      "footer settings",
+      fetchFooterSettingsFromContentful,
+      null
+    ),
+  ]);
 
   return (
     <SiteAccessGate>

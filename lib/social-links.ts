@@ -15,30 +15,7 @@ export function getIconPath(iconName: string): string {
   return iconMap[iconName] || "/IG.svg";
 }
 
-// Fetch social links with caching
-let cachedSocialLinks: SocialLink[] | null = null;
-let lastFetchTime = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
 export async function getSocialLinks(): Promise<SocialLink[]> {
-  const now = Date.now();
-
-  // Return cached data if still valid
-  if (cachedSocialLinks && now - lastFetchTime < CACHE_DURATION) {
-    return cachedSocialLinks;
-  }
-
-  try {
-    const linksData = await fetchLinksPageFromContentful();
-    const socialLinks = linksData.socialLinks;
-
-    // Update cache
-    cachedSocialLinks = socialLinks;
-    lastFetchTime = now;
-
-    return socialLinks;
-  } catch (error) {
-    console.error("Error fetching social links:", error);
-    throw new Error("Unable to fetch social links from Contentful.");
-  }
+  const linksData = await fetchLinksPageFromContentful();
+  return linksData.socialLinks;
 }
