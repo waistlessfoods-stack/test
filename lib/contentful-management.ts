@@ -339,20 +339,41 @@ function parseInstructionSteps(
 
 function mapServiceFields(entry: any) {
   const f = entry.fields;
+  const legacyImagePath =
+    typeof f.imagePath === "string" && f.imagePath.length > 0
+      ? String(f.imagePath)
+      : null;
+  const legacyMainImagePath =
+    typeof f.mainImagePath === "string" && f.mainImagePath.length > 0
+      ? String(f.mainImagePath)
+      : null;
+  const assetImagePath = getAssetUrl(f.image);
+  const assetMainImagePath = getAssetUrl(f.mainImage);
+  const assetGalleryImagePaths = getAssetUrls(f.galleryImages);
+  const resolvedImagePath =
+    assetImagePath ||
+    assetMainImagePath ||
+    legacyImagePath ||
+    legacyMainImagePath;
+
   return {
     id: entry.sys.id,
     slug: String(f.slug ?? ""),
     title: String(f.title ?? ""),
     description: String(f.description ?? ""),
     benefits: (f.benefits as string[]) || [],
-    imagePath: String(f.imagePath ?? ""),
+    imagePath: resolvedImagePath,
     sortOrder: Number(f.sortOrder ?? 0),
     breadcrumbLabel: String(f.breadcrumbLabel ?? ""),
     priceText: String(f.priceText ?? ""),
     includes: (f.includes as string[]) || [],
     howToBook: (f.howToBook as string[]) || [],
-    mainImagePath: String(f.mainImagePath ?? ""),
-    galleryImagePaths: (f.galleryImagePaths as string[]) || [],
+    mainImagePath:
+      assetMainImagePath || assetImagePath || legacyMainImagePath || legacyImagePath,
+    galleryImagePaths:
+      assetGalleryImagePaths.length > 0
+        ? assetGalleryImagePaths
+        : (f.galleryImagePaths as string[]) || [],
     reviews: (f.reviews as ServiceReviews) ?? null,
   };
 }
@@ -444,7 +465,7 @@ async function fetchServicesFromContentfulRaw(): Promise<ServiceEntry[]> {
     console.log(`[Contentful] fetchServices: got ${entries.items.length} entries`);
     const result = entries.items
       .map((e) => mapServiceFields(e))
-      .filter((item) => item.title && item.description && item.imagePath);
+      .filter((item) => item.title && item.description);
 
     if (!result.length) {
       throw new Error("No services found in Contentful.");
