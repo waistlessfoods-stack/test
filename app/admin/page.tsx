@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useAdminAuth } from '@/components/admin/admin-auth';
 
 const NAV_ITEMS = [
   {
@@ -48,78 +48,7 @@ const NAV_ITEMS = [
 ];
 
 export default function AdminPage() {
-  const [password, setPassword] = useState('');
-  const [authenticated, setAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const response = await fetch('/api/admin/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        setError(data.error || 'Invalid password');
-        return;
-      }
-      setAuthenticated(true);
-    } catch {
-      setError('Failed to authenticate');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!authenticated) {
-    return (
-      <div className="min-h-screen bg-[#f0f5f5] flex items-center justify-center p-4">
-        <div className="w-full max-w-sm">
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="h-1.5 bg-[#388082]" />
-            <div className="px-8 py-10">
-              <div className="flex justify-center mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-[#388082]/10 flex items-center justify-center">
-                  <svg className="w-7 h-7 text-[#388082]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-              </div>
-              <h1 className="text-center text-xl font-semibold text-gray-900 mb-1">Admin Portal</h1>
-              <p className="text-center text-sm text-gray-500 mb-8">Enter your admin password to continue</p>
-              <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Admin password"
-                  autoFocus
-                  required
-                  disabled={loading}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#388082]/40 focus:border-[#388082] transition"
-                />
-                {error && <p className="text-sm text-red-500 text-center">{error}</p>}
-                <button
-                  type="submit"
-                  disabled={loading || !password}
-                  className="w-full py-3 rounded-xl bg-[#388082] text-white text-sm font-medium hover:bg-[#2e6b6d] active:scale-[0.98] transition disabled:opacity-60"
-                >
-                  {loading ? 'Verifying…' : 'Access Dashboard'}
-                </button>
-              </form>
-            </div>
-          </div>
-          <p className="text-center text-xs text-gray-400 mt-6">WaitsLess Foods · Admin Portal</p>
-        </div>
-      </div>
-    );
-  }
+  const { logout } = useAdminAuth();
 
   return (
     <div className="min-h-screen bg-[#f0f5f5]">
@@ -138,7 +67,7 @@ export default function AdminPage() {
             </div>
           </div>
           <button
-            onClick={() => { setAuthenticated(false); setPassword(''); }}
+            onClick={logout}
             className="text-xs font-medium text-white/80 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition"
           >
             Log out

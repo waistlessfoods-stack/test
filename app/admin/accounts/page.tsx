@@ -1,83 +1,88 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useAdminAuth } from '@/components/admin/admin-auth';
+
+type Account = {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  createdAt: string;
+};
 
 export default function AdminAccountsPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [password, setPassword] = useState('');
-  const [authenticated, setAuthenticated] = useState(false);
-  const [accounts, setAccounts] = useState<any[]>([]);
+  const { password, logout } = useAdminAuth();
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  useEffect(() => {
+    let cancelled = false;
 
-    try {
-      const response = await fetch('/api/admin/accounts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
+    async function loadAccounts() {
+      setLoading(true);
+      setError('');
 
-      const data = await response.json();
+      try {
+        const response = await fetch('/api/admin/accounts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
 
-      if (!response.ok) {
-        setError(data.error || 'Invalid password');
-        setLoading(false);
-        return;
+        const data = await response.json();
+
+        if (cancelled) {
+          return;
+        }
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            logout();
+            return;
+          }
+
+          setError(data.error || 'Failed to load accounts');
+          return;
+        }
+
+        setAccounts(data.accounts || []);
+      } catch {
+        if (!cancelled) {
+          setError('Failed to load accounts');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
-
-      setAuthenticated(true);
-      setAccounts(data.accounts || []);
-    } catch (err) {
-      setError('Failed to authenticate');
-    } finally {
-      setLoading(false);
     }
-  };
 
-  if (!authenticated) {
+    if (password) {
+      loadAccounts();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [logout, password]);
+
+  if (loading && accounts.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Admin Access</h1>
-          <p className="text-slate-600 mb-6">View all user accounts</p>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="rounded-lg bg-white px-6 py-5 shadow">
+          <p className="text-sm text-slate-600">Loading accounts...</p>
+        </div>
+      </div>
+    );
+  }
 
-          <form onSubmit={handlePasswordSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
-                Admin Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter admin password"
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={loading}
-              />
-            </div>
-
-            {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading || !password}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-            >
-              {loading ? 'Checking...' : 'Access Accounts'}
-            </button>
-          </form>
+  if (error && accounts.length === 0) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="max-w-md rounded-lg border border-red-200 bg-white p-6 text-center shadow">
+          <p className="text-sm text-red-700">{error}</p>
         </div>
       </div>
     );
@@ -90,15 +95,15 @@ export default function AdminAccountsPage() {
           <div>
             <h1 className="text-3xl font-bold text-slate-900">User Accounts</h1>
             <p className="text-slate-600 mt-1">
-              Total: <span className="font-semibold text-slate-900">{accounts.length}</span> accounts
+              Total:{' '}
+              <span className="font-semibold text-slate-900">
+                {accounts.length}
+              </span>{' '}
+              accounts
             </p>
           </div>
           <button
-            onClick={() => {
-              setAuthenticated(false);
-              setPassword('');
-              setAccounts([]);
-            }}
+            onClick={logout}
             className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition"
           >
             Logout
@@ -115,8 +120,12 @@ export default function AdminAccountsPage() {
               <table className="w-full">
                 <thead className="bg-slate-100 border-b border-slate-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Name</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Email</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
+                      Email
+                    </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
                       Email Verified
                     </th>
@@ -128,8 +137,12 @@ export default function AdminAccountsPage() {
                 <tbody className="divide-y divide-slate-200">
                   {accounts.map((account) => (
                     <tr key={account.id} className="hover:bg-slate-50 transition">
-                      <td className="px-6 py-4 text-sm text-slate-900">{account.name}</td>
-                      <td className="px-6 py-4 text-sm text-slate-600">{account.email}</td>
+                      <td className="px-6 py-4 text-sm text-slate-900">
+                        {account.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-600">
+                        {account.email}
+                      </td>
                       <td className="px-6 py-4 text-sm">
                         <span
                           className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${

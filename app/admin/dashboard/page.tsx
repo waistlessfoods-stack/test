@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAdminAuth } from '@/components/admin/admin-auth';
 
 interface DashboardStats {
   totalAccounts: number;
@@ -32,79 +33,77 @@ interface DashboardStats {
 }
 
 export default function AdminDashboard() {
-  const [password, setPassword] = useState('');
-  const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const { password, logout } = useAdminAuth();
 
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  useEffect(() => {
+    let cancelled = false;
 
-    try {
-      const response = await fetch('/api/admin/dashboard', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
+    async function loadStats() {
+      setLoading(true);
+      setError('');
 
-      const data = await response.json();
+      try {
+        const response = await fetch('/api/admin/dashboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
 
-      if (!response.ok) {
-        setError(data.error || 'Invalid password');
-        setLoading(false);
-        return;
+        const data = await response.json();
+
+        if (cancelled) {
+          return;
+        }
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            logout();
+            return;
+          }
+
+          setError(data.error || 'Failed to load dashboard');
+          return;
+        }
+
+        setStats(data.stats);
+      } catch {
+        if (!cancelled) {
+          setError('Failed to load dashboard');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
-
-      setAuthenticated(true);
-      setStats(data.stats);
-    } catch (err) {
-      setError('Failed to authenticate');
-    } finally {
-      setLoading(false);
     }
-  };
 
-  if (!authenticated) {
+    if (password) {
+      loadStats();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [logout, password]);
+
+  if (loading && !stats) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Admin Dashboard</h1>
-          <p className="text-slate-600 mb-6">Enter password to continue</p>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="rounded-lg bg-white px-6 py-5 shadow">
+          <p className="text-sm text-slate-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
-          <form onSubmit={handlePasswordSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
-                Admin Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter admin password"
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={loading}
-                autoFocus
-              />
-            </div>
-
-            {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading || !password}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-            >
-              {loading ? 'Checking...' : 'Access Dashboard'}
-            </button>
-          </form>
+  if (error && !stats) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="max-w-md rounded-lg border border-red-200 bg-white p-6 text-center shadow">
+          <p className="text-sm text-red-700">{error}</p>
         </div>
       </div>
     );
@@ -121,11 +120,7 @@ export default function AdminDashboard() {
               <p className="text-slate-600 mt-1">Welcome back</p>
             </div>
             <button
-              onClick={() => {
-                setAuthenticated(false);
-                setPassword('');
-                setStats(null);
-              }}
+              onClick={logout}
               className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition"
             >
               Logout

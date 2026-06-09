@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAdminAuth } from "@/components/admin/admin-auth";
 
 type Booking = {
   id: number;
@@ -61,40 +62,64 @@ function formatDate(iso: string) {
 }
 
 export default function AdminBookingsPage() {
-  const [password, setPassword] = useState("");
-  const [authed, setAuthed] = useState(false);
-  const [authError, setAuthError] = useState("");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [filter, setFilter] = useState<FilterTab>("all");
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [fadingOut, setFadingOut] = useState<Set<number>>(new Set());
+  const { password, logout } = useAdminAuth();
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setAuthError("");
-    try {
-      const res = await fetch("/api/admin/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-      if (!res.ok) {
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadBookings() {
+      setLoading(true);
+      setError("");
+
+      try {
+        const res = await fetch("/api/admin/bookings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password }),
+        });
         const data = await res.json();
-        setAuthError(data.error ?? "Incorrect password");
-        return;
+
+        if (cancelled) {
+          return;
+        }
+
+        if (!res.ok) {
+          if (res.status === 401) {
+            logout();
+            return;
+          }
+
+          setError(data.error ?? "Failed to load bookings");
+          return;
+        }
+
+        setBookings(data.bookings ?? []);
+      } catch {
+        if (!cancelled) {
+          setError("Failed to connect. Please try again.");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
-      const data = await res.json();
-      setBookings(data.bookings ?? []);
-      setAuthed(true);
-    } catch {
-      setAuthError("Failed to connect. Please try again.");
-    } finally {
-      setLoading(false);
     }
-  }
+
+    if (password) {
+      loadBookings();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [logout, password]);
 
   async function updateStatus(bookingId: number, status: string) {
     setUpdatingId(bookingId);
@@ -127,6 +152,8 @@ export default function AdminBookingsPage() {
             prev.map((b) => (b.id === bookingId ? { ...b, status } : b))
           );
         }
+      } else if (res.status === 401) {
+        logout();
       } else {
         // Revert animation if request failed
         setFadingOut((prev) => {
@@ -158,62 +185,21 @@ export default function AdminBookingsPage() {
   const filtered =
     filter === "all" ? bookings : bookings.filter((b) => b.status === filter);
 
-  // ── Login screen ───────────────────────────────────────────────────────────
-  if (!authed) {
+  if (loading && bookings.length === 0) {
     return (
       <div className="min-h-screen bg-[#f0f5f5] flex items-center justify-center p-4">
-        <div className="w-full max-w-sm">
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="h-1.5 bg-[#388082]" />
-            <div className="px-8 py-10">
-              <div className="flex justify-center mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-[#388082]/10 flex items-center justify-center">
-                  <svg
-                    className="w-7 h-7 text-[#388082]"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.8}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <h1 className="text-center text-xl font-semibold text-gray-900 mb-1">
-                Booking Requests
-              </h1>
-              <p className="text-center text-sm text-gray-500 mb-8">
-                Enter your admin password to continue
-              </p>
-              <form onSubmit={handleLogin} className="space-y-4">
-                <input
-                  type="password"
-                  placeholder="Admin password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#388082]/40 focus:border-[#388082] transition"
-                />
-                {authError && (
-                  <p className="text-sm text-red-500 text-center">{authError}</p>
-                )}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3 rounded-xl bg-[#388082] text-white text-sm font-medium hover:bg-[#2e6b6d] active:scale-[0.98] transition disabled:opacity-60"
-                >
-                  {loading ? "Verifying…" : "Access Dashboard"}
-                </button>
-              </form>
-            </div>
-          </div>
-          <p className="text-center text-xs text-gray-400 mt-6">
-            WaitsLess Foods · Admin Portal
-          </p>
+        <div className="rounded-2xl bg-white px-6 py-5 shadow-lg">
+          <p className="text-sm text-gray-600">Loading booking requests...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && bookings.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#f0f5f5] flex items-center justify-center p-4">
+        <div className="max-w-md rounded-2xl border border-red-200 bg-white p-6 text-center shadow-lg">
+          <p className="text-sm text-red-600">{error}</p>
         </div>
       </div>
     );
@@ -271,11 +257,7 @@ export default function AdminBookingsPage() {
               Dashboard
             </a>
             <button
-              onClick={() => {
-                setAuthed(false);
-                setPassword("");
-                setBookings([]);
-              }}
+              onClick={logout}
               className="text-xs font-medium text-white/80 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition"
             >
               Log out
