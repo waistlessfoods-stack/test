@@ -160,8 +160,16 @@ async function fetchBlogPageFromContentfulRaw(): Promise<BlogPageData> {
   }
 }
 
-export const fetchBlogPageFromContentful = unstable_cache(
+const fetchBlogPageFromContentfulCached = unstable_cache(
   fetchBlogPageFromContentfulRaw,
   ["contentful-blog-page"],
   { revalidate: 300, tags: ["blog-page"] }
 );
+
+export async function fetchBlogPageFromContentful(): Promise<BlogPageData> {
+  if (process.env.NODE_ENV !== "production") {
+    return fetchBlogPageFromContentfulRaw();
+  }
+
+  return fetchBlogPageFromContentfulCached();
+}

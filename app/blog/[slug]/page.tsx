@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
+import { MarkdownContent } from "@/components/markdown-content";
 import { fetchBlogPageFromContentful } from "@/lib/contentful-blog";
 
 type BlogDetailPageProps = {
@@ -52,7 +53,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
               {post.title}
             </h1>
 
-            <p className="text-lg leading-8 text-[#262626]">{post.excerpt}</p>
+            <MarkdownContent content={post.excerpt} className="space-y-6" />
           </div>
         </article>
       </Container>
