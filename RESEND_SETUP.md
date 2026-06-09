@@ -107,12 +107,18 @@ Ready-to-use endpoint for sending emails:
 
 **Endpoint:** `POST /api/email/send`
 
+Requires `EMAIL_SEND_API_SECRET` to be configured and sent as either:
+
+- `Authorization: Bearer <EMAIL_SEND_API_SECRET>`
+- `x-email-send-secret: <EMAIL_SEND_API_SECRET>`
+
 Returns: `{ data: { id: string }, error: null }` or `{ data: null, error: { message, name } }`
 
 ### Welcome Email Example
 ```bash
 curl -X POST http://localhost:3000/api/email/send \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $EMAIL_SEND_API_SECRET" \
   -d '{
     "type": "welcome",
     "to": "test@example.com",
@@ -124,6 +130,7 @@ curl -X POST http://localhost:3000/api/email/send \
 ```bash
 curl -X POST http://localhost:3000/api/email/send \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $EMAIL_SEND_API_SECRET" \
   -d '{
     "type": "order-confirmation",
     "to": "customer@example.com",
@@ -231,7 +238,8 @@ Use these in development to safely test different scenarios.
 
 ### API Documentation
 ```bash
-GET /api/email/send
+curl http://localhost:3000/api/email/send \
+  -H "Authorization: Bearer $EMAIL_SEND_API_SECRET"
 ```
 
 This returns examples and supported email types.

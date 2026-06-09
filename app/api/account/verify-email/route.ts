@@ -3,6 +3,11 @@ import { db } from '@/lib/db';
 import { verification, user as userTable } from '@/lib/db/schema';
 import { sendEmail } from '@/lib/email/resend';
 import EmailVerificationEmail from '@/lib/email/templates/email-verification-email';
+import {
+  checkRateLimit,
+  normalizeRateLimitEmail,
+  rateLimitResponse,
+} from '@/lib/rate-limit';
 import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -63,13 +68,32 @@ async function withDbRetry<T>(operation: () => Promise<T>, retries = 2): Promise
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email } = body;
+    const email = normalizeRateLimitEmail(body?.email);
 
     if (!email) {
       return NextResponse.json(
         { error: 'Email is required' },
         { status: 400 }
       );
+    }
+
+    const ipLimit = checkRateLimit(request, {
+      name: 'verify-email:ip',
+      limit: 5,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (ipLimit.limited) {
+      return rateLimitResponse(ipLimit);
+    }
+
+    const emailLimit = checkRateLimit(request, {
+      name: 'verify-email:email',
+      identifier: email,
+      limit: 3,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (emailLimit.limited) {
+      return rateLimitResponse(emailLimit);
     }
 
     // Find the user

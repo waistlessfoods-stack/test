@@ -7,6 +7,7 @@ import { orders } from "@/lib/db/schema";
 import { syncCurrentClerkUser } from "@/lib/clerk-user-sync";
 import { calculateCartTotals } from "@/lib/pricing";
 import { getServerSalesTaxRate } from "@/lib/tax-settings";
+import { fetchShopPageFromContentful } from "@/lib/contentful-management";
 
 const stripeSecretKey =
     process.env.sandbox_secret_key_stripe || process.env.STRIPE_SECRET_KEY;
@@ -24,40 +25,109 @@ type CheckoutItem = {
   imagePath?: string;
 };
 
-function toCheckoutItem(item: unknown): CheckoutItem | null {
+type CheckoutItemRequest = {
+  id?: string;
+  slug?: string;
+  quantity: number;
+};
+
+function toCheckoutItemRequest(item: unknown): CheckoutItemRequest | null {
   if (!item || typeof item !== "object") return null;
 
   const maybeItem = item as {
     id?: unknown;
-    name?: unknown;
     slug?: unknown;
-    price?: unknown;
     quantity?: unknown;
-    imagePath?: unknown;
   };
 
-  const name = typeof maybeItem.name === "string" ? maybeItem.name : "";
+  const id =
+    typeof maybeItem.id === "string" && maybeItem.id.trim().length > 0
+      ? maybeItem.id.trim()
+      : undefined;
   const slug =
     typeof maybeItem.slug === "string" && maybeItem.slug.trim().length > 0
       ? maybeItem.slug.trim()
-      : name
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "");
+      : undefined;
+  const quantity = Number(maybeItem.quantity);
+
+  if ((!id && !slug) || !Number.isInteger(quantity) || quantity <= 0) {
+    return null;
+  }
 
   return {
-    id: typeof maybeItem.id === "string" ? maybeItem.id : crypto.randomUUID(),
-    name,
+    id,
     slug,
-    price: Number(maybeItem.price) || 0,
-    quantity: Number(maybeItem.quantity) || 0,
-    imagePath:
-      typeof maybeItem.imagePath === "string" ? maybeItem.imagePath : undefined,
+    quantity: Math.min(quantity, 20),
   };
 }
 
-function isCheckoutItem(item: CheckoutItem | null): item is CheckoutItem {
-  return Boolean(item && item.name && item.quantity > 0);
+function parseRecipePrice(price: string): number | null {
+  const normalized = price.trim().toLowerCase();
+
+  if (!normalized || normalized === "free") {
+    return null;
+  }
+
+  const parsed = Number(normalized.replace(/[^0-9.]/g, ""));
+
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return null;
+  }
+
+  return parsed;
+}
+
+async function resolveCheckoutItems(rawItems: unknown): Promise<CheckoutItem[]> {
+  if (!Array.isArray(rawItems) || rawItems.length === 0) {
+    return [];
+  }
+
+  const requestedItems = rawItems
+    .map(toCheckoutItemRequest)
+    .filter((item): item is CheckoutItemRequest => Boolean(item));
+
+  if (requestedItems.length === 0) {
+    return [];
+  }
+
+  const shopData = await fetchShopPageFromContentful();
+  const paidRecipes = shopData.recipes
+    .map((recipe) => ({
+      ...recipe,
+      numericPrice: parseRecipePrice(recipe.price),
+    }))
+    .filter((recipe) => recipe.numericPrice !== null);
+
+  const byId = new Map(paidRecipes.map((recipe) => [recipe.id, recipe]));
+  const bySlug = new Map(paidRecipes.map((recipe) => [recipe.slug, recipe]));
+  const resolvedItems = new Map<string, CheckoutItem>();
+
+  for (const item of requestedItems) {
+    const recipe =
+      (item.id ? byId.get(item.id) : undefined) ||
+      (item.slug ? bySlug.get(item.slug) : undefined);
+
+    if (!recipe || recipe.numericPrice === null) {
+      throw new Error("One or more cart items are no longer available.");
+    }
+
+    const existing = resolvedItems.get(recipe.id);
+    const nextQuantity = Math.min(
+      (existing?.quantity ?? 0) + item.quantity,
+      20,
+    );
+
+    resolvedItems.set(recipe.id, {
+      id: recipe.id,
+      name: recipe.title,
+      slug: recipe.slug,
+      price: recipe.numericPrice,
+      quantity: nextQuantity,
+      imagePath: recipe.imagePath ?? undefined,
+    });
+  }
+
+  return [...resolvedItems.values()];
 }
 
 // Helper to detect transient database errors
@@ -159,11 +229,14 @@ export async function POST(request: Request) {
     console.log("[Checkout] Parsing request body...");
     const bodyStart = Date.now();
     const origin = request.headers.get("origin") || "http://localhost:3000";
-    const body = await request.json();
+    let body: { items?: unknown } = {};
+    try {
+      body = await request.json();
+    } catch {
+      body = {};
+    }
     const rawItems = body?.items;
-    const items: CheckoutItem[] = Array.isArray(rawItems)
-      ? rawItems.map(toCheckoutItem).filter(isCheckoutItem)
-      : [];
+    const items = await resolveCheckoutItems(rawItems);
     console.log(`[Checkout] Body parsed in ${Date.now() - bodyStart}ms`, {
       itemCount: items?.length || 0,
       totalPrice: items?.reduce((sum: number, i: any) => sum + (i.price * i.quantity), 0) || 0,
@@ -172,7 +245,17 @@ export async function POST(request: Request) {
     const taxRate = await getServerSalesTaxRate();
     const totals = calculateCartTotals(items, taxRate);
 
-    // If no items provided, use test item (for stripe-test page)
+    const allowTestCheckout =
+      items.length === 0 && process.env.NODE_ENV !== "production";
+
+    if (items.length === 0 && !allowTestCheckout) {
+      return NextResponse.json(
+        { error: "Your cart is empty or contains unavailable items." },
+        { status: 400 },
+      );
+    }
+
+    // If no items provided in development, use test item (for stripe-test page)
     console.log("[Checkout] Building line items...");
     const lineItemsStart = Date.now();
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =

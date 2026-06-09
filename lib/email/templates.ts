@@ -1,5 +1,27 @@
 // Email template generators for different use cases
 
+function escapeHtml(value: string | number | null | undefined): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function formatOptionalValue(value: string | null | undefined): string {
+  const trimmed = value?.trim();
+  return trimmed ? escapeHtml(trimmed) : "Not provided";
+}
+
+function formatEnquiryType(type: string): string {
+  return type
+    .split("_")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export function orderConfirmationTemplate({
   customerName,
   orderNumber,
@@ -329,3 +351,185 @@ export function bookingNotificationTemplate({
   `;
 }
 
+export function enquiryConfirmationTemplate({
+  name,
+  type,
+  message,
+}: {
+  name: string;
+  type: string;
+  message?: string | null;
+}) {
+  const enquiryLabel = formatEnquiryType(type);
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #388082; color: white; padding: 28px 30px; border-radius: 8px; text-align: center; }
+          .content { margin: 24px 0; }
+          .detail-box { background: #f4f4f4; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+          .detail-row { margin-bottom: 10px; }
+          .detail-label { font-weight: bold; color: #555; }
+          .footer { text-align: center; color: #888; font-size: 12px; margin-top: 30px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin:0; font-size:22px;">Enquiry Received</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${escapeHtml(name)},</p>
+            <p>Thank you for reaching out to WaistLess Foods. We've received your ${escapeHtml(enquiryLabel.toLowerCase())} enquiry and will be in touch shortly.</p>
+            <div class="detail-box">
+              <div class="detail-row"><span class="detail-label">Enquiry Type:</span> ${escapeHtml(enquiryLabel)}</div>
+              <div class="detail-row"><span class="detail-label">Message:</span> ${formatOptionalValue(message)}</div>
+            </div>
+            <p>If you have more details to share, you can reply directly to this email.</p>
+          </div>
+          <div class="footer">
+            <p>© 2026 Waistless Foods. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+}
+
+export function enquiryNotificationTemplate({
+  name,
+  email,
+  phone,
+  type,
+  message,
+  enquiryId,
+}: {
+  name: string;
+  email: string;
+  phone?: string | null;
+  type: string;
+  message?: string | null;
+  enquiryId: number;
+}) {
+  const enquiryLabel = formatEnquiryType(type);
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #388082; color: white; padding: 28px 30px; border-radius: 8px; }
+          .detail-box { background: #f4f4f4; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+          .detail-row { margin-bottom: 10px; }
+          .detail-label { font-weight: bold; color: #555; }
+          .footer { text-align: center; color: #888; font-size: 12px; margin-top: 30px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin:0; font-size:20px; color:white;">New Enquiry #${enquiryId}</h1>
+          </div>
+          <div class="detail-box" style="margin-top:24px;">
+            <h3 style="margin-top:0;">Contact Details</h3>
+            <div class="detail-row"><span class="detail-label">Name:</span> ${escapeHtml(name)}</div>
+            <div class="detail-row"><span class="detail-label">Email:</span> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></div>
+            <div class="detail-row"><span class="detail-label">Phone:</span> ${formatOptionalValue(phone)}</div>
+          </div>
+          <div class="detail-box">
+            <h3 style="margin-top:0;">Enquiry Details</h3>
+            <div class="detail-row"><span class="detail-label">Type:</span> ${escapeHtml(enquiryLabel)}</div>
+            <div class="detail-row"><span class="detail-label">Message:</span> ${formatOptionalValue(message)}</div>
+          </div>
+          <div class="footer">
+            <p>© 2026 Waistless Foods. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+}
+
+export function newsletterConfirmationTemplate({ email }: { email: string }) {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #388082; color: white; padding: 28px 30px; border-radius: 8px; text-align: center; }
+          .content { margin: 24px 0; }
+          .footer { text-align: center; color: #888; font-size: 12px; margin-top: 30px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin:0; font-size:22px;">You're on the list</h1>
+          </div>
+          <div class="content">
+            <p>Hi there,</p>
+            <p>Thanks for subscribing to WaistLess Foods. We'll send recipes, chef tips, updates, and sustainable cooking inspiration to ${escapeHtml(email)}.</p>
+            <p>We're glad you're here.</p>
+          </div>
+          <div class="footer">
+            <p>© 2026 Waistless Foods. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+}
+
+export function newsletterNotificationTemplate({
+  email,
+  subscriberId,
+}: {
+  email: string;
+  subscriberId: number;
+}) {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #388082; color: white; padding: 28px 30px; border-radius: 8px; }
+          .detail-box { background: #f4f4f4; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+          .detail-row { margin-bottom: 10px; }
+          .detail-label { font-weight: bold; color: #555; }
+          .footer { text-align: center; color: #888; font-size: 12px; margin-top: 30px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin:0; font-size:20px; color:white;">New Newsletter Subscriber #${subscriberId}</h1>
+          </div>
+          <div class="detail-box" style="margin-top:24px;">
+            <div class="detail-row"><span class="detail-label">Email:</span> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></div>
+          </div>
+          <div class="footer">
+            <p>© 2026 Waistless Foods. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+}

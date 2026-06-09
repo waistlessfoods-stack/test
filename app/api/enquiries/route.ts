@@ -1,5 +1,15 @@
 import { db } from "@/lib/db";
 import { enquiries } from "@/lib/db/schema";
+import { sendEmail, fromEmail } from "@/lib/email/resend";
+import {
+  enquiryConfirmationTemplate,
+  enquiryNotificationTemplate,
+} from "@/lib/email/templates";
+import {
+  checkRateLimit,
+  normalizeRateLimitEmail,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 
 // Helper to detect transient database errors
@@ -49,13 +59,41 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { type, name, email, phone, message } = body;
+    const normalizedEmail = normalizeRateLimitEmail(email);
 
     // Validate required fields
-    if (!type || !name || !email) {
+    if (!type || !name || !normalizedEmail) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      return NextResponse.json(
+        { error: "Invalid email address" },
+        { status: 400 }
+      );
+    }
+
+    const ipLimit = checkRateLimit(request, {
+      name: "enquiries:ip",
+      limit: 5,
+      windowMs: 15 * 60 * 1000,
+    });
+    if (ipLimit.limited) {
+      return rateLimitResponse(ipLimit);
+    }
+
+    const emailLimit = checkRateLimit(request, {
+      name: "enquiries:email",
+      identifier: normalizedEmail,
+      limit: 3,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (emailLimit.limited) {
+      return rateLimitResponse(emailLimit);
     }
 
     // Insert into database with retry logic
@@ -65,15 +103,50 @@ export async function POST(request: NextRequest) {
         .values({
           type,
           name,
-          email,
+          email: normalizedEmail,
           phone: phone || null,
           message: message || null,
         })
         .returning()
     );
 
+    const enquiry = result[0];
+    const adminEmail = process.env.ADMIN_EMAIL || fromEmail;
+
+    const [confirmationEmail, notificationEmail] = await Promise.all([
+      sendEmail({
+        to: normalizedEmail,
+        subject: "We received your WaistLess Foods enquiry",
+        html: enquiryConfirmationTemplate({
+          name,
+          type,
+          message,
+        }),
+      }),
+      sendEmail({
+        to: adminEmail,
+        subject: `New ${String(type).replaceAll("_", " ")} enquiry`,
+        replyTo: normalizedEmail,
+        html: enquiryNotificationTemplate({
+          name,
+          email: normalizedEmail,
+          phone,
+          type,
+          message,
+          enquiryId: enquiry.id,
+        }),
+      }),
+    ]);
+
+    if (confirmationEmail.error || notificationEmail.error) {
+      console.error("Enquiry email send failed:", {
+        confirmation: confirmationEmail.error,
+        notification: notificationEmail.error,
+      });
+    }
+
     return NextResponse.json(
-      { success: true, data: result[0] },
+      { success: true, data: enquiry },
       { status: 201 }
     );
   } catch (error) {

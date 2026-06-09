@@ -1,5 +1,15 @@
 import { db } from "@/lib/db";
 import { subscribers } from "@/lib/db/schema";
+import { sendEmail, fromEmail } from "@/lib/email/resend";
+import {
+  newsletterConfirmationTemplate,
+  newsletterNotificationTemplate,
+} from "@/lib/email/templates";
+import {
+  checkRateLimit,
+  normalizeRateLimitEmail,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "drizzle-orm";
 
@@ -49,14 +59,33 @@ async function withDbRetry<T>(
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email } = body;
+    const rawEmail = normalizeRateLimitEmail(body?.email);
 
     // Validate email
-    if (!email || !email.includes("@")) {
+    if (!rawEmail || !rawEmail.includes("@")) {
       return NextResponse.json(
         { error: "Valid email is required" },
         { status: 400 }
       );
+    }
+
+    const ipLimit = checkRateLimit(request, {
+      name: "newsletter:ip",
+      limit: 5,
+      windowMs: 15 * 60 * 1000,
+    });
+    if (ipLimit.limited) {
+      return rateLimitResponse(ipLimit);
+    }
+
+    const emailLimit = checkRateLimit(request, {
+      name: "newsletter:email",
+      identifier: rawEmail,
+      limit: 3,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (emailLimit.limited) {
+      return rateLimitResponse(emailLimit);
     }
 
     // Check if email already exists with retry logic
@@ -64,7 +93,7 @@ export async function POST(request: NextRequest) {
       db
         .select()
         .from(subscribers)
-        .where(sql`${subscribers.email} = ${email}`)
+        .where(sql`${subscribers.email} = ${rawEmail}`)
         .limit(1)
     );
 
@@ -80,13 +109,40 @@ export async function POST(request: NextRequest) {
       db
         .insert(subscribers)
         .values({
-          email: email.toLowerCase().trim(),
+          email: rawEmail,
         })
         .returning()
     );
 
+    const subscriber = result[0];
+    const adminEmail = process.env.ADMIN_EMAIL || fromEmail;
+
+    const [confirmationEmail, notificationEmail] = await Promise.all([
+      sendEmail({
+        to: rawEmail,
+        subject: "Welcome to WaistLess Foods",
+        html: newsletterConfirmationTemplate({ email: rawEmail }),
+      }),
+      sendEmail({
+        to: adminEmail,
+        subject: "New Newsletter Subscriber",
+        replyTo: rawEmail,
+        html: newsletterNotificationTemplate({
+          email: rawEmail,
+          subscriberId: subscriber.id,
+        }),
+      }),
+    ]);
+
+    if (confirmationEmail.error || notificationEmail.error) {
+      console.error("Newsletter email send failed:", {
+        confirmation: confirmationEmail.error,
+        notification: notificationEmail.error,
+      });
+    }
+
     return NextResponse.json(
-      { success: true, message: "Successfully subscribed to newsletter", data: result[0] },
+      { success: true, message: "Successfully subscribed to newsletter", data: subscriber },
       { status: 201 }
     );
   } catch (error) {

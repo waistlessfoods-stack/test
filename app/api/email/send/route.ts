@@ -5,7 +5,44 @@ import PasswordResetEmail from '@/lib/email/templates/password-reset-email';
 import { NextRequest, NextResponse } from 'next/server';
 import React from 'react';
 
+function getConfiguredSecret(): string | null {
+  return process.env.EMAIL_SEND_API_SECRET ?? null;
+}
+
+function getProvidedSecret(request: NextRequest): string | null {
+  const authorization = request.headers.get('authorization');
+  if (authorization?.startsWith('Bearer ')) {
+    return authorization.slice('Bearer '.length).trim();
+  }
+
+  return request.headers.get('x-email-send-secret');
+}
+
+function isAuthorized(request: NextRequest): boolean {
+  const configuredSecret = getConfiguredSecret();
+  const providedSecret = getProvidedSecret(request);
+
+  return Boolean(configuredSecret && providedSecret === configuredSecret);
+}
+
+function protectedResponse(request: NextRequest): NextResponse | null {
+  if (!getConfiguredSecret()) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  return null;
+}
+
 export async function POST(request: NextRequest) {
+  const unauthorized = protectedResponse(request);
+  if (unauthorized) {
+    return unauthorized;
+  }
+
   try {
     const body = await request.json();
     const { type, to, data } = body;
@@ -94,9 +131,18 @@ export async function POST(request: NextRequest) {
 }
 
 // Example GET for testing
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const unauthorized = protectedResponse(request);
+  if (unauthorized) {
+    return unauthorized;
+  }
+
   return NextResponse.json({
     message: 'Email API powered by React Email + Resend',
+    auth: {
+      header: 'Authorization: Bearer <EMAIL_SEND_API_SECRET>',
+      alternateHeader: 'x-email-send-secret: <EMAIL_SEND_API_SECRET>',
+    },
     usage: {
       method: 'POST',
       endpoint: '/api/email/send',

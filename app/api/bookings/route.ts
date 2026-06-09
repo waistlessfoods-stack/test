@@ -2,6 +2,11 @@ import { db } from "@/lib/db";
 import { bookings } from "@/lib/db/schema";
 import { sendEmail, fromEmail } from "@/lib/email/resend";
 import { bookingConfirmationTemplate, bookingNotificationTemplate } from "@/lib/email/templates";
+import {
+  checkRateLimit,
+  normalizeRateLimitEmail,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 
 function isTransientDbError(error: unknown): boolean {
@@ -56,6 +61,7 @@ export async function POST(request: NextRequest) {
       alternativeDate,
       notes,
     } = body;
+    const normalizedEmail = normalizeRateLimitEmail(email);
 
     // Validate required fields
     if (
@@ -63,7 +69,7 @@ export async function POST(request: NextRequest) {
       !serviceTitle ||
       !firstName ||
       !lastName ||
-      !email ||
+      !normalizedEmail ||
       !phone ||
       !guests ||
       !preferredDate ||
@@ -77,11 +83,30 @@ export async function POST(request: NextRequest) {
 
     // Basic email format check
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(normalizedEmail)) {
       return NextResponse.json(
         { error: "Invalid email address" },
         { status: 400 }
       );
+    }
+
+    const ipLimit = checkRateLimit(request, {
+      name: "bookings:ip",
+      limit: 3,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (ipLimit.limited) {
+      return rateLimitResponse(ipLimit);
+    }
+
+    const emailLimit = checkRateLimit(request, {
+      name: "bookings:email",
+      identifier: normalizedEmail,
+      limit: 2,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (emailLimit.limited) {
+      return rateLimitResponse(emailLimit);
     }
 
     // Insert booking into database
@@ -93,7 +118,7 @@ export async function POST(request: NextRequest) {
           serviceTitle,
           firstName,
           lastName,
-          email,
+          email: normalizedEmail,
           phone,
           guests: Number(guests),
           preferredDate,
@@ -108,7 +133,7 @@ export async function POST(request: NextRequest) {
 
     // Send confirmation email to the customer
     await sendEmail({
-      to: email,
+      to: normalizedEmail,
       subject: `Booking Request Received – ${serviceTitle}`,
       html: bookingConfirmationTemplate({
         firstName,
@@ -125,11 +150,11 @@ export async function POST(request: NextRequest) {
     await sendEmail({
       to: adminEmail,
       subject: `New Booking Request – ${serviceTitle}`,
-      replyTo: email,
+      replyTo: normalizedEmail,
       html: bookingNotificationTemplate({
         firstName,
         lastName,
-        email,
+        email: normalizedEmail,
         phone,
         serviceTitle,
         preferredDate,

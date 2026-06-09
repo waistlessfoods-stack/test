@@ -116,12 +116,13 @@ if (error) {
 
 ## API Endpoint Usage
 
-The email API is available at `POST /api/email/send` for programmatic sending:
+The email API is available at `POST /api/email/send` for programmatic sending. It requires `EMAIL_SEND_API_SECRET` and either `Authorization: Bearer <EMAIL_SEND_API_SECRET>` or `x-email-send-secret: <EMAIL_SEND_API_SECRET>`.
 
 ### Test Welcome Email
 ```bash
 curl -X POST http://localhost:3000/api/email/send \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $EMAIL_SEND_API_SECRET" \
   -d '{
     "type": "welcome",
     "to": "test@example.com",
@@ -133,6 +134,7 @@ curl -X POST http://localhost:3000/api/email/send \
 ```bash
 curl -X POST http://localhost:3000/api/email/send \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $EMAIL_SEND_API_SECRET" \
   -d '{
     "type": "order-confirmation",
     "to": "customer@example.com",
@@ -156,6 +158,7 @@ curl -X POST http://localhost:3000/api/email/send \
 ```bash
 curl -X POST http://localhost:3000/api/email/send \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $EMAIL_SEND_API_SECRET" \
   -d '{
     "type": "password-reset",
     "to": "user@example.com",
@@ -209,7 +212,7 @@ For safe testing without affecting your domain:
 
 ### Preview Emails
 
-Visit `GET /api/email/send` to see API documentation and examples.
+Call `GET /api/email/send` with `Authorization: Bearer <EMAIL_SEND_API_SECRET>` to see API documentation and examples.
 
 ## Error Handling
 
