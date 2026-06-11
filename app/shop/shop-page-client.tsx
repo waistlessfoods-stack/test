@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Check, Search } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import {
   Carousel,
@@ -11,6 +11,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { CarouselArrowButton } from "@/components/ui/carousel-arrow-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSession } from "@/lib/auth-client";
@@ -250,6 +251,26 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
                 })}
               </CarouselContent>
             </Carousel>
+            {data.categories.length > 1 && (
+              <>
+                <CarouselArrowButton
+                  side="previous"
+                  tone="subtle"
+                  onClick={() => api?.scrollPrev()}
+                  aria-label="Previous category"
+                >
+                  <ChevronLeft className="size-3.5" />
+                </CarouselArrowButton>
+                <CarouselArrowButton
+                  side="next"
+                  tone="subtle"
+                  onClick={() => api?.scrollNext()}
+                  aria-label="Next category"
+                >
+                  <ChevronRight className="size-3.5" />
+                </CarouselArrowButton>
+              </>
+            )}
           </div>
 
           {filteredRecipes.length === 0 ? (
@@ -306,7 +327,7 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
 
                         {item.featured && (
                           <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
-                            <span className="inline-flex items-center rounded-full border-[3px] border-white/75 bg-white/35 px-7 py-1.5 text-lg lg:text-sm 2xl:text-base font-semibold uppercase tracking-wide text-[#0F8DAB] backdrop-blur-sm shadow-[0_4px_14px_rgba(255,255,255,0.25)]">
+                            <span className="inline-flex items-center rounded-full border-[3px] border-[#0F8DAB] bg-white/35 px-7 py-1.5 text-lg lg:text-sm 2xl:text-base font-semibold uppercase tracking-wide text-[#0F8DAB] backdrop-blur-sm shadow-[0_4px_14px_rgba(15,141,171,0.25)]">
                               Featured
                             </span>
                           </div>

@@ -17,8 +17,6 @@ export interface EmailVerificationEmailProps {
   verificationLink: string;
 }
 
-const baseUrl = process.env.RESEND_FROM_EMAIL || 'https://waitslessfood.com';
-
 export default function EmailVerificationEmail({
   name,
   verificationLink,
@@ -68,6 +66,14 @@ export default function EmailVerificationEmail({
     </Html>
   );
 }
+
+(EmailVerificationEmail as typeof EmailVerificationEmail & {
+  PreviewProps: EmailVerificationEmailProps;
+}).PreviewProps = {
+  name: 'Amber',
+  verificationLink:
+    'https://waitslessfood.com/api/auth/verify-email?token=preview-token&email=amber%40example.com',
+};
 
 const main = {
   backgroundColor: '#f4f4f4',

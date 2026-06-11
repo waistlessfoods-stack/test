@@ -126,7 +126,9 @@ Affected routes:
 
 Risk: Medium
 
-Admin password checks have no rate limiting or lockout behavior.
+Status: Fixed on 2026-06-10. Admin login now has IP-based rate limiting on `/api/admin/verify`.
+
+Admin password checks previously had no rate limiting or lockout behavior.
 
 Recommended fix:
 
@@ -139,6 +141,8 @@ Recommended fix:
 File: `app/api/bookings/route.ts`
 
 Risk: Medium
+
+Status: Fixed on 2026-06-10. The booking route now checks both customer and admin email results and returns `emailSent`.
 
 `sendEmail()` returns `{ data, error }`, but the booking route does not inspect the result. The UI can say a confirmation was sent even when Gmail failed.
 
@@ -211,11 +215,11 @@ Recommended fix:
 - [x] Replace client-sent checkout prices with server-authoritative pricing.
 - [x] Remove or protect `/api/email/send`.
 - [x] Add rate limiting to public write routes.
-- [ ] Add honeypot fields to newsletter, enquiry, and booking forms.
-- [ ] Add server-side max length checks for all public text fields.
-- [ ] Use secure random tokens for email verification.
-- [ ] Require auth for requesting email verification.
-- [ ] Move admin auth to an httpOnly session cookie.
-- [ ] Add brute force protection to admin login.
-- [ ] Check `sendEmail()` results in `/api/bookings`.
+- [x] Add honeypot fields to newsletter, enquiry, and booking forms.
+- [x] Add server-side max length checks for all public text fields.
+- [x] Use secure random tokens for email verification.
+- [x] Require auth for requesting email verification.
+- [x] Move admin auth to an httpOnly session cookie.
+- [x] Add brute force protection to admin login.
+- [x] Check `sendEmail()` results in `/api/bookings`.
 - [ ] Add structured logging for form submissions and email failures.

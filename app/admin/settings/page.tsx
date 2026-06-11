@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useAdminAuth } from "@/components/admin/admin-auth";
 
 export default function AdminSettingsPage() {
-  const { password, logout } = useAdminAuth();
+  const { authenticated, logout } = useAdminAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -22,8 +22,6 @@ export default function AdminSettingsPage() {
       try {
         const response = await fetch("/api/admin/settings", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password }),
         });
 
         const data = await response.json();
@@ -55,14 +53,14 @@ export default function AdminSettingsPage() {
       }
     }
 
-    if (password) {
+    if (authenticated) {
       loadSettings();
     }
 
     return () => {
       cancelled = true;
     };
-  }, [logout, password]);
+  }, [authenticated, logout]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +73,6 @@ export default function AdminSettingsPage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          password,
           taxRate: taxPercent,
         }),
       });

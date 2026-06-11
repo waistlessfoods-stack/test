@@ -1,23 +1,29 @@
 import React from 'react';
+import { randomBytes } from 'crypto';
+import { auth, currentUser as getCurrentClerkUser } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import { verification, user as userTable } from '@/lib/db/schema';
-import { sendEmail } from '@/lib/email/resend';
+import { syncCurrentClerkUser } from '@/lib/clerk-user-sync';
+import { sendEmail } from '@/lib/email/mailer';
 import EmailVerificationEmail from '@/lib/email/templates/email-verification-email';
 import {
   checkRateLimit,
   normalizeRateLimitEmail,
   rateLimitResponse,
 } from '@/lib/rate-limit';
-import { eq } from 'drizzle-orm';
+import { validateTextFieldLengths } from '@/lib/text-field-validation';
+import { and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * Generate a secure random token
  */
 function generateToken(): string {
-  return Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15);
+  return randomBytes(32).toString('hex');
+}
+
+function generateVerificationId(): string {
+  return `verify_${Date.now()}_${randomBytes(8).toString('hex')}`;
 }
 
 function isTransientDbError(error: unknown): boolean {
@@ -67,14 +73,22 @@ async function withDbRetry<T>(operation: () => Promise<T>, retries = 2): Promise
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const email = normalizeRateLimitEmail(body?.email);
+    const { userId } = await auth();
+    const clerkUser = await getCurrentClerkUser();
+    const email = normalizeRateLimitEmail(clerkUser?.primaryEmailAddress?.emailAddress);
 
-    if (!email) {
+    if (!userId || !email) {
       return NextResponse.json(
-        { error: 'Email is required' },
-        { status: 400 }
+        { error: 'You must be signed in to request email verification' },
+        { status: 401 }
       );
+    }
+
+    const textFieldError = validateTextFieldLengths({ email }, {
+      email: { label: 'Email', max: 254 },
+    });
+    if (textFieldError) {
+      return NextResponse.json({ error: textFieldError }, { status: 400 });
     }
 
     const ipLimit = checkRateLimit(request, {
@@ -96,18 +110,20 @@ export async function POST(request: NextRequest) {
       return rateLimitResponse(emailLimit);
     }
 
-    // Find the user
+    await syncCurrentClerkUser();
+
+    // Find the signed-in user only; never trust request-body email for this flow.
     const existingUser = await withDbRetry(() =>
       db
         .select()
         .from(userTable)
-        .where(eq(userTable.email, email))
+        .where(and(eq(userTable.id, userId), eq(userTable.email, email)))
         .limit(1)
     );
 
     if (existingUser.length === 0) {
       return NextResponse.json(
-        { error: 'User not found' },
+        { error: 'Signed-in user record was not found' },
         { status: 404 }
       );
     }
@@ -136,7 +152,7 @@ export async function POST(request: NextRequest) {
     // Store verification token in database
     await withDbRetry(() =>
       db.insert(verification).values({
-        id: `verify_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+        id: generateVerificationId(),
         identifier: email,
         value: token,
         expiresAt,
@@ -147,7 +163,7 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
     const verificationLink = `${baseUrl}/api/auth/verify-email?token=${token}&email=${encodeURIComponent(email)}`;
 
-    // Send verification email using Resend
+    // Send verification email
     const { data, error } = await sendEmail({
       to: email,
       subject: 'Verify Your Email Address',
@@ -196,13 +212,12 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     method: 'POST',
-    description: 'Request email verification for current user',
-    body: {
-      email: 'string (required) - email address to verify',
-    },
+    description: 'Request email verification for the currently signed-in user',
+    auth: 'Required',
+    body: 'No body required; email is read from the authenticated user session.',
     response: {
       message: 'Verification email sent',
-      emailId: 'string - Resend email ID',
+      emailId: 'string - email provider message ID',
     },
   });
 }

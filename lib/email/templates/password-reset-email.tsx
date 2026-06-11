@@ -91,6 +91,13 @@ export default function PasswordResetEmail({
   );
 }
 
+(PasswordResetEmail as typeof PasswordResetEmail & {
+  PreviewProps: PasswordResetEmailProps;
+}).PreviewProps = {
+  name: "Amber",
+  resetLink: "https://waitslessfood.com/reset-password?token=preview-token",
+};
+
 const main = {
   backgroundColor: "#ffffff",
   fontFamily:

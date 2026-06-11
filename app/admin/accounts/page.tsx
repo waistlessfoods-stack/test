@@ -12,7 +12,7 @@ type Account = {
 };
 
 export default function AdminAccountsPage() {
-  const { password, logout } = useAdminAuth();
+  const { authenticated, logout } = useAdminAuth();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -27,8 +27,6 @@ export default function AdminAccountsPage() {
       try {
         const response = await fetch('/api/admin/accounts', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password }),
         });
 
         const data = await response.json();
@@ -59,14 +57,14 @@ export default function AdminAccountsPage() {
       }
     }
 
-    if (password) {
+    if (authenticated) {
       loadAccounts();
     }
 
     return () => {
       cancelled = true;
     };
-  }, [logout, password]);
+  }, [authenticated, logout]);
 
   if (loading && accounts.length === 0) {
     return (

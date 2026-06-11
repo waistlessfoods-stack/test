@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { user } from '@/lib/db/schema';
+import { requireAdminSession } from '@/lib/admin-session';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Helper to detect transient database errors
@@ -47,28 +48,13 @@ async function withDbRetry<T>(
 
 /**
  * POST /api/admin/accounts
- * Authenticates with admin password and returns all user accounts
+ * Returns all user accounts for an authenticated admin session.
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { password } = body;
-
-    // Verify admin password
-    const adminPassword = process.env.ADMIN_PASSWORD;
-    
-    if (!adminPassword) {
-      return NextResponse.json(
-        { error: 'Admin access not configured' },
-        { status: 500 }
-      );
-    }
-
-    if (!password || password !== adminPassword) {
-      return NextResponse.json(
-        { error: 'Invalid password' },
-        { status: 401 }
-      );
+    const authError = requireAdminSession(request);
+    if (authError) {
+      return authError;
     }
 
     // Fetch all users with retry logic
@@ -113,15 +99,12 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     method: 'POST',
-    description: 'Authenticate with admin password and retrieve all user accounts',
-    body: {
-      password: 'string (required) - admin password from ADMIN_PASSWORD env var',
-    },
+    description: 'Retrieve all user accounts with an authenticated admin session cookie',
+    auth: 'Requires httpOnly admin session cookie from /api/admin/verify',
     example: {
       request: {
         method: 'POST',
         url: '/api/admin/accounts',
-        body: { password: 'your-admin-password' },
       },
       response: {
         accounts: [

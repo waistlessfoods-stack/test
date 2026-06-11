@@ -113,7 +113,7 @@ export default function BlogPageClient({ data }: BlogPageClientProps) {
             {filteredPosts.map((post) => (
               <article
                 key={post.id}
-                className="group overflow-hidden rounded-[5px] border border-[#dcdcdc] bg-[#e8e8e8] shadow-[0_8px_14px_-16px_rgba(0,0,0,0.55)] transition-colors duration-200 hover:bg-[#e5e5e5]"
+                className="group overflow-hidden rounded-[5px] border border-[#dcdcdc] bg-[#e8e8e8] shadow-[0_8px_14px_-16px_rgba(0,0,0,0.55)] transition-all duration-300 hover:bg-[#eeeeee] hover:shadow-[0_14px_30px_-20px_rgba(0,0,0,0.7)]"
               >
                 <Link href={`/blog/${post.slug}`} className="block h-full">
                   <div className="relative aspect-square overflow-hidden bg-[#efefef]">
@@ -122,8 +122,14 @@ export default function BlogPageClient({ data }: BlogPageClientProps) {
                       alt={post.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
+                      className="object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-110"
                     />
+                    <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/20" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 translate-y-3 opacity-0 transition-all duration-300 group-hover:-translate-y-1/2 group-hover:opacity-100">
+                      <span className="inline-flex items-center justify-center rounded-md border border-white/80 bg-white/20 px-8 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-[0_8px_24px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.35)] backdrop-blur-sm">
+                        Read More
+                      </span>
+                    </div>
                   </div>
 
                   <div className="space-y-2.5 px-4 pb-4 pt-3.5">

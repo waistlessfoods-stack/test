@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 
 export const fromEmail = gmailUser || 'no-reply@gmail.com';
 
-// Email sending helper following the { data, error } pattern
+// Email sending helper following the { data, error } pattern.
 export async function sendEmail({
   to,
   subject,

@@ -169,9 +169,9 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
               {(recipe.cookTime || recipe.servingSize) && (
                 <div className="flex flex-wrap gap-3">
                   {recipe.cookTime && (
-                    <div className="inline-flex items-center gap-2 rounded-md border border-[#CBE7E8] bg-[#F3FAFA] px-3 py-2">
+                    <div className="inline-flex items-center gap-3 rounded-full border border-black bg-white px-5 py-2.5">
                       <svg
-                        className="h-4 w-4 text-[#2F7A7E]"
+                        className="h-5 w-5 text-black"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -180,16 +180,16 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
                         <circle cx="12" cy="12" r="9" />
                         <polyline points="12 7 12 12 15 14" />
                       </svg>
-                      <span className="text-xs font-semibold uppercase tracking-wide text-[#2F7A7E]">
+                      <span className="text-sm font-bold uppercase tracking-wide text-black">
                         Cook
                       </span>
-                      <span className="text-sm font-semibold text-[#1a1a1a]">{recipe.cookTime}</span>
+                      <span className="text-base font-bold text-black">{recipe.cookTime}</span>
                     </div>
                   )}
                   {recipe.servingSize && (
-                    <div className="inline-flex items-center gap-2 rounded-md border border-[#CBE7E8] bg-[#F3FAFA] px-3 py-2">
+                    <div className="inline-flex items-center gap-3 rounded-full border border-black bg-white px-5 py-2.5">
                       <svg
-                        className="h-4 w-4 text-[#2F7A7E]"
+                        className="h-5 w-5 text-black"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -198,10 +198,10 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
                         <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" />
                         <circle cx="10" cy="7" r="4" />
                       </svg>
-                      <span className="text-xs font-semibold uppercase tracking-wide text-[#2F7A7E]">
+                      <span className="text-sm font-bold uppercase tracking-wide text-black">
                         Serves
                       </span>
-                      <span className="text-sm font-semibold text-[#1a1a1a]">{recipe.servingSize}</span>
+                      <span className="text-base font-bold text-black">{recipe.servingSize}</span>
                     </div>
                   )}
                 </div>

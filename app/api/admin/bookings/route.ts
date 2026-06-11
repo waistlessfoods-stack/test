@@ -1,27 +1,18 @@
 import { db } from "@/lib/db";
 import { bookings } from "@/lib/db/schema";
+import { requireAdminSession } from "@/lib/admin-session";
 import { desc } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
  * POST /api/admin/bookings
- * Returns all bookings, requires admin password in body
+ * Returns all bookings for an authenticated admin session.
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { password } = body;
-
-    const adminPassword = process.env.ADMIN_PASSWORD;
-    if (!adminPassword) {
-      return NextResponse.json(
-        { error: "Admin access not configured" },
-        { status: 500 }
-      );
-    }
-
-    if (!password || password !== adminPassword) {
-      return NextResponse.json({ error: "Invalid password" }, { status: 401 });
+    const authError = requireAdminSession(request);
+    if (authError) {
+      return authError;
     }
 
     const allBookings = await db
@@ -41,23 +32,16 @@ export async function POST(request: NextRequest) {
 
 /**
  * PATCH /api/admin/bookings
- * Update booking status — requires admin password + bookingId + status
+ * Update booking status for an authenticated admin session.
  */
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { password, bookingId, status } = body;
+    const { bookingId, status } = body;
 
-    const adminPassword = process.env.ADMIN_PASSWORD;
-    if (!adminPassword) {
-      return NextResponse.json(
-        { error: "Admin access not configured" },
-        { status: 500 }
-      );
-    }
-
-    if (!password || password !== adminPassword) {
-      return NextResponse.json({ error: "Invalid password" }, { status: 401 });
+    const authError = requireAdminSession(request);
+    if (authError) {
+      return authError;
     }
 
     const validStatuses = ["pending", "confirmed", "cancelled"];

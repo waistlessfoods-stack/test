@@ -135,6 +135,19 @@ export default function OrderConfirmationEmail({
   );
 }
 
+(OrderConfirmationEmail as typeof OrderConfirmationEmail & {
+  PreviewProps: OrderConfirmationEmailProps;
+}).PreviewProps = {
+  customerName: "Amber Smith",
+  orderNumber: "ORD-1042",
+  orderTotal: "$49.99",
+  orderDate: "June 10, 2026",
+  items: [
+    { name: "Premium Recipe Pack", price: "$29.99", quantity: 1 },
+    { name: "Weekly Meal Plan", price: "$20.00", quantity: 1 },
+  ],
+};
+
 const main = {
   backgroundColor: "#ffffff",
   fontFamily:

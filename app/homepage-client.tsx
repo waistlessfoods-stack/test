@@ -477,8 +477,14 @@ export default function HomepageClient({ data }: HomepageClientProps) {
               </CarouselItem>
             </CarouselContent>
 
-            <CarouselPrevious className="z-20 -left-6 md:-left-6 top-1/2 -translate-y-1/2 text-white" />
-            <CarouselNext className="z-20 -right-6 md:-right-6 top-1/2 -translate-y-1/2 text-white" />
+            <CarouselPrevious
+              appearance="brand"
+              className="z-20 -left-6 top-1/2 -translate-y-1/2 md:-left-6"
+            />
+            <CarouselNext
+              appearance="brand"
+              className="z-20 -right-6 top-1/2 -translate-y-1/2 md:-right-6"
+            />
 
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-50">
               {[...data.testimonials, { id: "review-links" }].map((_, index) => (

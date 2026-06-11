@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { enquiries } from "@/lib/db/schema";
-import { sendEmail, fromEmail } from "@/lib/email/resend";
+import { sendEmail, fromEmail } from "@/lib/email/mailer";
 import {
   enquiryConfirmationTemplate,
   enquiryNotificationTemplate,
@@ -10,6 +10,8 @@ import {
   normalizeRateLimitEmail,
   rateLimitResponse,
 } from "@/lib/rate-limit";
+import { isHoneypotFilled } from "@/lib/honeypot";
+import { validateTextFieldLengths } from "@/lib/text-field-validation";
 import { NextRequest, NextResponse } from "next/server";
 
 // Helper to detect transient database errors
@@ -58,6 +60,25 @@ async function withDbRetry<T>(
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+    if (isHoneypotFilled(body)) {
+      return NextResponse.json(
+        { success: true, data: null },
+        { status: 202 }
+      );
+    }
+
+    const textFieldError = validateTextFieldLengths(body, {
+      type: { label: "Enquiry type", max: 40 },
+      name: { label: "Name", max: 120 },
+      email: { label: "Email", max: 254 },
+      phone: { label: "Phone", max: 40 },
+      message: { label: "Message", max: 2000 },
+    });
+    if (textFieldError) {
+      return NextResponse.json({ error: textFieldError }, { status: 400 });
+    }
+
     const { type, name, email, phone, message } = body;
     const normalizedEmail = normalizeRateLimitEmail(email);
 

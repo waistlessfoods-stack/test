@@ -69,7 +69,7 @@ export default function AdminBookingsPage() {
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [fadingOut, setFadingOut] = useState<Set<number>>(new Set());
-  const { password, logout } = useAdminAuth();
+  const { authenticated, logout } = useAdminAuth();
 
   useEffect(() => {
     let cancelled = false;
@@ -81,8 +81,6 @@ export default function AdminBookingsPage() {
       try {
         const res = await fetch("/api/admin/bookings", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password }),
         });
         const data = await res.json();
 
@@ -112,14 +110,14 @@ export default function AdminBookingsPage() {
       }
     }
 
-    if (password) {
+    if (authenticated) {
       loadBookings();
     }
 
     return () => {
       cancelled = true;
     };
-  }, [logout, password]);
+  }, [authenticated, logout]);
 
   async function updateStatus(bookingId: number, status: string) {
     setUpdatingId(bookingId);
@@ -132,7 +130,7 @@ export default function AdminBookingsPage() {
       const res = await fetch("/api/admin/bookings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, bookingId, status }),
+        body: JSON.stringify({ bookingId, status }),
       });
       if (res.ok) {
         if (willLeave) {

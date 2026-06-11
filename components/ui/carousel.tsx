@@ -182,13 +182,19 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+type CarouselControlProps = React.ComponentProps<typeof Button> & {
+  appearance?: "glass" | "brand";
+};
+
 function CarouselPrevious({
   className,
+  appearance = "glass",
   variant = "ghost",
   size = "icon",
   ...props
-}: React.ComponentProps<typeof Button>) {
+}: CarouselControlProps) {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
+  const isBrand = appearance === "brand";
 
   return (
     <Button
@@ -196,7 +202,9 @@ function CarouselPrevious({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-12 rounded-full border-0 bg-[#16B0B9] p-0 shadow-none transition-colors group hover:bg-[#0F8DAB]",
+        isBrand
+          ? "absolute size-12 rounded-full border border-black/5 bg-[#00676E]/45 p-0 text-white shadow-none backdrop-blur-sm transition-all hover:border-black/10 hover:bg-[#00676E]/70 hover:text-white"
+          : "group absolute size-12 overflow-hidden rounded-full border border-white/45 bg-[#16B0B9]/72 p-0 shadow-[inset_0_2px_1px_rgba(255,255,255,0.42),inset_0_-8px_14px_rgba(0,89,98,0.18),0_8px_18px_rgba(0,47,52,0.24)] backdrop-blur-md transition-all before:absolute before:inset-[3px] before:rounded-full before:border before:border-white/20 before:content-[''] hover:bg-[#16B0B9]/82 hover:shadow-[inset_0_2px_1px_rgba(255,255,255,0.5),inset_0_-8px_14px_rgba(0,89,98,0.16),0_10px_22px_rgba(0,47,52,0.28)]",
         orientation === "horizontal"
           ? "top-1/2 -left-12 -translate-y-1/2"
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -206,7 +214,14 @@ function CarouselPrevious({
       onClick={scrollPrev}
       {...props}
     >
-      <ChevronLeft className="size-7 text-white transition-colors" />
+      <ChevronLeft
+        className={cn(
+          "relative z-10 text-white transition-colors",
+          isBrand
+            ? "size-7"
+            : "size-7 drop-shadow-[0_1px_1px_rgba(0,77,86,0.55)]",
+        )}
+      />
       <span className="sr-only">Previous slide</span>
     </Button>
   );
@@ -214,11 +229,13 @@ function CarouselPrevious({
 
 function CarouselNext({
   className,
+  appearance = "glass",
   variant = "ghost",
   size = "icon",
   ...props
-}: React.ComponentProps<typeof Button>) {
+}: CarouselControlProps) {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
+  const isBrand = appearance === "brand";
 
   return (
     <Button
@@ -226,7 +243,9 @@ function CarouselNext({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-12 rounded-full border-0 bg-[#16B0B9] p-0 shadow-none transition-colors group hover:bg-[#0F8DAB]",
+        isBrand
+          ? "absolute size-12 rounded-full border border-black/5 bg-[#00676E]/45 p-0 text-white shadow-none backdrop-blur-sm transition-all hover:border-black/10 hover:bg-[#00676E]/70 hover:text-white"
+          : "group absolute size-12 overflow-hidden rounded-full border border-white/45 bg-[#16B0B9]/72 p-0 shadow-[inset_0_2px_1px_rgba(255,255,255,0.42),inset_0_-8px_14px_rgba(0,89,98,0.18),0_8px_18px_rgba(0,47,52,0.24)] backdrop-blur-md transition-all before:absolute before:inset-[3px] before:rounded-full before:border before:border-white/20 before:content-[''] hover:bg-[#16B0B9]/82 hover:shadow-[inset_0_2px_1px_rgba(255,255,255,0.5),inset_0_-8px_14px_rgba(0,89,98,0.16),0_10px_22px_rgba(0,47,52,0.28)]",
         orientation === "horizontal"
           ? "top-1/2 -right-12 -translate-y-1/2"
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -236,7 +255,14 @@ function CarouselNext({
       onClick={scrollNext}
       {...props}
     >
-      <ChevronRight className="size-7 text-white transition-colors" />
+      <ChevronRight
+        className={cn(
+          "relative z-10 text-white transition-colors",
+          isBrand
+            ? "size-7"
+            : "size-7 drop-shadow-[0_1px_1px_rgba(0,77,86,0.55)]",
+        )}
+      />
       <span className="sr-only">Next slide</span>
     </Button>
   );

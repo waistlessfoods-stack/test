@@ -36,7 +36,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const { password, logout } = useAdminAuth();
+  const { authenticated, logout } = useAdminAuth();
 
   useEffect(() => {
     let cancelled = false;
@@ -48,8 +48,6 @@ export default function AdminDashboard() {
       try {
         const response = await fetch('/api/admin/dashboard', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password }),
         });
 
         const data = await response.json();
@@ -80,14 +78,14 @@ export default function AdminDashboard() {
       }
     }
 
-    if (password) {
+    if (authenticated) {
       loadStats();
     }
 
     return () => {
       cancelled = true;
     };
-  }, [logout, password]);
+  }, [authenticated, logout]);
 
   if (loading && !stats) {
     return (

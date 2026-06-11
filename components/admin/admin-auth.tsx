@@ -8,11 +8,8 @@ import {
   useState,
 } from "react";
 
-const ADMIN_PASSWORD_STORAGE_KEY = "admin-portal-password";
-
 type AdminAuthContextValue = {
   authenticated: boolean;
-  password: string;
   isChecking: boolean;
   isSubmitting: boolean;
   error: string;
@@ -22,7 +19,26 @@ type AdminAuthContextValue = {
 
 const AdminAuthContext = createContext<AdminAuthContextValue | null>(null);
 
-async function verifyAdminPassword(password: string) {
+async function getAdminSessionStatus() {
+  const response = await fetch("/api/admin/verify", {
+    method: "GET",
+  });
+
+  let data: { authenticated?: boolean; error?: string } = {};
+
+  try {
+    data = await response.json();
+  } catch {
+    data = {};
+  }
+
+  return {
+    ok: response.ok && data.authenticated === true,
+    error: data.error ?? "Admin session required",
+  };
+}
+
+async function createAdminSession(password: string) {
   const response = await fetch("/api/admin/verify", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -41,7 +57,6 @@ async function verifyAdminPassword(password: string) {
 }
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
-  const [password, setPassword] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,29 +66,15 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     async function restoreSession() {
-      const savedPassword = window.sessionStorage.getItem(
-        ADMIN_PASSWORD_STORAGE_KEY,
-      );
-
-      if (!savedPassword) {
-        if (!cancelled) {
-          setIsChecking(false);
-        }
-        return;
-      }
-
-      const result = await verifyAdminPassword(savedPassword);
+      const result = await getAdminSessionStatus();
 
       if (cancelled) {
         return;
       }
 
       if (result.ok) {
-        setPassword(savedPassword);
         setAuthenticated(true);
       } else {
-        window.sessionStorage.removeItem(ADMIN_PASSWORD_STORAGE_KEY);
-        setPassword("");
         setAuthenticated(false);
       }
 
@@ -93,18 +94,14 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     setError("");
 
     try {
-      const result = await verifyAdminPassword(nextPassword);
+      const result = await createAdminSession(nextPassword);
 
       if (!result.ok) {
         setAuthenticated(false);
-        setPassword("");
-        window.sessionStorage.removeItem(ADMIN_PASSWORD_STORAGE_KEY);
         setError(result.error);
         return false;
       }
 
-      window.sessionStorage.setItem(ADMIN_PASSWORD_STORAGE_KEY, nextPassword);
-      setPassword(nextPassword);
       setAuthenticated(true);
       setError("");
       return true;
@@ -117,9 +114,13 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  function logout() {
-    window.sessionStorage.removeItem(ADMIN_PASSWORD_STORAGE_KEY);
-    setPassword("");
+  async function logout() {
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+    } catch {
+      // Local state still needs to clear even if the network request fails.
+    }
+
     setAuthenticated(false);
     setError("");
   }
@@ -128,7 +129,6 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     <AdminAuthContext.Provider
       value={{
         authenticated,
-        password,
         isChecking,
         isSubmitting,
         error,

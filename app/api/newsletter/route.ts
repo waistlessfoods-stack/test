@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { subscribers } from "@/lib/db/schema";
-import { sendEmail, fromEmail } from "@/lib/email/resend";
+import { sendEmail, fromEmail } from "@/lib/email/mailer";
 import {
   newsletterConfirmationTemplate,
   newsletterNotificationTemplate,
@@ -10,6 +10,8 @@ import {
   normalizeRateLimitEmail,
   rateLimitResponse,
 } from "@/lib/rate-limit";
+import { isHoneypotFilled } from "@/lib/honeypot";
+import { validateTextFieldLengths } from "@/lib/text-field-validation";
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "drizzle-orm";
 
@@ -59,6 +61,21 @@ async function withDbRetry<T>(
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+    if (isHoneypotFilled(body)) {
+      return NextResponse.json(
+        { success: true, message: "Successfully subscribed to newsletter" },
+        { status: 202 }
+      );
+    }
+
+    const textFieldError = validateTextFieldLengths(body, {
+      email: { label: "Email", max: 254 },
+    });
+    if (textFieldError) {
+      return NextResponse.json({ error: textFieldError }, { status: 400 });
+    }
+
     const rawEmail = normalizeRateLimitEmail(body?.email);
 
     // Validate email

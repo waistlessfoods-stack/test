@@ -1,12 +1,14 @@
 import { db } from "@/lib/db";
 import { bookings } from "@/lib/db/schema";
-import { sendEmail, fromEmail } from "@/lib/email/resend";
+import { sendEmail, fromEmail } from "@/lib/email/mailer";
 import { bookingConfirmationTemplate, bookingNotificationTemplate } from "@/lib/email/templates";
 import {
   checkRateLimit,
   normalizeRateLimitEmail,
   rateLimitResponse,
 } from "@/lib/rate-limit";
+import { isHoneypotFilled } from "@/lib/honeypot";
+import { validateTextFieldLengths } from "@/lib/text-field-validation";
 import { NextRequest, NextResponse } from "next/server";
 
 function isTransientDbError(error: unknown): boolean {
@@ -49,6 +51,26 @@ async function withDbRetry<T>(fn: () => Promise<T>, maxAttempts = 2): Promise<T>
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+    if (isHoneypotFilled(body)) {
+      return NextResponse.json({ success: true }, { status: 202 });
+    }
+
+    const textFieldError = validateTextFieldLengths(body, {
+      serviceSlug: { label: "Service slug", max: 160 },
+      serviceTitle: { label: "Service title", max: 160 },
+      firstName: { label: "First name", max: 120 },
+      lastName: { label: "Last name", max: 120 },
+      email: { label: "Email", max: 254 },
+      phone: { label: "Phone", max: 40 },
+      preferredDate: { label: "Preferred date", max: 80 },
+      alternativeDate: { label: "Alternative date", max: 80 },
+      notes: { label: "Notes", max: 3000 },
+    });
+    if (textFieldError) {
+      return NextResponse.json({ error: textFieldError }, { status: 400 });
+    }
+
     const {
       serviceSlug,
       serviceTitle,
@@ -131,41 +153,60 @@ export async function POST(request: NextRequest) {
 
     const booking = result[0];
 
-    // Send confirmation email to the customer
-    await sendEmail({
-      to: normalizedEmail,
-      subject: `Booking Request Received – ${serviceTitle}`,
-      html: bookingConfirmationTemplate({
-        firstName,
-        serviceTitle,
-        preferredDate,
-        alternativeDate,
-        guests: Number(guests),
-        notes,
-      }),
-    });
-
-    // Send notification email to the business
     const adminEmail = process.env.ADMIN_EMAIL || fromEmail;
-    await sendEmail({
-      to: adminEmail,
-      subject: `New Booking Request – ${serviceTitle}`,
-      replyTo: normalizedEmail,
-      html: bookingNotificationTemplate({
-        firstName,
-        lastName,
-        email: normalizedEmail,
-        phone,
-        serviceTitle,
-        preferredDate,
-        alternativeDate,
-        guests: Number(guests),
-        notes,
-        bookingId: booking.id,
-      }),
-    });
 
-    return NextResponse.json({ success: true, bookingId: booking.id }, { status: 201 });
+    const [confirmationEmail, notificationEmail] = await Promise.all([
+      sendEmail({
+        to: normalizedEmail,
+        subject: `Booking Request Received - ${serviceTitle}`,
+        html: bookingConfirmationTemplate({
+          firstName,
+          serviceTitle,
+          preferredDate,
+          alternativeDate,
+          guests: Number(guests),
+          notes,
+        }),
+      }),
+      sendEmail({
+        to: adminEmail,
+        subject: `New Booking Request - ${serviceTitle}`,
+        replyTo: normalizedEmail,
+        html: bookingNotificationTemplate({
+          firstName,
+          lastName,
+          email: normalizedEmail,
+          phone,
+          serviceTitle,
+          preferredDate,
+          alternativeDate,
+          guests: Number(guests),
+          notes,
+          bookingId: booking.id,
+        }),
+      }),
+    ]);
+
+    const confirmationEmailSent = !confirmationEmail.error;
+    const notificationEmailSent = !notificationEmail.error;
+    const emailSent = confirmationEmailSent && notificationEmailSent;
+    if (!emailSent) {
+      console.error("Booking email send failed:", {
+        confirmation: confirmationEmail.error,
+        notification: notificationEmail.error,
+      });
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        bookingId: booking.id,
+        emailSent,
+        confirmationEmailSent,
+        notificationEmailSent,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     if (error instanceof Error && error.message.includes("Temporary database")) {
       return NextResponse.json(

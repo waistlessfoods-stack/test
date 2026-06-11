@@ -8,6 +8,7 @@ import { getIconPath } from "@/lib/social-links";
 import type { SocialLink } from "@/lib/contentful-links";
 import type { FooterSettings } from "@/lib/contentful-management";
 import Link from "next/link";
+import { HONEYPOT_FIELD } from "@/lib/honeypot";
 
 type FooterProps = {
   socialLinks?: SocialLink[];
@@ -33,6 +34,7 @@ const QUICK_MENU_LINKS = [
 
 export default function Footer({ socialLinks = [], footerSettings }: FooterProps) {
   const [email, setEmail] = useState("");
+  const [companyWebsite, setCompanyWebsite] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
@@ -88,7 +90,7 @@ export default function Footer({ socialLinks = [], footerSettings }: FooterProps
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, [HONEYPOT_FIELD]: companyWebsite }),
       });
 
       const data = await response.json();
@@ -123,6 +125,16 @@ export default function Footer({ socialLinks = [], footerSettings }: FooterProps
 
               <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
                 <div className="flex flex-col gap-2 rounded-xl border border-white/25 bg-white p-2 sm:flex-row sm:items-center">
+                  <input
+                    type="text"
+                    name={HONEYPOT_FIELD}
+                    value={companyWebsite}
+                    onChange={(e) => setCompanyWebsite(e.target.value)}
+                    className="hidden"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                  />
                   <input
                     type="email"
                     placeholder="Enter your email"

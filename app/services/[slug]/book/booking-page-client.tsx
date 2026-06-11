@@ -14,6 +14,7 @@ import {
 import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { HONEYPOT_FIELD } from "@/lib/honeypot";
 
 type BookingPageClientProps = {
   serviceSlug: string;
@@ -34,10 +35,12 @@ export default function BookingPageClient({
   const [phone, setPhone] = useState("");
   const [guests, setGuests] = useState<number>(0);
   const [notes, setNotes] = useState("");
+  const [companyWebsite, setCompanyWebsite] = useState("");
   const [preferredDate, setPreferredDate] = useState<Date>();
   const [alternativeDate, setAlternativeDate] = useState<Date>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [confirmationEmailSent, setConfirmationEmailSent] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const handleIncrement = () => setGuests((prev) => prev + 1);
@@ -68,14 +71,18 @@ export default function BookingPageClient({
           preferredDate: format(preferredDate, "PPP"),
           alternativeDate: alternativeDate ? format(alternativeDate, "PPP") : null,
           notes,
+          [HONEYPOT_FIELD]: companyWebsite,
         }),
       });
 
+      const data: { error?: string; confirmationEmailSent?: boolean } =
+        await res.json();
+
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.error || "Something went wrong.");
       }
 
+      setConfirmationEmailSent(data.confirmationEmailSent !== false);
       setSubmitted(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -147,7 +154,15 @@ export default function BookingPageClient({
             </div>
             <h2 className="text-2xl font-medium text-black mb-3">Request Received!</h2>
             <p className="text-[#878787] text-base md:text-lg">
-              Thank you, {firstName}. We've received your booking request and sent a confirmation to <strong>{email}</strong>. We'll be in touch shortly.
+              {confirmationEmailSent ? (
+                <>
+                  Thank you, {firstName}. We've received your booking request and sent a confirmation to <strong>{email}</strong>. We'll be in touch shortly.
+                </>
+              ) : (
+                <>
+                  Thank you, {firstName}. We've received your booking request, but the confirmation email could not be sent. We'll still be in touch shortly.
+                </>
+              )}
             </p>
           </div>
         ) : (
@@ -155,6 +170,16 @@ export default function BookingPageClient({
             onSubmit={handleSubmit}
             className="grid grid-cols-1 lg:grid-cols-2 gap-7 md:gap-8 rounded-xl border border-gray-100 bg-white p-5 md:p-8 shadow-sm"
           >
+            <input
+              type="text"
+              name={HONEYPOT_FIELD}
+              value={companyWebsite}
+              onChange={(e) => setCompanyWebsite(e.target.value)}
+              className="hidden"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+            />
             <div className="lg:col-span-2 pb-2">
               <h2 className="text-sm md:text-base font-semibold uppercase tracking-wide text-[#388082]">
                 Contact Details

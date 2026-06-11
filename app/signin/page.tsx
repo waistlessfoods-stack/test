@@ -202,7 +202,7 @@ export default function SignInPage() {
       <div className="flex w-full items-center justify-center bg-gradient-to-br from-gray-50 to-white px-6 py-12 lg:w-1/2">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h1 className="mb-2 font-['Bebas_Neue'] text-5xl uppercase tracking-wide text-[#00676E]">
+            <h1 className="mb-2 font-['Bebas_Neue'] text-5xl uppercase tracking-wide text-black">
               {step === "identifier" ? "Welcome Back" : "Enter Password"}
             </h1>
             <p className="text-gray-600">

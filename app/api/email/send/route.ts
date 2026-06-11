@@ -1,4 +1,4 @@
-import { sendEmail } from '@/lib/email/resend';
+import { sendEmail } from '@/lib/email/mailer';
 import WelcomeEmail from '@/lib/email/templates/welcome-email';
 import OrderConfirmationEmail from '@/lib/email/templates/order-confirmation-email';
 import PasswordResetEmail from '@/lib/email/templates/password-reset-email';
@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json({
-    message: 'Email API powered by React Email + Resend',
+    message: 'Email API powered by React Email + Nodemailer',
     auth: {
       header: 'Authorization: Bearer <EMAIL_SEND_API_SECRET>',
       alternateHeader: 'x-email-send-secret: <EMAIL_SEND_API_SECRET>',

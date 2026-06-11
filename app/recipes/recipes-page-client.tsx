@@ -11,6 +11,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { CarouselArrowButton } from "@/components/ui/carousel-arrow-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { RecipesPageData, RecipeCategory, Recipe } from "@/lib/contentful-management";
@@ -308,26 +309,24 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
 
             {data.categories.length > 1 && (
               <>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
+                <CarouselArrowButton
+                  side="previous"
+                  tone="subtle"
                   onClick={scrollCategoriesToPrev}
                   aria-label="Previous category"
-                  className="absolute left-1 top-1/2 hidden -translate-y-1/2 md:inline-flex size-8 rounded-full border border-black/5 bg-white/45 text-black/30 shadow-none backdrop-blur-sm transition-all hover:bg-white/70 hover:text-black/55 hover:border-black/10"
+                  className="hidden md:inline-flex"
                 >
                   <ChevronLeft className="size-3.5" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
+                </CarouselArrowButton>
+                <CarouselArrowButton
+                  side="next"
+                  tone="subtle"
                   onClick={scrollCategoriesToNext}
                   aria-label="Next category"
-                  className="absolute right-1 top-1/2 hidden -translate-y-1/2 md:inline-flex size-8 rounded-full border border-black/5 bg-white/45 text-black/30 shadow-none backdrop-blur-sm transition-all hover:bg-white/70 hover:text-black/55 hover:border-black/10"
+                  className="hidden md:inline-flex"
                 >
                   <ChevronRight className="size-3.5" />
-                </Button>
+                </CarouselArrowButton>
               </>
             )}
           </div>
@@ -378,7 +377,7 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
 
                     {item.featured && (
                       <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
-                        <span className="inline-flex items-center rounded-full border-[3px] border-white/75 bg-white/35 px-7 py-1.5 text-lg lg:text-sm 2xl:text-base font-semibold uppercase tracking-wide text-[#0F8DAB] backdrop-blur-sm shadow-[0_4px_14px_rgba(255,255,255,0.25)]">
+                        <span className="inline-flex items-center rounded-full border-[3px] border-[#0F8DAB] bg-white/35 px-7 py-1.5 text-lg lg:text-sm 2xl:text-base font-semibold uppercase tracking-wide text-[#0F8DAB] backdrop-blur-sm shadow-[0_4px_14px_rgba(15,141,171,0.25)]">
                           Featured
                         </span>
                       </div>

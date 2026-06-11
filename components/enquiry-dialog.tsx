@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { HONEYPOT_FIELD } from "@/lib/honeypot";
 
 interface EnquiryDialogProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export default function EnquiryDialog({
     email: "",
     phone: "",
     message: "",
+    companyWebsite: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<
@@ -73,6 +75,7 @@ export default function EnquiryDialog({
         email: "",
         phone: "",
         message: "",
+        companyWebsite: "",
       });
 
       setTimeout(() => {
@@ -123,6 +126,16 @@ export default function EnquiryDialog({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="text"
+              name={HONEYPOT_FIELD}
+              value={formData.companyWebsite}
+              onChange={handleChange}
+              className="hidden"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+            />
             <div>
               <label
                 htmlFor="name"

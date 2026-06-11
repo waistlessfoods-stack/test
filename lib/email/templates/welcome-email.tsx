@@ -83,6 +83,10 @@ export default function WelcomeEmail({ name }: WelcomeEmailProps) {
   );
 }
 
+(WelcomeEmail as typeof WelcomeEmail & { PreviewProps: WelcomeEmailProps }).PreviewProps = {
+  name: "Amber",
+};
+
 const main = {
   backgroundColor: "#ffffff",
   fontFamily:
