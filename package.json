@@ -2,14 +2,12 @@
   "name": "waistlessfood.com",
   "version": "0.1.0",
   "private": true,
-  "resolutions": {
-    "@clerk/shared": "4.1.0"
-  },
+  "packageManager": "pnpm@11.5.3",
   "scripts": {
     "dev": "next dev",
     "email:dev": "email dev --dir lib/email/templates --port 3001",
     "killdev": "pkill -f 'next dev|next-server' || true; rm -f .next/dev/lock",
-    "restart": "yarn killdev && yarn dev",
+    "restart": "pnpm killdev && pnpm dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -44,6 +42,7 @@
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.4",
     "@react-email/components": "^1.0.8",
+    "@react-email/render": "^2.0.8",
     "@types/nodemailer": "^7.0.11",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -75,7 +74,7 @@
     "@types/node": "^25",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^10",
+    "eslint": "^9.39.4",
     "eslint-config-next": "16.1.6",
     "fallow": "^2.89.0",
     "tailwindcss": "^4",

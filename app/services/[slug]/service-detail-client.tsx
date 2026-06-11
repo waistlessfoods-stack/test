@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { Star } from "lucide-react";
 import {
   Breadcrumb,
@@ -46,13 +46,14 @@ type ServiceDetailClientProps = {
 export default function ServiceDetailClient({
   service,
 }: ServiceDetailClientProps) {
+  const serviceKey = `${service.slug}:${service.images.main ?? ""}`;
+
+  return <ServiceDetailContent key={serviceKey} service={service} />;
+}
+
+function ServiceDetailContent({ service }: ServiceDetailClientProps) {
   const [visibleCount, setVisibleCount] = useState(2);
   const [mainImage, setMainImage] = useState(service.images.main);
-
-  useEffect(() => {
-    setMainImage(service.images.main);
-    setVisibleCount(2);
-  }, [service.slug, service.images.main]);
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-6 md:py-10 bg-white">
@@ -74,7 +75,7 @@ export default function ServiceDetailClient({
 
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-start">
         <section className="w-full lg:w-[520px] flex flex-col gap-4">
-          <div className="relative w-full lg:w-[520px] aspect-[5/6] rounded-[16px] overflow-hidden">
+          <div className="relative w-full lg:w-[520px] aspect-[5/6] rounded-none overflow-hidden">
             {mainImage ? (
               <Image
                 src={mainImage}
@@ -94,7 +95,7 @@ export default function ServiceDetailClient({
               <div
                 key={`${image}-${index}`}
                 onClick={() => image && setMainImage(image)}
-                className={`relative aspect-square rounded-[16px] overflow-hidden cursor-pointer transition-all group hover:ring-2 hover:ring-primary ${
+                className={`relative aspect-square rounded-none overflow-hidden cursor-pointer transition-all group hover:ring-2 hover:ring-primary ${
                   mainImage === image ? "ring-2 ring-primary" : ""
                 }`}
               >

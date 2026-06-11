@@ -19,10 +19,10 @@ export default function ServiceDetailLoading() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8">
             {/* Left Side - Image */}
             <div className="space-y-6">
-              <Skeleton className="w-full aspect-[4/3] rounded-md" />
+              <Skeleton className="w-full aspect-[4/3] rounded-none" />
               <div className="grid grid-cols-4 gap-3">
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="aspect-square rounded-lg" />
+                  <Skeleton key={i} className="aspect-square rounded-none" />
                 ))}
               </div>
             </div>

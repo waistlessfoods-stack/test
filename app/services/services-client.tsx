@@ -31,7 +31,7 @@ export default function ServicesClientPage({
             {services.map((service, index) => (
               <div
                 key={index}
-                className="bg-[#F4F4F4] rounded-[16px] p-3 md:p-4 lg:p-4 flex flex-col justify-between gap-3"
+                className="bg-[#F4F4F4] rounded-none p-3 md:p-4 lg:p-4 flex flex-col justify-between gap-3"
               >
                 <div className="flex flex-col gap-3 flex-1">
                   <div className="flex flex-col gap-2">
