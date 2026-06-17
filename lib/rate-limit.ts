@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { rateLimitBuckets } from "@/lib/db/schema";
-import { getRequestLogContext, logWarn } from "@/lib/structured-log";
+import { getRequestLogContext, logWarn, maskEmail } from "@/lib/structured-log";
 
 type RateLimitOptions = {
   name: string;
@@ -83,6 +83,14 @@ async function cleanupExpiredBuckets(now: Date) {
   }
 }
 
+function getLogSafeBucketIdentifier(name: string, identifier: string) {
+  if (name.endsWith(":email") || identifier.includes("@")) {
+    return maskEmail(identifier);
+  }
+
+  return identifier;
+}
+
 export async function checkRateLimit(
   request: NextRequest,
   options: RateLimitOptions,
@@ -139,7 +147,7 @@ export async function checkRateLimit(
     logWarn("rate_limit.exceeded", {
       ...getRequestLogContext(request),
       bucketName: options.name,
-      bucketIdentifier: identifier,
+      bucketIdentifier: getLogSafeBucketIdentifier(options.name, identifier),
       limit: options.limit,
       count,
       resetAt: new Date(resolvedResetAt).toISOString(),

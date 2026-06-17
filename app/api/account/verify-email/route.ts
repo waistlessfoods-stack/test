@@ -3,6 +3,7 @@ import { randomBytes } from 'crypto';
 import { auth, currentUser as getCurrentClerkUser } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import { verification, user as userTable } from '@/lib/db/schema';
+import { getCanonicalAppUrl } from '@/lib/app-url';
 import { syncCurrentClerkUser } from '@/lib/clerk-user-sync';
 import { sendEmail } from '@/lib/email/mailer';
 import { hashVerificationToken } from '@/lib/email-verification-token';
@@ -162,7 +163,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Build verification link
-    const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+    const baseUrl = getCanonicalAppUrl();
     const verificationLink = `${baseUrl}/api/auth/verify-email?token=${token}&email=${encodeURIComponent(email)}`;
 
     // Send verification email

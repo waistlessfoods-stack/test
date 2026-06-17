@@ -14,129 +14,139 @@ The strongest fixes from the earlier audit are now in place:
 - Admin access now uses an httpOnly session cookie instead of storing the raw password in browser storage.
 - Email verification now requires an authenticated user and uses secure random tokens.
 
-The audit items identified in the earlier pass are now fixed in the current codebase.
-
-## Critical Findings
-
-### 1. Resume Checkout Can Undercharge Pending Orders
-
-File: `app/api/orders/[id]/checkout/route.ts`
-
-Risk: Critical
-
-Status: Fixed on 2026-06-17.
-
-The initial checkout route now stores a server-owned `checkoutSnapshot` in order metadata, including subtotal, tax, total, currency, and line-item source data. Resume checkout rebuilds the Stripe session from that snapshot instead of from recipe items alone. For older pending orders that do not yet have a snapshot, the route derives a server-owned fallback snapshot from the stored order amount and item subtotal so tax is not silently dropped.
-
-Relevant code:
-
-- Snapshot helper: `lib/order-checkout-snapshot.ts`
-- Snapshot creation during initial checkout: `app/api/stripe/checkout/route.ts`
-- Snapshot-based rebuild during resume checkout: `app/api/orders/[id]/checkout/route.ts`
-
-## High Findings
-
-### 2. Stripe Redirect URLs Trust the Request `Origin` Header
-
-Files:
-
-- `app/api/stripe/checkout/route.ts`
-- `app/api/orders/[id]/checkout/route.ts`
-
-Risk: High
-
-Status: Fixed on 2026-06-17.
-
-Both checkout routes now build Stripe `success_url` and `cancel_url` from a server-owned canonical base URL helper instead of the incoming request `Origin` header. The helper resolves `NEXT_PUBLIC_APP_URL`, `APP_URL`, or `BETTER_AUTH_URL`, with `http://localhost:3000` only as a local fallback.
-
-Relevant code:
-
-- Canonical base URL helper: `lib/app-url.ts`
-- Initial checkout route: `app/api/stripe/checkout/route.ts`
-- Resume checkout route: `app/api/orders/[id]/checkout/route.ts`
-
-## Medium Findings
-
-### 3. Public Route Rate Limiting Is In-Memory Only
-
-File: `lib/rate-limit.ts`
-
-Risk: Medium
-
-Status: Fixed on 2026-06-17.
-
-The app now enforces rate limiting through a shared Postgres-backed `rate_limit_buckets` table instead of a process-local in-memory `Map`. This makes the limit state consistent across instances and restarts, assuming the migration has been applied.
-
-Relevant code:
-
-- Shared limiter implementation: `lib/rate-limit.ts`
-- Shared-store schema: `lib/db/schema.ts`
-- Migration: `drizzle/0006_rate_limit_buckets.sql`
-
-Affected flows:
-
-- `POST /api/newsletter`
-- `POST /api/enquiries`
-- `POST /api/bookings`
-- `POST /api/account/verify-email`
-- `POST /api/admin/verify`
-
-Recommended fix:
-
-- Apply the `rate_limit_buckets` migration in each environment before deployment.
-- Keep the current response headers, now backed by shared infrastructure.
-
-### 4. Booking Guest Count Is Not Validated as a Positive Bounded Integer
-
-File: `app/api/bookings/route.ts`
-
-Risk: Medium
-
-Status: Fixed on 2026-06-17.
-
-The booking route now parses `guests` explicitly and requires a whole number between `1` and `50` before proceeding. The booking form also applies matching client-side `min`, `max`, and integer-only checks to reduce invalid submissions before they reach the server.
-
-Relevant code:
-
-- Server validation: `app/api/bookings/route.ts`
-- Booking form bounds and input checks: `app/services/[slug]/book/booking-page-client.tsx`
+Most of the earlier audit items are now fixed, but a few residual risks remain in the current codebase.
 
 ## Low Findings
 
-### 5. Newsletter Endpoint Reveals Subscription Status
+### 1. Admin Session Signing Still Falls Back To `ADMIN_PASSWORD`
+
+File: `lib/admin-session.ts`
+
+Risk: Low
+
+Status: Open on 2026-06-17.
+
+Admin session signing still uses `ADMIN_SESSION_SECRET || ADMIN_PASSWORD`, so the session-signing secret falls back to the admin login credential when a dedicated secret is not configured.
+
+Relevant code:
+
+- `lib/admin-session.ts`
+
+Why this matters:
+
+- Session integrity depends on a credential that may be rotated or chosen for human memorability rather than cryptographic strength.
+- It is better secret hygiene to separate authentication secrets from cookie-signing secrets.
+
+Recommended fix:
+
+- Require `ADMIN_SESSION_SECRET` in production.
+- Treat fallback to `ADMIN_PASSWORD` as development-only if it remains at all.
+
+### 2. Newsletter Duplicate Handling Is Not Race-Safe
 
 File: `app/api/newsletter/route.ts`
 
 Risk: Low
 
-Status: Fixed on 2026-06-17.
+Status: Open on 2026-06-17.
 
-The endpoint now returns the same success-shaped response for both new and already-subscribed email addresses, with a successful HTTP status in both cases.
+The route checks for an existing subscriber and then inserts in a separate step. Concurrent requests for the same email can both pass the read step and then race into the unique constraint on insert.
 
 Relevant code:
 
 - `app/api/newsletter/route.ts`
 
-### 6. Email Verification Tokens Are Stored in Plaintext
+Why this matters:
 
-Files:
+- One request can still return a 500 from the unique constraint instead of the intended generic success response.
+- That weakens reliability and partially undermines the duplicate-handling hardening.
 
-- `app/api/account/verify-email/route.ts`
-- `lib/db/schema.ts`
+Recommended fix:
 
-Risk: Low
+- Switch to a single insert-with-conflict-handling flow.
+- Treat unique constraint conflicts as the same generic success response.
 
-Status: Fixed on 2026-06-17.
+## Fixed Since The Prior Audit
 
-Verification tokens are now hashed with SHA-256 before storage. Verification compares the incoming token's hash against the stored value. A temporary plaintext fallback remains in the verification route so older links that were issued before this change can still complete during the transition.
+### Resume Checkout Amount Integrity
+
+Status: Fixed.
+
+Resume checkout now rebuilds Stripe sessions from a server-owned checkout snapshot that includes tax, instead of reconstructing from item rows alone.
 
 Relevant code:
 
-- Token hash helper: `lib/email-verification-token.ts`
-- Hashed token storage: `app/api/account/verify-email/route.ts`
-- Hashed token verification with plaintext fallback: `app/api/auth/verify-email/route.ts`
+- `lib/order-checkout-snapshot.ts`
+- `app/api/stripe/checkout/route.ts`
+- `app/api/orders/[id]/checkout/route.ts`
 
-## Fixed Since The Prior Audit
+### Stripe Redirect URL Trust
+
+Status: Fixed.
+
+Checkout and resume checkout now build redirect URLs from a server-owned canonical URL helper rather than the request `Origin` header.
+
+Relevant code:
+
+- `lib/app-url.ts`
+- `app/api/stripe/checkout/route.ts`
+- `app/api/orders/[id]/checkout/route.ts`
+
+### Shared Rate Limiting Store
+
+Status: Fixed, assuming migration applied.
+
+Rate limiting now uses the shared `rate_limit_buckets` Postgres table instead of an in-memory `Map`.
+
+Relevant code:
+
+- `lib/rate-limit.ts`
+- `lib/db/schema.ts`
+- `drizzle/0006_rate_limit_buckets.sql`
+
+### Booking Guest Validation
+
+Status: Fixed.
+
+Booking submissions now require an integer guest count between `1` and `50`, with matching client-side bounds.
+
+Relevant code:
+
+- `app/api/bookings/route.ts`
+- `app/services/[slug]/book/booking-page-client.tsx`
+
+### Newsletter Enumeration Response
+
+Status: Fixed.
+
+Newsletter duplicates now return the same success-shaped response as first-time subscriptions.
+
+Relevant code:
+
+- `app/api/newsletter/route.ts`
+
+### Hashed Verification Tokens
+
+Status: Fixed, with temporary backward-compatibility fallback.
+
+Verification tokens are hashed at rest, and verification prefers hashed lookup while still accepting older plaintext-issued links.
+
+Relevant code:
+
+- `lib/email-verification-token.ts`
+- `app/api/account/verify-email/route.ts`
+- `app/api/auth/verify-email/route.ts`
+
+### Verification Email Link Base URL
+
+Status: Fixed.
+
+Verification emails now use the same canonical app URL helper as checkout, rather than depending directly on `BETTER_AUTH_URL`.
+
+Relevant code:
+
+- `lib/app-url.ts`
+- `app/api/account/verify-email/route.ts`
 
 ### Server-Authoritative Stripe Pricing
 
@@ -160,13 +170,13 @@ Relevant code:
 
 ### Public Form Abuse Controls
 
-Status: Partially fixed and improved.
+Status: Mostly fixed.
 
 Newsletter, enquiry, and booking submissions now have:
 
 - Honeypot checking
 - Text length caps
-- IP and email-based rate limiting
+- Shared-store rate limiting
 
 Relevant code:
 
@@ -177,11 +187,17 @@ Relevant code:
 - `lib/rate-limit.ts`
 - `lib/text-field-validation.ts`
 
-Remaining gap: none for storage locality once the migration is applied.
+Remaining gap:
 
-### 7. Structured Logging For Forms, Rate Limits, And Email Failures
+- `app/api/newsletter/route.ts` duplicate handling is still not race-safe under concurrency.
 
-Files:
+### Structured Logging For Forms, Rate Limits, And Email Failures
+
+Status: Fixed.
+
+Form routes, rate-limit events, and email failures now emit structured JSON logs with consistent event names and request context.
+
+Relevant code:
 
 - `lib/structured-log.ts`
 - `lib/rate-limit.ts`
@@ -190,25 +206,6 @@ Files:
 - `app/api/newsletter/route.ts`
 - `app/api/bookings/route.ts`
 - `app/api/account/verify-email/route.ts`
-
-Risk: Low
-
-Status: Fixed on 2026-06-17.
-
-The app now emits structured JSON logs for:
-
-- Public form submissions
-- Honeypot-triggered requests
-- Rate-limit exceed events
-- Email send failures
-- Verification email requests
-
-Relevant code:
-
-- Structured log helper: `lib/structured-log.ts`
-- Rate-limit event logging: `lib/rate-limit.ts`
-- Email transport logging: `lib/email/mailer.ts`
-- Route-level submission and failure logging in the public write routes
 
 ### Admin Password Storage In The Browser
 
@@ -225,17 +222,22 @@ Relevant code:
 
 ### Admin Login Brute Force Protection
 
-Status: Fixed, with the same shared-state caveat as other rate limiting.
+Status: Fixed, with shared-store enforcement and one secret-hygiene gap.
 
 `POST /api/admin/verify` now applies IP-based rate limiting before password verification.
 
 Relevant code:
 
-- `app/api/admin/verify/route.ts:18-25`
+- `app/api/admin/verify/route.ts`
+- `lib/rate-limit.ts`
+
+Remaining gap:
+
+- `lib/admin-session.ts` still falls back to `ADMIN_PASSWORD` when `ADMIN_SESSION_SECRET` is not configured.
 
 ### Email Verification Flow Hardening
 
-Status: Largely fixed.
+Status: Mostly fixed.
 
 The request endpoint now:
 
@@ -243,12 +245,17 @@ The request endpoint now:
 - Uses the signed-in user's email only
 - Uses `crypto.randomBytes()`
 - Applies rate limiting
+- Stores hashed verification tokens
 
 Relevant code:
 
 - `app/api/account/verify-email/route.ts`
+- `app/api/auth/verify-email/route.ts`
+- `lib/email-verification-token.ts`
 
-Remaining gap: none.
+Remaining gap:
+
+- None.
 
 ### Booking Email Delivery Accuracy
 
@@ -258,23 +265,7 @@ The booking route now checks both email send results and returns `emailSent`, `c
 
 Relevant code:
 
-- `app/api/bookings/route.ts:158-208`
-
-### Structured Logging
-
-Status: Fixed.
-
-Form routes, rate-limit events, and email failures now emit structured JSON logs with consistent event names and request context.
-
-Relevant code:
-
-- `lib/structured-log.ts`
-- `lib/rate-limit.ts`
-- `lib/email/mailer.ts`
-- `app/api/enquiries/route.ts`
-- `app/api/newsletter/route.ts`
 - `app/api/bookings/route.ts`
-- `app/api/account/verify-email/route.ts`
 
 ## Good Existing Controls
 
@@ -293,7 +284,7 @@ Relevant code:
 
 | Route | Source UI | Stores Data | Sends Email | Current Main Risk |
 | --- | --- | --- | --- | --- |
-| `POST /api/newsletter` | Footer newsletter form | `subscribers` | Yes, subscriber and admin | Low |
+| `POST /api/newsletter` | Footer newsletter form | `subscribers` | Yes, subscriber and admin | Duplicate handling is not race-safe under concurrency |
 | `POST /api/enquiries` | Consultation/enquiry dialogs | `enquiries` | Yes, customer and admin | Low |
 | `POST /api/bookings` | Chef service booking form | `bookings` | Yes, customer and admin | Low |
 
@@ -320,7 +311,7 @@ Relevant code:
 
 | Route | Auth Model | Purpose | Current Main Risk |
 | --- | --- | --- | --- |
-| `POST /api/admin/verify` | Password -> signed session cookie | Verifies admin access | Low |
+| `POST /api/admin/verify` | Password -> signed session cookie | Verifies admin access | Session signing still falls back to `ADMIN_PASSWORD` without `ADMIN_SESSION_SECRET` |
 | `POST /api/admin/accounts` | Signed admin session | Lists accounts | Low |
 | `POST /api/admin/dashboard` | Signed admin session | Dashboard stats | Low |
 | `POST /api/admin/bookings` | Signed admin session | Lists bookings | Low |
@@ -345,3 +336,9 @@ Relevant code:
 - [x] Return a generic success-shaped response for already-subscribed newsletter emails.
 - [x] Hash verification tokens at rest.
 - [x] Add structured logging for form submissions, rate-limit events, and email failures.
+- [x] Mask or hash email-based rate-limit identifiers before logging them.
+
+## Current Open Fixes
+
+- [ ] Require a dedicated `ADMIN_SESSION_SECRET` in production.
+- [ ] Make newsletter duplicate handling race-safe with conflict-aware insert logic.
