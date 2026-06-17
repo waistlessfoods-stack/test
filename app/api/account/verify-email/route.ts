@@ -5,12 +5,14 @@ import { db } from '@/lib/db';
 import { verification, user as userTable } from '@/lib/db/schema';
 import { syncCurrentClerkUser } from '@/lib/clerk-user-sync';
 import { sendEmail } from '@/lib/email/mailer';
+import { hashVerificationToken } from '@/lib/email-verification-token';
 import EmailVerificationEmail from '@/lib/email/templates/email-verification-email';
 import {
   checkRateLimit,
   normalizeRateLimitEmail,
   rateLimitResponse,
 } from '@/lib/rate-limit';
+import { getRequestLogContext, logError, logInfo, maskEmail } from '@/lib/structured-log';
 import { validateTextFieldLengths } from '@/lib/text-field-validation';
 import { and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
@@ -91,7 +93,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: textFieldError }, { status: 400 });
     }
 
-    const ipLimit = checkRateLimit(request, {
+    const ipLimit = await checkRateLimit(request, {
       name: 'verify-email:ip',
       limit: 5,
       windowMs: 60 * 60 * 1000,
@@ -100,7 +102,7 @@ export async function POST(request: NextRequest) {
       return rateLimitResponse(ipLimit);
     }
 
-    const emailLimit = checkRateLimit(request, {
+    const emailLimit = await checkRateLimit(request, {
       name: 'verify-email:email',
       identifier: email,
       limit: 3,
@@ -154,7 +156,7 @@ export async function POST(request: NextRequest) {
       db.insert(verification).values({
         id: generateVerificationId(),
         identifier: email,
-        value: token,
+        value: hashVerificationToken(token),
         expiresAt,
       })
     );
@@ -174,12 +176,24 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error('Failed to send verification email:', error);
+      logError('verify_email.email_failed', {
+        ...getRequestLogContext(request),
+        userId,
+        email: maskEmail(email),
+        error,
+      });
       return NextResponse.json(
         { error: 'Failed to send verification email' },
         { status: 500 }
       );
     }
+
+    logInfo('verify_email.requested', {
+      ...getRequestLogContext(request),
+      userId,
+      email: maskEmail(email),
+      emailId: data?.id ?? null,
+    });
 
     return NextResponse.json(
       {
@@ -189,7 +203,10 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error requesting email verification:', error);
+    logError('verify_email.request_failed', {
+      ...getRequestLogContext(request),
+      error,
+    });
 
     if (isTransientDbError(error)) {
       return NextResponse.json(

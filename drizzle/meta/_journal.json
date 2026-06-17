@@ -43,6 +43,13 @@
       "when": 1775102400000,
       "tag": "0005_tax_settings_table",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1781680735898,
+      "tag": "0006_rate_limit_buckets",
+      "breakpoints": true
     }
   ]
 }

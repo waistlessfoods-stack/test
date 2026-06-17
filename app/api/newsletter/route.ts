@@ -11,9 +11,12 @@ import {
   rateLimitResponse,
 } from "@/lib/rate-limit";
 import { isHoneypotFilled } from "@/lib/honeypot";
+import { getRequestLogContext, logError, logInfo, maskEmail } from "@/lib/structured-log";
 import { validateTextFieldLengths } from "@/lib/text-field-validation";
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "drizzle-orm";
+
+const NEWSLETTER_SUCCESS_MESSAGE = "Successfully subscribed to newsletter";
 
 // Helper to detect transient database errors
 function isTransientDbError(error: unknown): boolean {
@@ -63,8 +66,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     if (isHoneypotFilled(body)) {
+      logInfo("newsletter.honeypot_triggered", {
+        ...getRequestLogContext(request),
+      });
       return NextResponse.json(
-        { success: true, message: "Successfully subscribed to newsletter" },
+        { success: true, message: NEWSLETTER_SUCCESS_MESSAGE },
         { status: 202 }
       );
     }
@@ -86,7 +92,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const ipLimit = checkRateLimit(request, {
+    const ipLimit = await checkRateLimit(request, {
       name: "newsletter:ip",
       limit: 5,
       windowMs: 15 * 60 * 1000,
@@ -95,7 +101,7 @@ export async function POST(request: NextRequest) {
       return rateLimitResponse(ipLimit);
     }
 
-    const emailLimit = checkRateLimit(request, {
+    const emailLimit = await checkRateLimit(request, {
       name: "newsletter:email",
       identifier: rawEmail,
       limit: 3,
@@ -115,9 +121,13 @@ export async function POST(request: NextRequest) {
     );
 
     if (existingSubscriber.length > 0) {
+      logInfo("newsletter.duplicate_submission", {
+        ...getRequestLogContext(request),
+        email: maskEmail(rawEmail),
+      });
       return NextResponse.json(
-        { error: "This email is already subscribed" },
-        { status: 409 }
+        { success: true, message: NEWSLETTER_SUCCESS_MESSAGE, data: null },
+        { status: 200 }
       );
     }
 
@@ -152,14 +162,24 @@ export async function POST(request: NextRequest) {
     ]);
 
     if (confirmationEmail.error || notificationEmail.error) {
-      console.error("Newsletter email send failed:", {
+      logError("newsletter.email_failed", {
+        ...getRequestLogContext(request),
+        email: maskEmail(rawEmail),
+        subscriberId: subscriber.id,
         confirmation: confirmationEmail.error,
         notification: notificationEmail.error,
       });
     }
 
+    logInfo("newsletter.subscribed", {
+      ...getRequestLogContext(request),
+      email: maskEmail(rawEmail),
+      subscriberId: subscriber.id,
+      emailSent: !confirmationEmail.error && !notificationEmail.error,
+    });
+
     return NextResponse.json(
-      { success: true, message: "Successfully subscribed to newsletter", data: subscriber },
+      { success: true, message: NEWSLETTER_SUCCESS_MESSAGE, data: subscriber },
       { status: 201 }
     );
   } catch (error) {
@@ -170,7 +190,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error("Error subscribing to newsletter:", error);
+    logError("newsletter.subscribe_failed", {
+      ...getRequestLogContext(request),
+      error,
+    });
     return NextResponse.json(
       { error: "Failed to subscribe. Please try again later." },
       { status: 500 }

@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { verification, user as userTable } from '@/lib/db/schema';
+import { hashVerificationToken } from '@/lib/email-verification-token';
 import { eq, and } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -61,19 +62,37 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Find the verification record
-    const verificationRecords = await withDbRetry(() =>
+    const hashedToken = hashVerificationToken(token);
+
+    // Prefer hashed token lookup, but allow a plaintext fallback for links that
+    // were issued before token-at-rest hashing was introduced.
+    let verificationRecords = await withDbRetry(() =>
       db
         .select()
         .from(verification)
         .where(
           and(
             eq(verification.identifier, email),
-            eq(verification.value, token)
+            eq(verification.value, hashedToken)
           )
         )
         .limit(1)
     );
+
+    if (verificationRecords.length === 0) {
+      verificationRecords = await withDbRetry(() =>
+        db
+          .select()
+          .from(verification)
+          .where(
+            and(
+              eq(verification.identifier, email),
+              eq(verification.value, token)
+            )
+          )
+          .limit(1)
+      );
+    }
 
     if (verificationRecords.length === 0) {
       return NextResponse.json(

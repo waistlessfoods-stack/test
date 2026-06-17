@@ -16,7 +16,7 @@ const ADMIN_LOGIN_WINDOW_MS = 15 * 60 * 1000;
  */
 export async function POST(request: NextRequest) {
   try {
-    const loginLimit = checkRateLimit(request, {
+    const loginLimit = await checkRateLimit(request, {
       name: 'admin-login:ip',
       limit: ADMIN_LOGIN_LIMIT,
       windowMs: ADMIN_LOGIN_WINDOW_MS,

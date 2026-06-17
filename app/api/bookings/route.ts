@@ -8,8 +8,12 @@ import {
   rateLimitResponse,
 } from "@/lib/rate-limit";
 import { isHoneypotFilled } from "@/lib/honeypot";
+import { getRequestLogContext, logError, logInfo, maskEmail } from "@/lib/structured-log";
 import { validateTextFieldLengths } from "@/lib/text-field-validation";
 import { NextRequest, NextResponse } from "next/server";
+
+const MIN_BOOKING_GUESTS = 1;
+const MAX_BOOKING_GUESTS = 50;
 
 function isTransientDbError(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
@@ -53,6 +57,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     if (isHoneypotFilled(body)) {
+      logInfo("booking.honeypot_triggered", {
+        ...getRequestLogContext(request),
+      });
       return NextResponse.json({ success: true }, { status: 202 });
     }
 
@@ -84,6 +91,12 @@ export async function POST(request: NextRequest) {
       notes,
     } = body;
     const normalizedEmail = normalizeRateLimitEmail(email);
+    const parsedGuests =
+      typeof guests === "number"
+        ? guests
+        : typeof guests === "string"
+          ? Number(guests.trim())
+          : Number.NaN;
 
     // Validate required fields
     if (
@@ -93,7 +106,9 @@ export async function POST(request: NextRequest) {
       !lastName ||
       !normalizedEmail ||
       !phone ||
-      !guests ||
+      guests === undefined ||
+      guests === null ||
+      guests === "" ||
       !preferredDate ||
       !notes
     ) {
@@ -112,7 +127,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const ipLimit = checkRateLimit(request, {
+    if (
+      !Number.isInteger(parsedGuests) ||
+      parsedGuests < MIN_BOOKING_GUESTS ||
+      parsedGuests > MAX_BOOKING_GUESTS
+    ) {
+      return NextResponse.json(
+        {
+          error: `Number of guests must be a whole number between ${MIN_BOOKING_GUESTS} and ${MAX_BOOKING_GUESTS}.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    const ipLimit = await checkRateLimit(request, {
       name: "bookings:ip",
       limit: 3,
       windowMs: 60 * 60 * 1000,
@@ -121,7 +149,7 @@ export async function POST(request: NextRequest) {
       return rateLimitResponse(ipLimit);
     }
 
-    const emailLimit = checkRateLimit(request, {
+    const emailLimit = await checkRateLimit(request, {
       name: "bookings:email",
       identifier: normalizedEmail,
       limit: 2,
@@ -142,7 +170,7 @@ export async function POST(request: NextRequest) {
           lastName,
           email: normalizedEmail,
           phone,
-          guests: Number(guests),
+          guests: parsedGuests,
           preferredDate,
           alternativeDate: alternativeDate || null,
           notes,
@@ -164,7 +192,7 @@ export async function POST(request: NextRequest) {
           serviceTitle,
           preferredDate,
           alternativeDate,
-          guests: Number(guests),
+          guests: parsedGuests,
           notes,
         }),
       }),
@@ -180,7 +208,7 @@ export async function POST(request: NextRequest) {
           serviceTitle,
           preferredDate,
           alternativeDate,
-          guests: Number(guests),
+          guests: parsedGuests,
           notes,
           bookingId: booking.id,
         }),
@@ -191,11 +219,23 @@ export async function POST(request: NextRequest) {
     const notificationEmailSent = !notificationEmail.error;
     const emailSent = confirmationEmailSent && notificationEmailSent;
     if (!emailSent) {
-      console.error("Booking email send failed:", {
+      logError("booking.email_failed", {
+        ...getRequestLogContext(request),
+        bookingId: booking.id,
+        email: maskEmail(normalizedEmail),
         confirmation: confirmationEmail.error,
         notification: notificationEmail.error,
       });
     }
+
+    logInfo("booking.submitted", {
+      ...getRequestLogContext(request),
+      bookingId: booking.id,
+      serviceSlug,
+      guests: parsedGuests,
+      email: maskEmail(normalizedEmail),
+      emailSent,
+    });
 
     return NextResponse.json(
       {
@@ -215,7 +255,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error("Error creating booking:", error);
+    logError("booking.submit_failed", {
+      ...getRequestLogContext(request),
+      error,
+    });
     return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });
   }
 }

@@ -11,6 +11,7 @@ import {
   rateLimitResponse,
 } from "@/lib/rate-limit";
 import { isHoneypotFilled } from "@/lib/honeypot";
+import { getRequestLogContext, logError, logInfo, maskEmail } from "@/lib/structured-log";
 import { validateTextFieldLengths } from "@/lib/text-field-validation";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -62,6 +63,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     if (isHoneypotFilled(body)) {
+      logInfo("enquiry.honeypot_triggered", {
+        ...getRequestLogContext(request),
+      });
       return NextResponse.json(
         { success: true, data: null },
         { status: 202 }
@@ -98,7 +102,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const ipLimit = checkRateLimit(request, {
+    const ipLimit = await checkRateLimit(request, {
       name: "enquiries:ip",
       limit: 5,
       windowMs: 15 * 60 * 1000,
@@ -107,7 +111,7 @@ export async function POST(request: NextRequest) {
       return rateLimitResponse(ipLimit);
     }
 
-    const emailLimit = checkRateLimit(request, {
+    const emailLimit = await checkRateLimit(request, {
       name: "enquiries:email",
       identifier: normalizedEmail,
       limit: 3,
@@ -160,11 +164,22 @@ export async function POST(request: NextRequest) {
     ]);
 
     if (confirmationEmail.error || notificationEmail.error) {
-      console.error("Enquiry email send failed:", {
+      logError("enquiry.email_failed", {
+        ...getRequestLogContext(request),
+        email: maskEmail(normalizedEmail),
+        enquiryId: enquiry.id,
         confirmation: confirmationEmail.error,
         notification: notificationEmail.error,
       });
     }
+
+    logInfo("enquiry.submitted", {
+      ...getRequestLogContext(request),
+      enquiryId: enquiry.id,
+      type,
+      email: maskEmail(normalizedEmail),
+      emailSent: !confirmationEmail.error && !notificationEmail.error,
+    });
 
     return NextResponse.json(
       { success: true, data: enquiry },
@@ -178,7 +193,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error("Error creating enquiry:", error);
+    logError("enquiry.submit_failed", {
+      ...getRequestLogContext(request),
+      error,
+    });
     return NextResponse.json(
       { error: "Failed to create enquiry" },
       { status: 500 }

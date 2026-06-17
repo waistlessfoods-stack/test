@@ -5,6 +5,11 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
 import { syncCurrentClerkUser } from "@/lib/clerk-user-sync";
+import { getCanonicalAppUrl } from "@/lib/app-url";
+import {
+  buildStripeLineItemsFromSnapshot,
+  createOrderCheckoutSnapshot,
+} from "@/lib/order-checkout-snapshot";
 import { calculateCartTotals } from "@/lib/pricing";
 import { getServerSalesTaxRate } from "@/lib/tax-settings";
 import { fetchShopPageFromContentful } from "@/lib/contentful-management";
@@ -225,10 +230,10 @@ export async function POST(request: Request) {
     await syncCurrentClerkUser();
 
     const customerEmail = user.primaryEmailAddress.emailAddress;
+    const appUrl = getCanonicalAppUrl();
 
     console.log("[Checkout] Parsing request body...");
     const bodyStart = Date.now();
-    const origin = request.headers.get("origin") || "http://localhost:3000";
     let body: { items?: unknown } = {};
     try {
       body = await request.json();
@@ -244,6 +249,14 @@ export async function POST(request: Request) {
 
     const taxRate = await getServerSalesTaxRate();
     const totals = calculateCartTotals(items, taxRate);
+    const checkoutSnapshot = createOrderCheckoutSnapshot({
+      currency: "usd",
+      items,
+      subtotalCents: totals.subtotalCents,
+      taxCents: totals.taxCents,
+      totalCents: totals.totalCents,
+      taxRate,
+    });
 
     const allowTestCheckout =
       items.length === 0 && process.env.NODE_ENV !== "production";
@@ -260,33 +273,7 @@ export async function POST(request: Request) {
     const lineItemsStart = Date.now();
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
       items.length > 0
-        ? [
-            ...items.map((item) => ({
-              quantity: item.quantity,
-              price_data: {
-                currency: "usd",
-                unit_amount: Math.round(item.price * 100), // Convert to cents
-                product_data: {
-                  name: item.name,
-                  ...(item.imagePath && { images: [item.imagePath] }),
-                },
-              },
-            })),
-            ...(totals.taxCents > 0
-              ? [
-                  {
-                    quantity: 1,
-                    price_data: {
-                      currency: "usd",
-                      unit_amount: totals.taxCents,
-                      product_data: {
-                        name: `Sales Tax (${(taxRate * 100).toFixed(2)}%)`,
-                      },
-                    },
-                  } satisfies Stripe.Checkout.SessionCreateParams.LineItem,
-                ]
-              : []),
-          ]
+        ? buildStripeLineItemsFromSnapshot(checkoutSnapshot)
         : [
             {
               quantity: 1,
@@ -338,8 +325,8 @@ export async function POST(request: Request) {
           subtotalCents: String(totals.subtotalCents),
           taxCents: String(totals.taxCents),
         },
-        success_url: `${origin}/orders?success=1`,
-        cancel_url: `${origin}/shop?canceled=1`,
+        success_url: `${appUrl}/orders?success=1`,
+        cancel_url: `${appUrl}/shop?canceled=1`,
       },
       {
         idempotencyKey, // Prevents duplicate charges if request is retried
@@ -365,6 +352,7 @@ export async function POST(request: Request) {
           customerEmail: customerEmail,
           metadata: {
             sessionUrl: stripeSession.url,
+            checkoutSnapshot,
           },
         })
     );

@@ -16,6 +16,9 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { HONEYPOT_FIELD } from "@/lib/honeypot";
 
+const MIN_BOOKING_GUESTS = 1;
+const MAX_BOOKING_GUESTS = 50;
+
 type BookingPageClientProps = {
   serviceSlug: string;
   serviceTitle: string;
@@ -43,8 +46,10 @@ export default function BookingPageClient({
   const [confirmationEmailSent, setConfirmationEmailSent] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const handleIncrement = () => setGuests((prev) => prev + 1);
-  const handleDecrement = () => setGuests((prev) => (prev > 0 ? prev - 1 : 0));
+  const handleIncrement = () =>
+    setGuests((prev) => Math.min(prev + 1, MAX_BOOKING_GUESTS));
+  const handleDecrement = () =>
+    setGuests((prev) => Math.max(prev - 1, 0));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +57,13 @@ export default function BookingPageClient({
 
     if (!firstName || !lastName || !email || !phone || !guests || !preferredDate || !notes) {
       setError("Please fill in all required fields.");
+      return;
+    }
+
+    if (!Number.isInteger(guests) || guests < MIN_BOOKING_GUESTS || guests > MAX_BOOKING_GUESTS) {
+      setError(
+        `Number of guests must be a whole number between ${MIN_BOOKING_GUESTS} and ${MAX_BOOKING_GUESTS}.`
+      );
       return;
     }
 
@@ -244,9 +256,21 @@ export default function BookingPageClient({
                 <Input
                   type="number"
                   value={guests}
-                  onChange={(e) => setGuests(parseInt(e.target.value) || 0)}
+                  min={MIN_BOOKING_GUESTS}
+                  max={MAX_BOOKING_GUESTS}
+                  step={1}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "") {
+                      setGuests(0);
+                      return;
+                    }
+
+                    const nextGuests = Number(value);
+                    setGuests(Number.isFinite(nextGuests) ? nextGuests : 0);
+                  }}
                   className="h-12 md:h-14 bg-[#F4F4F4] border-none rounded-lg px-4 text-base md:text-lg focus-visible:ring-1 focus-visible:ring-[#388082] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  placeholder="0"
+                  placeholder="1"
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 z-20">
                   <ChevronUp

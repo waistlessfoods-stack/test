@@ -1,12 +1,16 @@
 import nodemailer from 'nodemailer';
 import { render } from '@react-email/render';
 import React from 'react';
+import { logError, logInfo, logWarn, maskEmail } from '@/lib/structured-log';
 
 const gmailUser = process.env.Email;
 const gmailAppPassword = process.env.AppPassword;
 
 if (!gmailUser || !gmailAppPassword) {
-  console.warn('⚠️  Email or AppPassword env vars are not set. Email functionality will be disabled.');
+  logWarn('email.config_missing', {
+    hasEmailEnv: Boolean(gmailUser),
+    hasAppPasswordEnv: Boolean(gmailAppPassword),
+  });
 }
 
 const transporter = nodemailer.createTransport({
@@ -34,7 +38,10 @@ export async function sendEmail({
   replyTo?: string | string[];
 }) {
   if (!gmailUser || !gmailAppPassword) {
-    console.error('❌ Gmail credentials (Email / AppPassword) are not configured');
+    logError('email.send_config_missing', {
+      to: Array.isArray(to) ? to.map(maskEmail) : maskEmail(to),
+      subject,
+    });
     return {
       data: null,
       error: { message: 'Email service not configured', name: 'ConfigError' },
@@ -48,7 +55,10 @@ export async function sendEmail({
   }
 
   if (!emailHtml) {
-    console.error('❌ No email content provided (html or react)');
+    logError('email.send_missing_content', {
+      to: Array.isArray(to) ? to.map(maskEmail) : maskEmail(to),
+      subject,
+    });
     return {
       data: null,
       error: { message: 'No email content provided', name: 'ValidationError' },
@@ -69,10 +79,18 @@ export async function sendEmail({
       replyTo: replyToAddresses,
     });
 
-    console.log('✅ Email sent successfully:', info.messageId);
+    logInfo('email.sent', {
+      to: Array.isArray(to) ? to.map(maskEmail) : maskEmail(to),
+      subject,
+      messageId: info.messageId,
+    });
     return { data: { id: info.messageId }, error: null };
   } catch (err) {
-    console.error('❌ Failed to send email:', err);
+    logError('email.send_failed', {
+      to: Array.isArray(to) ? to.map(maskEmail) : maskEmail(to),
+      subject,
+      error: err,
+    });
     return {
       data: null,
       error: { message: (err as Error).message, name: 'SendError' },

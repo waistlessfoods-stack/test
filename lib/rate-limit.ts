@@ -1,4 +1,10 @@
+import "server-only";
+
 import { NextRequest, NextResponse } from "next/server";
+import { sql } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { rateLimitBuckets } from "@/lib/db/schema";
+import { getRequestLogContext, logWarn } from "@/lib/structured-log";
 
 type RateLimitOptions = {
   name: string;
@@ -15,70 +21,137 @@ type RateLimitResult = {
   retryAfterSeconds: number;
 };
 
-type RateLimitBucket = {
-  count: number;
-  resetAt: number;
-};
-
-const buckets = new Map<string, RateLimitBucket>();
-
 function getClientIp(request: NextRequest): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
   const realIp = request.headers.get("x-real-ip");
   const cfIp = request.headers.get("cf-connecting-ip");
 
+  return cfIp || realIp || forwardedFor?.split(",")[0]?.trim() || "unknown";
+}
+
+function isTransientDbError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  const message = error.message.toLowerCase();
   return (
-    cfIp ||
-    realIp ||
-    forwardedFor?.split(",")[0]?.trim() ||
-    "unknown"
+    message.includes("econnreset") ||
+    message.includes("etimedout") ||
+    message.includes("epipe") ||
+    message.includes("connection reset") ||
+    message.includes("timeout")
   );
 }
 
-function cleanupExpiredBuckets(now: number) {
-  if (buckets.size < 5000) return;
+async function withDbRetry<T>(
+  fn: () => Promise<T>,
+  maxAttempts: number = 3,
+): Promise<T> {
+  let lastError: Error | null = null;
 
-  for (const [key, bucket] of buckets) {
-    if (bucket.resetAt <= now) {
-      buckets.delete(key);
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      if (!isTransientDbError(error) || attempt >= maxAttempts - 1) {
+        throw lastError;
+      }
+
+      const delay = 250 * Math.pow(2, attempt);
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
+  }
+
+  throw lastError;
+}
+
+async function cleanupExpiredBuckets(now: Date) {
+  try {
+    await withDbRetry(() =>
+      db
+        .delete(rateLimitBuckets)
+        .where(sql`${rateLimitBuckets.resetAt} <= ${now}`),
+    );
+  } catch (error) {
+    logWarn("rate_limit.cleanup_failed", {
+      now: now.toISOString(),
+      error,
+    });
   }
 }
 
-export function checkRateLimit(
+export async function checkRateLimit(
   request: NextRequest,
   options: RateLimitOptions,
-): RateLimitResult {
+): Promise<RateLimitResult> {
   const now = Date.now();
-  cleanupExpiredBuckets(now);
-
+  const nowDate = new Date(now);
   const identifier = options.identifier?.trim() || getClientIp(request);
   const key = `${options.name}:${identifier}`;
-  const existing = buckets.get(key);
+  const resetAt = new Date(now + options.windowMs);
 
-  if (!existing || existing.resetAt <= now) {
-    const resetAt = now + options.windowMs;
-    buckets.set(key, { count: 1, resetAt });
+  void cleanupExpiredBuckets(nowDate);
 
-    return {
-      limited: false,
-      limit: options.limit,
-      remaining: Math.max(options.limit - 1, 0),
-      resetAt,
-      retryAfterSeconds: Math.ceil((resetAt - now) / 1000),
-    };
+  const result = await withDbRetry(() =>
+    db.execute(sql`
+      INSERT INTO ${rateLimitBuckets} ("key", "count", "reset_at", "updated_at")
+      VALUES (${key}, 1, ${resetAt}, ${nowDate})
+      ON CONFLICT ("key") DO UPDATE
+      SET
+        "count" = CASE
+          WHEN ${rateLimitBuckets.resetAt} <= ${nowDate} THEN 1
+          ELSE ${rateLimitBuckets.count} + 1
+        END,
+        "reset_at" = CASE
+          WHEN ${rateLimitBuckets.resetAt} <= ${nowDate} THEN ${resetAt}
+          ELSE ${rateLimitBuckets.resetAt}
+        END,
+        "updated_at" = ${nowDate}
+      RETURNING "count", "reset_at"
+    `),
+  );
+
+  const row = result.rows[0] as
+    | { count: number | string; reset_at: Date | string }
+    | undefined;
+
+  if (!row) {
+    throw new Error("Rate limit store did not return a bucket row.");
   }
 
-  existing.count += 1;
+  const count =
+    typeof row.count === "number" ? row.count : Number.parseInt(row.count, 10);
+  const resolvedResetAt =
+    row.reset_at instanceof Date
+      ? row.reset_at.getTime()
+      : new Date(row.reset_at).getTime();
+  const retryAfterSeconds = Math.max(
+    1,
+    Math.ceil((resolvedResetAt - now) / 1000),
+  );
+  const remaining = Math.max(options.limit - count, 0);
+  const limited = count > options.limit;
 
-  const remaining = Math.max(options.limit - existing.count, 0);
-  const retryAfterSeconds = Math.ceil((existing.resetAt - now) / 1000);
+  if (limited) {
+    logWarn("rate_limit.exceeded", {
+      ...getRequestLogContext(request),
+      bucketName: options.name,
+      bucketIdentifier: identifier,
+      limit: options.limit,
+      count,
+      resetAt: new Date(resolvedResetAt).toISOString(),
+      retryAfterSeconds,
+    });
+  }
 
   return {
-    limited: existing.count > options.limit,
+    limited,
     limit: options.limit,
     remaining,
-    resetAt: existing.resetAt,
+    resetAt: resolvedResetAt,
     retryAfterSeconds,
   };
 }

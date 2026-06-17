@@ -5,14 +5,11 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
 import { syncCurrentClerkUser } from "@/lib/clerk-user-sync";
-
-type OrderItem = {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  imagePath?: string;
-};
+import { getCanonicalAppUrl } from "@/lib/app-url";
+import {
+  buildStripeLineItemsFromSnapshot,
+  resolveOrderCheckoutSnapshot,
+} from "@/lib/order-checkout-snapshot";
 
 const stripeSecretKey =
   process.env.sandbox_secret_key_stripe || process.env.STRIPE_SECRET_KEY;
@@ -20,20 +17,6 @@ const stripeSecretKey =
 const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" })
   : null;
-
-function isOrderItems(value: unknown): value is OrderItem[] {
-  return (
-    Array.isArray(value) &&
-    value.every(
-      (item) =>
-        typeof item === "object" &&
-        item !== null &&
-        typeof (item as OrderItem).name === "string" &&
-        typeof (item as OrderItem).price === "number" &&
-        typeof (item as OrderItem).quantity === "number"
-    )
-  );
-}
 
 export async function POST(
   request: Request,
@@ -56,6 +39,7 @@ export async function POST(
     }
 
     await syncCurrentClerkUser();
+    const appUrl = getCanonicalAppUrl();
 
     const { id } = await context.params;
     const orderId = Number(id);
@@ -79,8 +63,6 @@ export async function POST(
       );
     }
 
-    const origin = request.headers.get("origin") || "http://localhost:3000";
-
     // Reuse existing open checkout session if Stripe still has a valid URL.
     try {
       const existingSession = await stripe.checkout.sessions.retrieve(
@@ -93,25 +75,21 @@ export async function POST(
       // If retrieval fails, we create a new session below.
     }
 
-    if (!isOrderItems(existingOrder.items) || existingOrder.items.length === 0) {
+    const checkoutSnapshot = resolveOrderCheckoutSnapshot({
+      amount: existingOrder.amount,
+      currency: existingOrder.currency,
+      items: existingOrder.items,
+      metadata: existingOrder.metadata,
+    });
+
+    if (!checkoutSnapshot) {
       return NextResponse.json(
-        { error: "Order items are invalid. Please contact support." },
+        { error: "Order checkout data is invalid. Please contact support." },
         { status: 400 }
       );
     }
 
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
-      existingOrder.items.map((item) => ({
-        quantity: item.quantity,
-        price_data: {
-          currency: existingOrder.currency,
-          unit_amount: Math.round(item.price * 100),
-          product_data: {
-            name: item.name,
-            ...(item.imagePath && { images: [item.imagePath] }),
-          },
-        },
-      }));
+    const lineItems = buildStripeLineItemsFromSnapshot(checkoutSnapshot);
 
     const stripeSession = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -122,8 +100,8 @@ export async function POST(
         userId,
         orderId: String(existingOrder.id),
       },
-      success_url: `${origin}/orders?success=1`,
-      cancel_url: `${origin}/orders?resume=1`,
+      success_url: `${appUrl}/orders?success=1`,
+      cancel_url: `${appUrl}/orders?resume=1`,
     });
 
     const previousMetadata =
@@ -138,6 +116,7 @@ export async function POST(
         updatedAt: new Date(),
         metadata: {
           ...previousMetadata,
+          checkoutSnapshot,
           previousStripeSessionId: existingOrder.stripeSessionId,
           sessionUrl: stripeSession.url,
           resumedAt: new Date().toISOString(),
