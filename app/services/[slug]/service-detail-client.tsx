@@ -240,6 +240,32 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
               Book now
             </span>
           </Link>
+
+          <section className="flex flex-col gap-4 border-t border-gray-100 pt-6">
+            <h2 className="font-sans font-medium text-lg md:text-xl leading-7 tracking-tight text-black uppercase">
+              Keep Exploring
+            </h2>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Link
+                href="/services"
+                className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4 text-sm font-medium text-gray-800 transition hover:border-[#388082] hover:bg-white"
+              >
+                Browse all services
+              </Link>
+              <Link
+                href="/recipes"
+                className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4 text-sm font-medium text-gray-800 transition hover:border-[#388082] hover:bg-white"
+              >
+                Explore recipes
+              </Link>
+              <Link
+                href="/blog"
+                className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4 text-sm font-medium text-gray-800 transition hover:border-[#388082] hover:bg-white"
+              >
+                Read the blog
+              </Link>
+            </div>
+          </section>
         </section>
       </div>
     </main>

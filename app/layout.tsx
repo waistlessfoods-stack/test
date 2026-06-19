@@ -46,10 +46,10 @@ export const metadata: Metadata = {
       "Private Chef Amber curates fresh, flavorful meals, from pescatarian feasts to hearty family dinners, with an eco-conscious touch.",
     images: [
       {
-        url: "/logo.png",
-        width: 512,
-        height: 512,
-        alt: "WaistLess Foods logo",
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "WaistLess Foods social preview",
       },
     ],
   },
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: "WaistLess Foods | Waste Less. Taste More.",
     description:
       "Private Chef Amber curates fresh, flavorful meals, from pescatarian feasts to hearty family dinners, with an eco-conscious touch.",
-    images: ["/logo.png"],
+    images: ["/twitter-image"],
   },
 };
 

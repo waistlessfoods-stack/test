@@ -32,18 +32,19 @@ function slugifyCategoryName(value: string) {
 
 export default function RecipesPageClient({ data, initialCategorySlug }: RecipesPageClientProps) {
   const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(() => {
+    if (!initialCategorySlug) return new Set();
+
+    const normalizedSlug = slugifyCategoryName(initialCategorySlug);
+    const matchedCategory = data.categories.find(
+      (category) => slugifyCategoryName(category.name) === normalizedSlug
+    );
+
+    return matchedCategory ? new Set([matchedCategory.id]) : new Set();
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [unlockedRecipeIds, setUnlockedRecipeIds] = useState<Set<string>>(new Set());
   const { data: session, isPending } = useSession();
-
-  useEffect(() => {
-    if (!api) return;
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap());
-    });
-  }, [api]);
 
   useEffect(() => {
     if (!api || data.categories.length <= 1) return;
@@ -66,25 +67,9 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
   }, [api, data.categories.length]);
 
   useEffect(() => {
-    if (!initialCategorySlug) {
-      return;
-    }
-
-    const normalizedSlug = slugifyCategoryName(initialCategorySlug);
-    const matchedCategory = data.categories.find(
-      (category) => slugifyCategoryName(category.name) === normalizedSlug
-    );
-
-    if (matchedCategory) {
-      setSelectedCategories(new Set([matchedCategory.id]));
-    }
-  }, [data.categories, initialCategorySlug]);
-
-  useEffect(() => {
     if (isPending) return;
 
     if (!session?.user?.id) {
-      setUnlockedRecipeIds(new Set());
       return;
     }
 
@@ -177,6 +162,10 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
     return categoryMatch && searchMatch;
   });
 
+  const visibleUnlockedRecipeIds = session?.user?.id
+    ? unlockedRecipeIds
+    : new Set<string>();
+
   return (
     <div className="w-full min-h-screen bg-white overflow-x-hidden font-metropolis">
       {/* --- BANNER --- */}
@@ -187,6 +176,7 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
               src={data.bannerImagePath}
               alt="Background"
               fill
+              sizes="100vw"
               className="object-cover"
               priority
             />
@@ -267,6 +257,7 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
                           <Image
                             src={cat.imagePath}
                             fill
+                            sizes="(min-width: 1024px) 16vw, (min-width: 768px) 20vw, 50vw"
                             className={`object-cover transition-transform duration-500 ease-out ${
                               isSelected ? "scale-[1.1]" : "scale-[1.02] group-hover:scale-105"
                             }`}
@@ -369,7 +360,7 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
                       </div>
                     )}
 
-                    {item.price !== "Free" && unlockedRecipeIds.has(item.id) && (
+                    {item.price !== "Free" && visibleUnlockedRecipeIds.has(item.id) && (
                       <div className="absolute top-3 left-3 rounded-none bg-[#E8F5F5] px-2 py-1 text-[11px] font-semibold text-[#00676E]">
                         UNLOCKED
                       </div>

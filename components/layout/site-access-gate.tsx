@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent, ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   Dialog,
@@ -17,30 +17,51 @@ type SiteAccessGateProps = {
   children: ReactNode;
 };
 
-export default function SiteAccessGate({ children }: SiteAccessGateProps) {
-  const pathname = usePathname();
-  const isAuthRoute =
+function isPublicPath(pathname: string): boolean {
+  if (
+    pathname === "/" ||
+    pathname === "/about" ||
+    pathname === "/services" ||
+    pathname.startsWith("/services/") ||
+    pathname === "/shop" ||
+    pathname === "/recipes" ||
+    pathname.startsWith("/recipes/detail/") ||
+    pathname === "/blog" ||
+    pathname.startsWith("/blog/") ||
+    pathname === "/links" ||
+    pathname.startsWith("/links/")
+  ) {
+    return true;
+  }
+
+  if (
     pathname === "/signin" ||
     pathname.startsWith("/signin/") ||
     pathname === "/signup" ||
     pathname.startsWith("/signup/") ||
     pathname === "/sso-callback" ||
-    pathname.startsWith("/sso-callback/");
-  const isPublicRoute =
-    pathname === "/" ||
-    pathname === "/links" ||
-    pathname.startsWith("/links/") ||
-    isAuthRoute;
+    pathname.startsWith("/sso-callback/")
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+export default function SiteAccessGate({ children }: SiteAccessGateProps) {
+  const pathname = usePathname();
+  const isPublicRoute = isPublicPath(pathname);
 
   const [password, setPassword] = useState("");
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return window.sessionStorage.getItem(STORAGE_KEY) === "true";
+  });
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    const hasAccess = window.sessionStorage.getItem(STORAGE_KEY) === "true";
-    setIsUnlocked(hasAccess);
-  }, []);
 
   const isLocked = !isPublicRoute && !isUnlocked;
 

@@ -1,7 +1,15 @@
 import { fetchServicesFromContentful } from "@/lib/contentful-management";
+import { buildMetadata } from "@/lib/seo";
 import ServicesClientPage from "./services-client";
 
 export const revalidate = 300;
+
+export const metadata = buildMetadata({
+  title: "Services",
+  description:
+    "Explore private chef services, catering, and cooking classes from WaistLess Foods.",
+  path: "/services",
+});
 
 const fallbackSlugify = (value: string) =>
   value

@@ -23,18 +23,10 @@ type ShopPageClientProps = {
 
 export default function ShopPageClient({ data }: ShopPageClientProps) {
   const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
   const [unlockedRecipeIds, setUnlockedRecipeIds] = useState<Set<string>>(new Set());
   const { data: session, isPending } = useSession();
-
-  useEffect(() => {
-    if (!api) return;
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap());
-    });
-  }, [api]);
 
   useEffect(() => {
     if (!api || data.categories.length <= 1) return;
@@ -52,7 +44,6 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
     if (isPending) return;
 
     if (!session?.user?.id) {
-      setUnlockedRecipeIds(new Set());
       return;
     }
 
@@ -122,6 +113,10 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
     return categoryMatch && searchMatch;
   });
 
+  const visibleUnlockedRecipeIds = session?.user?.id
+    ? unlockedRecipeIds
+    : new Set<string>();
+
   return (
     <div className="w-full min-h-screen bg-white overflow-x-hidden font-metropolis">
       {/* --- BANNER --- */}
@@ -132,6 +127,7 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
               src={data.bannerImagePath}
               alt="Background"
               fill
+              sizes="100vw"
               className="object-cover"
               priority
             />
@@ -212,6 +208,7 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
                           <Image
                             src={cat.imagePath}
                             fill
+                            sizes="(min-width: 1024px) 16vw, (min-width: 768px) 20vw, 50vw"
                             className={`object-cover transition-transform duration-500 ease-out ${
                               isSelected ? "scale-[1.1]" : "scale-[1.02] group-hover:scale-105"
                             }`}
@@ -280,7 +277,7 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-5 2xl:gap-6 w-full">
               {filteredRecipes.map((item: Recipe) => {
-                const recipeHref = unlockedRecipeIds.has(item.id)
+                const recipeHref = visibleUnlockedRecipeIds.has(item.id)
                   ? `/recipes/detail/${item.slug}/full`
                   : `/recipes/detail/${item.slug}`;
 
@@ -292,15 +289,15 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
                   <div className="flex h-full flex-col overflow-hidden rounded-none border border-[#D8D8D8] bg-white">
                     <Link href={recipeHref} className="block">
                       <div className="relative h-[250px] lg:h-[205px] 2xl:h-[220px] overflow-hidden">
-                        {item.imagePath && (
-                          <Image
-                            src={item.imagePath}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-105"
-                            alt={item.title}
-                            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                          />
-                        )}
+                    {item.imagePath && (
+                      <Image
+                        src={item.imagePath}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        alt={item.title}
+                        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                      />
+                    )}
 
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/45 transition-colors duration-300" />
 
@@ -319,7 +316,7 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
                           </span>
                         </div>
 
-                        {unlockedRecipeIds.has(item.id) && (
+                        {visibleUnlockedRecipeIds.has(item.id) && (
                           <div className="absolute top-3 left-3 rounded-none bg-[#E8F5F5] px-2 py-1 text-[11px] font-semibold text-[#00676E]">
                             UNLOCKED
                           </div>

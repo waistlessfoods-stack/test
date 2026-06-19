@@ -180,14 +180,15 @@ export default function HomepageClient({ data }: HomepageClientProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-[31px] max-w-[1222px] mx-auto">
           {data.features.map((item: FeatureItem) => (
-            <div key={item.id} className="flex flex-col w-full h-full">
-              <div className="relative w-full aspect-387/257">
+            <div key={item.id} className="group flex flex-col w-full h-full">
+              <div className="relative w-full aspect-387/257 overflow-hidden">
                 {item.imagePath && (
                   <Image
                     src={item.imagePath}
                     alt={item.title}
                     fill
-                    className="object-cover"
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                 )}
               </div>
@@ -223,12 +224,17 @@ export default function HomepageClient({ data }: HomepageClientProps) {
 
       {/* About Chef Amber Section */}
       <section
-        className="relative w-full min-h-[700px] md:h-[764px] flex items-center justify-center overflow-hidden bg-fixed bg-center bg-cover"
-        style={{
-          backgroundImage: `url('${data.aboutImagePath}')`,
-          backgroundAttachment: "fixed",
-        }}
+        className="relative w-full min-h-[700px] md:h-[764px] flex items-center justify-center overflow-hidden"
       >
+        {data.aboutImagePath && (
+          <Image
+            src={data.aboutImagePath}
+            alt="Chef Amber background"
+            fill
+            sizes="100vw"
+            className="object-cover"
+          />
+        )}
         <div className="absolute inset-0 bg-black/10" />
 
         <div className="relative z-10 w-full bg-white/90 backdrop-blur-sm shadow-xl border-y border-white/20 py-10 md:py-14 flex justify-center">
@@ -307,7 +313,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 justify-items-center">
-            {data.featuredRecipes.map((item: FeaturedRecipe, index) => {
+            {data.featuredRecipes.map((item: FeaturedRecipe) => {
               const rawCategorySlug = (item.slug || item.title || "")
                 .toLowerCase()
                 .trim()
@@ -350,6 +356,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                         src={item.imagePath}
                         alt={item.title || displayTitle}
                         fill
+                        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                         className="object-cover transition-[transform,filter] duration-500 group-hover:scale-105 group-hover:brightness-110"
                       />
                     )}
@@ -380,6 +387,70 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white px-6 py-16 md:px-12 md:py-20">
+        <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-8">
+          <div className="max-w-[760px]">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.22em] text-[#388082]">
+              Explore More
+            </p>
+            <h2 className="mt-3 font-['Bebas_Neue'] text-[42px] leading-[0.95] text-black md:text-[58px]">
+              Find the right next step
+            </h2>
+            <p className="mt-3 max-w-[620px] text-[16px] leading-relaxed text-[#5B5B5B] md:text-[18px]">
+              Jump into chef services, premium recipes, practical cooking ideas,
+              or the latest stories from WaistLess Foods.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {[
+              {
+                href: "/services",
+                title: "Chef Services",
+                description:
+                  "Explore private dining, catering, and cooking class options.",
+              },
+              {
+                href: "/recipes",
+                title: "Recipe Library",
+                description:
+                  "Browse free and premium recipes by category and cooking style.",
+              },
+              {
+                href: "/shop",
+                title: "Premium Shop",
+                description:
+                  "Unlock paid recipes and save your favorites to your account.",
+              },
+              {
+                href: "/blog",
+                title: "Blog & Tips",
+                description:
+                  "Read practical food stories, nutrition ideas, and kitchen inspiration.",
+              },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group rounded-2xl border border-[#D9E3E3] bg-[#F8FBFB] p-6 transition-all duration-200 hover:border-[#388082] hover:bg-white hover:shadow-[0_14px_34px_-24px_rgba(0,0,0,0.45)]"
+              >
+                <div className="flex h-full flex-col gap-4">
+                  <div className="text-[28px] uppercase leading-none text-black md:text-[34px] font-['Bebas_Neue']">
+                    {item.title}
+                  </div>
+                  <p className="text-[15px] leading-relaxed text-[#5B5B5B]">
+                    {item.description}
+                  </p>
+                  <span className="mt-auto inline-flex items-center text-[13px] font-semibold uppercase tracking-[0.14em] text-[#388082] transition-transform duration-200 group-hover:translate-x-1">
+                    Explore
+                  </span>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -453,7 +524,13 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                         rel="noopener noreferrer"
                         className="group flex items-center justify-center gap-3 bg-[#388082] hover:bg-[#2d6b6d] active:scale-95 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 w-full sm:w-auto min-w-[200px] shadow-sm"
                       >
-                        <img src="https://cdn.simpleicons.org/yelp/ffffff" alt="Yelp" className="w-6 h-6 shrink-0" />
+                        <Image
+                          src="https://cdn.simpleicons.org/yelp/ffffff"
+                          alt="Yelp"
+                          width={24}
+                          height={24}
+                          className="h-6 w-6 shrink-0"
+                        />
                         <span className="text-base md:text-lg">See more on Yelp</span>
                       </a>
 

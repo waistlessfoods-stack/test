@@ -1,11 +1,17 @@
+import type { Metadata } from "next";
+import JsonLd from "@/components/seo/json-ld";
 import { Container } from "@/components/ui/container";
 import Link from "next/link";
-import { fetchRecipesPageFromContentful } from "@/lib/contentful-management";
+import {
+  fetchRecipesPageFromContentful,
+  findRecipeBySlug,
+} from "@/lib/contentful-management";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
 import { redirect } from "next/navigation";
+import { buildMetadata, toAbsoluteUrl } from "@/lib/seo";
 import RecipeFullClient from "./recipe-full-client";
 
 export const revalidate = 300;
@@ -24,6 +30,35 @@ function isFreeRecipe(price: string): boolean {
 
   const numericPrice = parseFloat(normalized.replace(/[^0-9.-]+/g, ""));
   return !Number.isNaN(numericPrice) && numericPrice <= 0;
+}
+
+export async function generateMetadata({
+  params,
+}: RecipeFullPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const data = await fetchRecipesPageFromContentful();
+  const recipe = findRecipeBySlug(data.recipes, slug);
+
+  if (!recipe) {
+    return buildMetadata({
+      title: "Recipe Not Found",
+      description: "This recipe could not be found.",
+      path: `/recipes/detail/${slug}/full`,
+      noIndex: true,
+    });
+  }
+
+  const recipeIsFree = isFreeRecipe(recipe.price);
+
+  return buildMetadata({
+    title: recipe.title,
+    description: recipe.detailDescription || recipe.description,
+    path: recipeIsFree
+      ? `/recipes/detail/${recipe.slug}/full`
+      : `/recipes/detail/${recipe.slug}`,
+    image: recipe.heroImagePath || recipe.imagePath,
+    noIndex: !recipeIsFree,
+  });
 }
 
 function hasRecipeInOrderItems(
@@ -85,7 +120,7 @@ export default async function RecipeFullPage({ params }: RecipeFullPageProps) {
   const { userId } = await auth();
 
   const data = await fetchRecipesPageFromContentful();
-  const recipe = data.recipes.find((r) => r.slug === slug);
+  const recipe = findRecipeBySlug(data.recipes, slug);
 
   if (!recipe) {
     return (
@@ -102,6 +137,10 @@ export default async function RecipeFullPage({ params }: RecipeFullPageProps) {
         </section>
       </div>
     );
+  }
+
+  if (recipe.slug !== slug) {
+    redirect(`/recipes/detail/${recipe.slug}/full`);
   }
 
   const recipeIsFree = isFreeRecipe(recipe.price);
@@ -129,5 +168,50 @@ export default async function RecipeFullPage({ params }: RecipeFullPageProps) {
     redirect(`/recipes/detail/${slug}`);
   }
 
-  return <RecipeFullClient recipe={recipe} isFreeRecipe={recipeIsFree} />;
+  const recipeUrl = toAbsoluteUrl(
+    recipeIsFree
+      ? `/recipes/detail/${recipe.slug}/full`
+      : `/recipes/detail/${recipe.slug}`
+  );
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Recipe",
+      name: recipe.title,
+      description: recipe.detailDescription || recipe.description,
+      image: recipe.heroImagePath || recipe.imagePath || undefined,
+      url: recipeUrl,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: toAbsoluteUrl("/"),
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Recipes",
+          item: toAbsoluteUrl("/recipes"),
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: recipe.title,
+          item: recipeUrl,
+        },
+      ],
+    },
+  ];
+
+  return (
+    <>
+      <JsonLd data={jsonLd} />
+      <RecipeFullClient recipe={recipe} isFreeRecipe={recipeIsFree} />
+    </>
+  );
 }

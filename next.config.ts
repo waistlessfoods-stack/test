@@ -16,6 +16,15 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+  async redirects() {
+    return [
+      {
+        source: "/blogs",
+        destination: "/blog",
+        permanent: true,
+      },
+    ];
+  },
   allowedDevOrigins: allowedDevOrigins?.length
     ? allowedDevOrigins
     : ["localhost", "127.0.0.1", "192.168.0.192"],
@@ -28,6 +37,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.simpleicons.org",
       },
     ],
   },

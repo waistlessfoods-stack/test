@@ -217,6 +217,7 @@ export type RecipeCategory = {
 export type Recipe = {
   id: string;
   slug: string;
+  legacyTitleSlug?: string;
   title: string;
   price: string;
   description: string;
@@ -263,6 +264,18 @@ function generateSlug(title: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+export function getGeneratedRecipeSlug(title: string): string {
+  return generateSlug(title);
+}
+
+export function doesRecipeMatchSlug(recipe: Recipe, slug: string): boolean {
+  return recipe.slug === slug || recipe.legacyTitleSlug === slug;
+}
+
+export function findRecipeBySlug(recipes: Recipe[], slug: string): Recipe | undefined {
+  return recipes.find((recipe) => doesRecipeMatchSlug(recipe, slug));
 }
 
 function toStringArray(value: unknown): string[] {
@@ -402,6 +415,12 @@ function mapRecipesOrShopPage(entry: any): RecipesPageData {
   const recipes: Recipe[] = ((f.recipes as any[]) || [])
     .map((e: any) => {
       const title = String(e.fields?.title ?? "");
+      const generatedTitleSlug = generateSlug(title);
+      const contentfulSlug =
+        typeof e.fields?.slug === "string" && e.fields.slug.trim().length > 0
+          ? e.fields.slug.trim()
+          : "";
+      const resolvedSlug = contentfulSlug || generatedTitleSlug;
       const imagePath = getAssetUrl(e.fields?.image);
       const multiCategoryIds = Array.isArray(e.fields?.categories)
         ? (e.fields.categories as any[])
@@ -418,7 +437,11 @@ function mapRecipesOrShopPage(entry: any): RecipesPageData {
 
       return {
         id: e.sys.id,
-        slug: generateSlug(title),
+        slug: resolvedSlug,
+        legacyTitleSlug:
+          contentfulSlug && contentfulSlug !== generatedTitleSlug
+            ? generatedTitleSlug
+            : undefined,
         title,
         price: String(e.fields?.price ?? ""),
         description: String(e.fields?.description ?? ""),

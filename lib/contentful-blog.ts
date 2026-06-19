@@ -31,6 +31,34 @@ export type BlogPageData = {
   readTimeOptions: number[];
 };
 
+function mapEntryToBlogPost(
+  entry: {
+    sys: { id: string };
+    fields?: Record<string, unknown>;
+  },
+  index: number
+): BlogPost {
+  const f = entry.fields ?? {};
+  const title = String(f.title ?? "").trim();
+  const excerpt = String(f.excerpt ?? "").trim();
+  const slug = String(f.slug ?? slugify(title)).trim();
+  const category = String(f.category ?? "Healthy Living").trim();
+  const readTimeMinutes = Number(f.readTimeMinutes ?? 5);
+  const imagePath = getAssetUrl(f.coverImage) || String(f.imagePath ?? "");
+
+  return {
+    id: entry.sys.id,
+    title,
+    slug,
+    excerpt,
+    category,
+    readTimeMinutes: Number.isFinite(readTimeMinutes) ? readTimeMinutes : 5,
+    imagePath,
+    sortOrder: Number(f.sortOrder ?? index + 1),
+    publishedAt: f.publishedAt ? String(f.publishedAt) : undefined,
+  };
+}
+
 const warnings = new Set<string>();
 
 function warnOnce(key: string, message: string): void {
@@ -69,8 +97,11 @@ function getRequiredDeliveryConfig(): DeliveryConfig {
 
   return config;
 }
-function getAssetUrl(asset: any): string | null {
-  const url = asset?.fields?.file?.url;
+function getAssetUrl(asset: unknown): string | null {
+  const maybeAsset = asset as
+    | { fields?: { file?: { url?: unknown } } }
+    | undefined;
+  const url = maybeAsset?.fields?.file?.url;
   if (!url || typeof url !== "string") return null;
   return url.startsWith("//") ? `https:${url}` : url;
 }
@@ -116,31 +147,10 @@ async function fetchBlogPageFromContentfulRaw(): Promise<BlogPageData> {
       include: 2,
       order: ["fields.sortOrder", "-fields.publishedAt"],
       limit: 100,
-    } as any);
+    } as Record<string, unknown>);
 
     const posts: BlogPost[] = entries.items
-      .map((entry, index) => {
-        const f = entry.fields as any;
-        const title = String(f.title ?? "").trim();
-        const excerpt = String(f.excerpt ?? "").trim();
-        const slug = String(f.slug ?? slugify(title)).trim();
-        const category = String(f.category ?? "Healthy Living").trim();
-        const readTimeMinutes = Number(f.readTimeMinutes ?? 5);
-        // Prefer coverImage asset; fall back to imagePath direct URL string
-        const imagePath = getAssetUrl(f.coverImage) || String(f.imagePath ?? "");
-
-        return {
-          id: entry.sys.id,
-          title,
-          slug,
-          excerpt,
-          category,
-          readTimeMinutes: Number.isFinite(readTimeMinutes) ? readTimeMinutes : 5,
-          imagePath,
-          sortOrder: Number(f.sortOrder ?? index + 1),
-          publishedAt: f.publishedAt ? String(f.publishedAt) : undefined,
-        };
-      })
+      .map((entry, index) => mapEntryToBlogPost(entry, index))
       .filter((post) => post.title && post.excerpt && post.imagePath);
 
     if (posts.length === 0) {
@@ -160,6 +170,44 @@ async function fetchBlogPageFromContentfulRaw(): Promise<BlogPageData> {
   }
 }
 
+async function fetchBlogPostBySlugFromContentfulRaw(
+  slug: string
+): Promise<BlogPost | null> {
+  const config = getRequiredDeliveryConfig();
+
+  try {
+    const client = createDeliveryClient({
+      space: config.spaceId,
+      accessToken: config.accessToken,
+      environment: config.environmentId,
+    });
+
+    const entries = await client.getEntries({
+      content_type: "blogPost",
+      "fields.slug": slug,
+      include: 2,
+      limit: 1,
+    } as Record<string, unknown>);
+
+    const entry = entries.items[0];
+    if (!entry) {
+      return null;
+    }
+
+    const post = mapEntryToBlogPost(entry, 0);
+    return post.title && post.excerpt && post.imagePath ? post : null;
+  } catch (error) {
+    console.error("[Contentful Blog Fetch By Slug] Error details:", error);
+    warnOnce(
+      "contentful-blog-slug-fetch-failed",
+      `[Contentful] Failed to fetch blog post by slug: ${error}`
+    );
+    throw new Error(
+      `Unable to fetch blog post from Contentful: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
 const fetchBlogPageFromContentfulCached = unstable_cache(
   fetchBlogPageFromContentfulRaw,
   ["contentful-blog-page"],
@@ -173,3 +221,9 @@ export async function fetchBlogPageFromContentful(): Promise<BlogPageData> {
 
   return fetchBlogPageFromContentfulCached();
 }
+
+export const fetchBlogPostBySlugFromContentful = unstable_cache(
+  fetchBlogPostBySlugFromContentfulRaw,
+  ["contentful-blog-post-by-slug"],
+  { revalidate: 300, tags: ["blog-page"] }
+);

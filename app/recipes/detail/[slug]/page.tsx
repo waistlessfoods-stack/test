@@ -1,9 +1,13 @@
+import type { Metadata } from "next";
+import JsonLd from "@/components/seo/json-ld";
 import { Container } from "@/components/ui/container";
 import Link from "next/link";
 import {
+  findRecipeBySlug,
   fetchRecipesPageFromContentful,
 } from "@/lib/contentful-management";
 import { redirect } from "next/navigation";
+import { buildMetadata, toAbsoluteUrl } from "@/lib/seo";
 import RecipeDetailClient from "./recipe-detail-client";
 
 export const revalidate = 300;
@@ -17,9 +21,11 @@ type RecipeDetailPageProps = {
 export async function generateStaticParams() {
   const data = await fetchRecipesPageFromContentful();
 
-  return data.recipes.map((recipe) => ({
-    slug: recipe.slug,
-  }));
+  return data.recipes.flatMap((recipe) =>
+    [recipe.slug, recipe.legacyTitleSlug]
+      .filter((value): value is string => Boolean(value))
+      .map((slug) => ({ slug }))
+  );
 }
 
 function isFreeRecipe(price: string): boolean {
@@ -32,6 +38,34 @@ function isFreeRecipe(price: string): boolean {
   return !Number.isNaN(numericPrice) && numericPrice <= 0;
 }
 
+export async function generateMetadata({
+  params,
+}: RecipeDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const data = await fetchRecipesPageFromContentful();
+  const recipe = findRecipeBySlug(data.recipes, slug);
+
+  if (!recipe) {
+    return buildMetadata({
+      title: "Recipe Not Found",
+      description: "This recipe could not be found.",
+      path: `/recipes/detail/${slug}`,
+      noIndex: true,
+    });
+  }
+
+  const targetPath = isFreeRecipe(recipe.price)
+    ? `/recipes/detail/${recipe.slug}/full`
+    : `/recipes/detail/${recipe.slug}`;
+
+  return buildMetadata({
+    title: recipe.title,
+    description: recipe.detailDescription || recipe.description,
+    path: targetPath,
+    image: recipe.heroImagePath || recipe.imagePath,
+  });
+}
+
 export default async function RecipeDetailPage({
   params,
 }: RecipeDetailPageProps) {
@@ -41,7 +75,7 @@ export default async function RecipeDetailPage({
   const data = await fetchRecipesPageFromContentful();
 
   // Find the specific recipe by slug
-  const recipe = data.recipes.find((r) => r.slug === slug);
+  const recipe = findRecipeBySlug(data.recipes, slug);
 
   if (!recipe) {
     return (
@@ -62,9 +96,54 @@ export default async function RecipeDetailPage({
     );
   }
 
-  if (isFreeRecipe(recipe.price)) {
-    redirect(`/recipes/detail/${slug}/full`);
+  if (recipe.slug !== slug) {
+    redirect(`/recipes/detail/${recipe.slug}`);
   }
 
-  return <RecipeDetailClient recipe={recipe} />;
+  if (isFreeRecipe(recipe.price)) {
+    redirect(`/recipes/detail/${recipe.slug}/full`);
+  }
+
+  const recipeUrl = toAbsoluteUrl(`/recipes/detail/${recipe.slug}`);
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Recipe",
+      name: recipe.title,
+      description: recipe.detailDescription || recipe.description,
+      image: recipe.heroImagePath || recipe.imagePath || undefined,
+      url: recipeUrl,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: toAbsoluteUrl("/"),
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Recipes",
+          item: toAbsoluteUrl("/recipes"),
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: recipe.title,
+          item: recipeUrl,
+        },
+      ],
+    },
+  ];
+
+  return (
+    <>
+      <JsonLd data={jsonLd} />
+      <RecipeDetailClient recipe={recipe} />
+    </>
+  );
 }

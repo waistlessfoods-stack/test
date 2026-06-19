@@ -1,25 +1,20 @@
 # App Sitemap
 
-Date: 2026-06-17
+Date: 2026-06-19
 Project: `waitslessfood.com`
 
-## Access model
+## Purpose
 
-The app currently has three separate access layers:
+This is the current route map for the app, with emphasis on:
 
-1. Public routes
-   - Accessible without unlocking the site.
-   - Includes `/`, `/links`, `/signin`, `/signup`, and `/sso-callback/*`.
+- public crawlable pages
+- private or non-indexable surfaces
+- legacy and redirect behavior
+- app-internal API surface
 
-2. Site-locked routes
-   - Most non-public pages render inside `SiteAccessGate`.
-   - Users must enter the admin password once per session to view them.
+## Public Crawlable Surface
 
-3. Authenticated or admin-only routes
-   - `/account` and `/orders` also require a signed-in user session.
-   - `/admin/*` requires the separate admin session flow.
-
-## Primary sitemap
+These are the routes currently intended to be publicly accessible and part of the SEO surface.
 
 ```text
 /
@@ -29,160 +24,157 @@ The app currently has three separate access layers:
 |   |   |-- /services/[slug]/book
 |-- /shop
 |-- /recipes
-|   |-- /recipes/[category]                    (legacy/mock category route)
 |   |-- /recipes/detail/[slug]
 |   |   |-- /recipes/detail/[slug]/full
 |-- /blog
 |   |-- /blog/[slug]
-|-- /blogs                                    (redirects to /blog)
 |-- /links
-|-- /signin
-|-- /signup
-|-- /sso-callback/[[...sso-callback]]
-|-- /account
-|-- /orders
-|-- /admin
-|   |-- /admin/dashboard
-|   |-- /admin/accounts
-|   |-- /admin/bookings
-|   |-- /admin/settings
-|-- /stripe-test                              (internal test page)
 ```
 
-## Route inventory
+Public route notes:
 
-### Public marketing and content
+- `/recipes/detail/[slug]` is the canonical recipe detail or preview route.
+- `/recipes/detail/[slug]/full` is accessible for free recipes, but paid full-content routes should remain non-indexed.
+- `/services/[slug]/book` is publicly reachable, but it is not an SEO target page.
+
+## Non-Indexable or Private Surface
+
+These routes exist in the app but should not be treated as public SEO targets.
+
+```text
+/signin
+/signup
+/sso-callback/[[...sso-callback]]
+/account
+/orders
+/admin
+|-- /admin/dashboard
+|-- /admin/accounts
+|-- /admin/bookings
+|-- /admin/settings
+/stripe-test
+```
+
+Notes:
+
+- `/signin`, `/signup`, and `/sso-callback/*` are public auth routes but should stay out of search.
+- `/account` and `/orders` require a signed-in user session.
+- `/admin/*` requires the separate admin session flow.
+- `/stripe-test` is an internal test surface and should stay non-indexed.
+
+## Redirect and Legacy Routes
+
+```text
+/blogs                  -> /blog
+/recipes/[category]     -> /recipes?category=...
+```
+
+Notes:
+
+- `/blogs` is a legacy alias and should permanently redirect to `/blog`.
+- `/recipes/[category]` is no longer the primary recipe category experience and should be treated as legacy redirect behavior.
+
+## Route Inventory
+
+### Marketing and content
 
 - `/`
-  - Homepage.
-  - Contentful-backed.
-  - Public.
-
-- `/links`
-  - Standalone links page with enquiry actions and social/profile links.
-  - Contentful-backed.
-  - Public.
-
-- `/blog`
-  - Blog index.
-  - Contentful-backed.
-  - Site-locked.
-
-- `/blog/[slug]`
-  - Blog detail page.
-  - Contentful-backed.
-  - Site-locked.
-
-- `/blogs`
-  - Legacy alias route.
-  - Redirects to `/blog`.
-
-### Brand and service discovery
+  - Homepage
+  - Contentful-backed
+  - Public and indexable
 
 - `/about`
-  - About/brand page.
-  - Contentful-backed.
-  - Site-locked.
+  - Brand and about page
+  - Contentful-backed
+  - Public and indexable
+
+- `/blog`
+  - Blog index
+  - Contentful-backed
+  - Public and indexable
+
+- `/blog/[slug]`
+  - Blog detail page
+  - Contentful-backed
+  - Public and indexable
+
+- `/links`
+  - Standalone links page
+  - Public and currently treated as indexable
+
+### Services
 
 - `/services`
-  - Services listing page.
-  - Contentful-backed.
-  - Site-locked.
+  - Services listing page
+  - Contentful-backed
+  - Public and indexable
 
 - `/services/[slug]`
-  - Service detail page.
-  - Expected slugs appear to include `private`, `catering`, and `cooking-class`.
-  - Contentful-backed.
-  - Site-locked.
+  - Service detail page
+  - Contentful-backed
+  - Public and indexable
 
 - `/services/[slug]/book`
-  - Booking form for a specific service.
-  - Submits to bookings API.
-  - Site-locked.
+  - Service booking page
+  - Uses the service booking flow
+  - Publicly reachable, but not an SEO target
 
-### Recipes and commerce
+### Recipes and shop
 
 - `/recipes`
-  - Recipe index and category filtering.
-  - Contentful-backed.
-  - Site-locked.
-
-- `/recipes/[category]`
-  - Separate category route still using mock data.
-  - Does not appear aligned with the main Contentful recipe flow.
-  - Site-locked.
+  - Recipe index and filtering page
+  - Contentful-backed
+  - Public and indexable
 
 - `/recipes/detail/[slug]`
-  - Recipe detail/preview page.
-  - If the recipe is free, it redirects to `/recipes/detail/[slug]/full`.
-  - Site-locked.
+  - Recipe detail or paid preview page
+  - Canonical recipe route
+  - Public and indexable
 
 - `/recipes/detail/[slug]/full`
-  - Full recipe content.
-  - Free recipes are open after site unlock.
-  - Paid recipes require a matching completed order for access.
-  - Site-locked.
+  - Full recipe content
+  - Free recipes may resolve here
+  - Paid full routes should remain non-indexed
 
 - `/shop`
-  - Premium recipe storefront.
-  - Cart and checkout entry point.
-  - Contentful-backed.
-  - Site-locked.
+  - Premium recipe storefront
+  - Public and indexable
 
 - `/orders`
-  - Order history and payment recovery.
-  - Requires user sign-in.
-  - Also site-locked.
+  - Order history and payment recovery
+  - Signed-in user route
+  - Non-indexable
 
 ### Authentication and account
 
 - `/signin`
-  - Clerk-based sign-in flow.
-  - Public.
+  - Clerk-based sign-in flow
+  - Public but non-indexable
 
 - `/signup`
-  - Clerk-based sign-up flow.
-  - Public.
+  - Clerk-based sign-up flow
+  - Public but non-indexable
 
 - `/sso-callback/[[...sso-callback]]`
-  - OAuth/SSO callback handler route.
-  - Public.
+  - OAuth or SSO callback route
+  - Public but non-indexable
 
 - `/account`
-  - User account settings and embedded Clerk profile manager.
-  - Requires user sign-in.
-  - Also site-locked.
+  - User account settings
+  - Signed-in user route
+  - Non-indexable
 
 ### Admin
 
 - `/admin`
-  - Admin portal landing page.
-  - Requires admin session.
-
 - `/admin/dashboard`
-  - Dashboard for orders, accounts, enquiries, and subscribers.
-  - Requires admin session.
-
 - `/admin/accounts`
-  - Registered user accounts list.
-  - Requires admin session.
-
 - `/admin/bookings`
-  - Booking management UI.
-  - Requires admin session.
-
 - `/admin/settings`
-  - Storefront tax/settings UI.
-  - Requires admin session.
 
-### Internal/testing
+All admin routes require the admin session flow and should remain non-indexable.
 
-- `/stripe-test`
-  - Stripe checkout test page.
-  - Should likely remain non-indexed or development-only.
-  - Site-locked.
-
-## Functional flow map
+## Functional Flow Map
 
 ### Visitor flow
 
@@ -216,19 +208,9 @@ The app currently has three separate access layers:
 -> POST /api/bookings
 ```
 
-### Admin flow
+## API Surface
 
-```text
-/admin
--> /admin/dashboard
--> /admin/accounts
--> /admin/bookings
--> /admin/settings
-```
-
-## API sitemap
-
-These are app-internal routes, not user-facing pages, but they are part of the full surface area.
+These are app-internal routes and not user-facing sitemap entries.
 
 ### Auth, account, and webhooks
 
@@ -266,11 +248,7 @@ These are app-internal routes, not user-facing pages, but they are part of the f
 - `/api/revalidate/contentful`
 - `/api/revalidate/header-settings`
 
-## Notes
+## Related Docs
 
-- The main navigable app is split across content pages, recipe commerce, service booking, user account/order history, and a separate admin portal.
-- `/recipes/[category]` looks like a legacy route that still serves mock data and should probably be treated carefully in navigation and SEO decisions.
-- Because of `SiteAccessGate`, the practical public sitemap is much smaller than the route tree suggests.
-- If you want, the next useful step is for me to turn this into either:
-  - an SEO-focused XML/`app/sitemap.ts` sitemap for crawlable pages, or
-  - a visual flowchart version for docs/stakeholders.
+- SEO handoff and remaining rollout work: [docs/seo-roadmap.md](/Volumes/samsung_980_500gb/code/macbook-m1/waitslessfood.com/docs/seo-roadmap.md)
+- Search Console rollout checklist: [docs/search-console-checklist.md](/Volumes/samsung_980_500gb/code/macbook-m1/waitslessfood.com/docs/search-console-checklist.md)

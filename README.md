@@ -20,6 +20,13 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Project Docs
+
+- [Docs Index](/Volumes/samsung_980_500gb/code/macbook-m1/waitslessfood.com/docs/README.md)
+- [SEO Roadmap](/Volumes/samsung_980_500gb/code/macbook-m1/waitslessfood.com/docs/seo-roadmap.md)
+- [App Sitemap](/Volumes/samsung_980_500gb/code/macbook-m1/waitslessfood.com/docs/app-sitemap.md)
+- [Search Console Checklist](/Volumes/samsung_980_500gb/code/macbook-m1/waitslessfood.com/docs/search-console-checklist.md)
+
 ## Stripe CLI Setup
 
 Stripe's VS Code extension requires the Stripe CLI to forward webhooks and stream events.

@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import JsonLd from "@/components/seo/json-ld";
 import { fetchServiceDetailFromContentful } from "@/lib/contentful-management";
+import { buildMetadata, toAbsoluteUrl } from "@/lib/seo";
 import ServiceDetailClient from "./service-detail-client";
 
 export const revalidate = 300;
@@ -72,6 +75,31 @@ const toServiceDetail = (entry: {
   };
 };
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const service = await fetchServiceDetailFromContentful(slug);
+
+  if (!service) {
+    return buildMetadata({
+      title: "Service Not Found",
+      description: "This service could not be found.",
+      path: `/services/${slug}`,
+      noIndex: true,
+    });
+  }
+
+  return buildMetadata({
+    title: service.title,
+    description: service.description,
+    path: `/services/${service.slug}`,
+    image: service.mainImagePath || service.imagePath,
+  });
+}
+
 export default async function ServiceDetailPage({
   params,
 }: {
@@ -84,6 +112,51 @@ export default async function ServiceDetailPage({
   }
 
   const service = toServiceDetail(contentfulService);
+  const serviceUrl = toAbsoluteUrl(`/services/${service.slug}`);
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: service.title,
+      description: service.description,
+      url: serviceUrl,
+      image: service.images.main || undefined,
+      provider: {
+        "@type": "Organization",
+        name: "WaistLess Foods",
+        url: toAbsoluteUrl("/"),
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: toAbsoluteUrl("/"),
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Services",
+          item: toAbsoluteUrl("/services"),
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: service.breadcrumbLabel,
+          item: serviceUrl,
+        },
+      ],
+    },
+  ];
 
-  return <ServiceDetailClient service={service} />;
+  return (
+    <>
+      <JsonLd data={jsonLd} />
+      <ServiceDetailClient service={service} />
+    </>
+  );
 }
