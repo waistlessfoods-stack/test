@@ -34,7 +34,9 @@ export default function Header({
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
   const [isVerificationSending, setIsVerificationSending] = useState(false);
   const [verificationMessage, setVerificationMessage] = useState("");
   const [verificationError, setVerificationError] = useState("");
@@ -62,12 +64,32 @@ export default function Header({
   const formattedTax = currencyFormatter.format(taxAmount);
   const formattedTotal = currencyFormatter.format(totalPrice);
   const taxLabel = `Tax (${(taxRate * 100).toFixed(2)}%)`;
+  const isSignedIn = Boolean(session?.user);
+  const requiresSignInForCheckout = !isPending && !isSignedIn;
+  const checkoutSignInMessage =
+    "Please sign in or create an account to complete checkout.";
+  const checkoutSignInUrl = `/signin?redirect=/shop&message=${encodeURIComponent(
+    checkoutSignInMessage
+  )}`;
+  const checkoutButtonLabel = isPending
+    ? "Checking account..."
+    : requiresSignInForCheckout
+      ? "Sign in to Checkout"
+      : isCheckoutLoading
+        ? "Processing..."
+        : "Checkout";
+
+  const closeCartDrawers = () => {
+    setIsCartOpen(false);
+    setIsMobileCartOpen(false);
+  };
 
   const handleCheckout = async () => {
-    // Check if user is signed in
+    setCheckoutError("");
+
     if (!session?.user) {
-      // Redirect to sign in page with return URL
-      router.push("/signin?redirect=/shop&message=Please sign in to complete your purchase");
+      closeCartDrawers();
+      router.push(checkoutSignInUrl);
       return;
     }
 
@@ -81,10 +103,12 @@ export default function Header({
 
       if (!response.ok) {
         const payload = await response.json();
-        
-        // If auth error, redirect to sign in
         if (response.status === 401) {
-          router.push("/signin?redirect=/shop&message=" + encodeURIComponent(payload.error || "Please sign in to checkout"));
+          closeCartDrawers();
+          router.push(
+            "/signin?redirect=/shop&message=" +
+              encodeURIComponent(payload.error || checkoutSignInMessage)
+          );
           return;
         }
         
@@ -100,7 +124,11 @@ export default function Header({
       throw new Error("No checkout URL returned.");
     } catch (error) {
       console.error("Checkout error:", error);
-      alert(error instanceof Error ? error.message : "Checkout failed. Please try again.");
+      setCheckoutError(
+        error instanceof Error
+          ? error.message
+          : "Checkout failed. Please try again."
+      );
     } finally {
       setIsCheckoutLoading(false);
     }
@@ -531,19 +559,33 @@ export default function Header({
                           <span>{formattedTotal}</span>
                         </div>
                       </div>
+                      {requiresSignInForCheckout && (
+                        <div className="rounded-md border border-[#D4E4E2] bg-[#F8FCFB] p-3 text-sm leading-5 text-[#09686E]">
+                          Please sign in or create an account to complete
+                          checkout.
+                        </div>
+                      )}
+                      {checkoutError && (
+                        <div className="rounded-md border border-[#F1C7BD] bg-[#FFF5F2] p-3 text-sm leading-5 text-[#B84B3A]">
+                          {checkoutError}
+                        </div>
+                      )}
                       <Button 
                         className="bg-[#00676E] hover:bg-[#00575e]"
                         onClick={handleCheckout}
-                        disabled={isCheckoutLoading}
+                        disabled={isCheckoutLoading || isPending}
                       >
-                        {isCheckoutLoading ? "Processing..." : "Checkout"}
+                        {checkoutButtonLabel}
                       </Button>
                     </div>
                   )}
                   <Button
                     variant="outline"
                     className="border-[#D4E4E2] text-[#09686E]"
-                    onClick={() => setIsCartOpen(false)}
+                    onClick={() => {
+                      setCheckoutError("");
+                      closeCartDrawers();
+                    }}
                   >
                     Continue Shopping
                   </Button>
@@ -650,9 +692,9 @@ export default function Header({
               )
             )}
             
-            <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
+            <Sheet open={isMobileCartOpen} onOpenChange={setIsMobileCartOpen}>
               <SheetTrigger asChild>
-                <button className="relative">
+                <button className="relative" aria-label="Open cart">
                   <ShoppingCart className="w-6 h-6 text-[#00676E]" />
                   {totalItems > 0 && (
                     <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#00676E] px-1 text-[11px] font-semibold text-white">
@@ -750,19 +792,33 @@ export default function Header({
                           <span>{formattedTotal}</span>
                         </div>
                       </div>
+                      {requiresSignInForCheckout && (
+                        <div className="rounded-md border border-[#D4E4E2] bg-[#F8FCFB] p-3 text-sm leading-5 text-[#09686E]">
+                          Please sign in or create an account to complete
+                          checkout.
+                        </div>
+                      )}
+                      {checkoutError && (
+                        <div className="rounded-md border border-[#F1C7BD] bg-[#FFF5F2] p-3 text-sm leading-5 text-[#B84B3A]">
+                          {checkoutError}
+                        </div>
+                      )}
                       <Button 
                         className="bg-[#00676E] hover:bg-[#00575e]"
                         onClick={handleCheckout}
-                        disabled={isCheckoutLoading}
+                        disabled={isCheckoutLoading || isPending}
                       >
-                        {isCheckoutLoading ? "Processing..." : "Checkout"}
+                        {checkoutButtonLabel}
                       </Button>
                     </div>
                   )}
                   <Button
                     variant="outline"
                     className="border-[#D4E4E2] text-[#09686E]"
-                    onClick={() => setIsCartOpen(false)}
+                    onClick={() => {
+                      setCheckoutError("");
+                      closeCartDrawers();
+                    }}
                   >
                     Continue Shopping
                   </Button>
