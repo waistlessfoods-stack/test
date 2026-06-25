@@ -3,17 +3,7 @@ import type { MetadataRoute } from "next";
 export const revalidate = 300;
 
 function getBaseUrl(): string {
-  const candidate =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : null) ||
-    (process.env.NODE_ENV === "development"
-      ? "http://localhost:3000"
-      : "https://www.waistlessfoods.com");
-
-  return candidate.replace(/\/+$/, "");
+  return "https://www.waistlessfoods.com";
 }
 
 export default function robots(): MetadataRoute.Robots {
