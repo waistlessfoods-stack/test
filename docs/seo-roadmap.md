@@ -20,7 +20,7 @@ Already in place:
 - `noindex` coverage for auth, account, admin, orders, test, and legacy surfaces
 - Structured data for homepage, service detail, recipe detail, recipe full, and blog detail
 - Breadcrumb schema for service, recipe, and blog detail pages
-- Public SEO routes accessible without the `SiteAccessGate` password modal
+- Only `/` is accessible without the `SiteAccessGate` password modal under the current access policy
 - `/blogs` permanent redirect to `/blog`
 - Blog detail fetch by slug instead of filtering the full post list in memory
 - Recipe detail support for dedicated CMS slugs with legacy title-slug fallback and redirect behavior
@@ -45,6 +45,11 @@ Intended indexable routes:
 - `/blog`
 - `/blog/[slug]`
 - `/links`
+
+Current access policy:
+
+- `/` is password-free.
+- All other app UI routes require the site password before use.
 
 Intended non-indexable routes:
 
@@ -96,7 +101,7 @@ Use [docs/search-console-checklist.md](/Volumes/samsung_980_500gb/code/macbook-m
 ## Quick Checklist
 
 - [x] Define the intended public SEO surface
-- [x] Remove password-gate blocking from intended crawlable routes
+- [x] Limit password-free access to `/` only
 - [x] Add page-level metadata across public routes
 - [x] Add canonical URLs across public routes
 - [x] Add `noindex` coverage for private and legacy routes
@@ -112,7 +117,7 @@ Use [docs/search-console-checklist.md](/Volumes/samsung_980_500gb/code/macbook-m
 
 ## Success Criteria
 
-- Public marketing and content routes are crawlable without gated UX interference.
+- `/` remains crawlable without gated UX interference.
 - Every intended indexable route has unique metadata and a canonical URL.
 - Private, transactional, admin, and legacy routes are excluded consistently.
 - Recipe detail routes resolve to stable CMS-driven slugs.

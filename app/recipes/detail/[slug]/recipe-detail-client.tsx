@@ -122,7 +122,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
   };
 
   return (
-    <div className="w-full min-h-screen bg-white overflow-x-hidden font-metropolis">
+    <div className="w-full bg-white overflow-x-hidden font-metropolis">
       <section className="w-full py-12 2xl:py-10">
         <Container>
           <Link href="/recipes" className="mb-8 inline-block">

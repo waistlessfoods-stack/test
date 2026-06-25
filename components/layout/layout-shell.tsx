@@ -44,7 +44,7 @@ export default async function LayoutShell({ children }: { children: ReactNode })
   const isLinksPage = pathname === "/links" || pathname.startsWith("/links/");
 
   if (isLinksPage) {
-    return <>{children}</>;
+    return <SiteAccessGate>{children}</SiteAccessGate>;
   }
 
   const [socialLinks, headerSettings, footerSettings] = await Promise.all([

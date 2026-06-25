@@ -79,7 +79,7 @@ export default async function RecipeDetailPage({
 
   if (!recipe) {
     return (
-      <div className="w-full min-h-screen bg-white overflow-x-hidden font-metropolis">
+      <div className="w-full bg-white overflow-x-hidden font-metropolis">
         <section className="w-full py-16 2xl:py-12">
           <Container>
             <div className="text-center">

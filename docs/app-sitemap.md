@@ -14,7 +14,12 @@ This is the current route map for the app, with emphasis on:
 
 ## Public Crawlable Surface
 
-These are the routes currently intended to be publicly accessible and part of the SEO surface.
+These are the routes currently tracked as the SEO surface.
+
+Access policy:
+
+- `/` is publicly accessible without the site password.
+- All other app UI routes require the site password before use.
 
 ```text
 /

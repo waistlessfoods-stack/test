@@ -12,7 +12,8 @@ Use this checklist after deployment to verify that the SEO work in the app is ac
 - [ ] Confirm the production site is live.
 - [ ] Confirm `robots.txt` loads at `/robots.txt`.
 - [ ] Confirm the sitemap loads at `/sitemap.xml`.
-- [ ] Confirm the public SEO routes are accessible without the old site password modal.
+- [ ] Confirm `/` is accessible without the old site password modal.
+- [ ] Confirm all other app UI routes show the site password modal before use.
 - [x] Recipe slug migration completed successfully.
 
 ## Search Console Setup
@@ -118,7 +119,7 @@ Spot-check the live page source or URL inspection output for:
 
 ## Expected Good Outcomes
 
-- Public marketing/content routes are crawlable and indexable.
+- `/` is crawlable and indexable without gated UX interference.
 - Private and transactional routes remain excluded.
 - Filtered recipe query states do not create duplicate indexed pages.
 - Legacy route variants consolidate to canonical routes.

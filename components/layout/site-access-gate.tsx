@@ -18,34 +18,7 @@ type SiteAccessGateProps = {
 };
 
 function isPublicPath(pathname: string): boolean {
-  if (
-    pathname === "/" ||
-    pathname === "/about" ||
-    pathname === "/services" ||
-    pathname.startsWith("/services/") ||
-    pathname === "/shop" ||
-    pathname === "/recipes" ||
-    pathname.startsWith("/recipes/detail/") ||
-    pathname === "/blog" ||
-    pathname.startsWith("/blog/") ||
-    pathname === "/links" ||
-    pathname.startsWith("/links/")
-  ) {
-    return true;
-  }
-
-  if (
-    pathname === "/signin" ||
-    pathname.startsWith("/signin/") ||
-    pathname === "/signup" ||
-    pathname.startsWith("/signup/") ||
-    pathname === "/sso-callback" ||
-    pathname.startsWith("/sso-callback/")
-  ) {
-    return true;
-  }
-
-  return false;
+  return pathname === "/";
 }
 
 export default function SiteAccessGate({ children }: SiteAccessGateProps) {
