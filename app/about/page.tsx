@@ -13,7 +13,11 @@ export async function generateMetadata() {
     title: "About",
     description: data.heroParagraph1 || data.contentParagraph1,
     path: "/about",
-    image: data.heroBackgroundImagePath || data.contentImagePath || data.logoImagePath,
+    image:
+      data.contentImagePath ||
+      data.heroBackgroundImagePath ||
+      data.contentImage2Path ||
+      data.logoImagePath,
   });
 }
 

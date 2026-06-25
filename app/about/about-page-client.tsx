@@ -1,7 +1,5 @@
 "use client";
 
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Card, CardContent } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import Image from "next/image";
 import type { AboutPageData } from "@/lib/contentful-management";
@@ -11,27 +9,39 @@ type AboutPageClientProps = {
 };
 
 export default function AboutPageClient({ data }: AboutPageClientProps) {
-  return (
-    <main className="w-full bg-white antialiased">
-      {/* --- HERO SECTION --- */}
-      <section className="relative w-full h-auto min-h-[420px] md:h-[850px] overflow-hidden flex items-start md:items-center bg-[#1a1a1a]">
-        <div className="absolute inset-0 z-0">
-          {data.heroBackgroundImagePath && (
-            <Image
-              src={data.heroBackgroundImagePath}
-              fill
-              alt="Chef Amber Background"
-              className="object-cover object-top scale-110 origin-top md:scale-100 md:object-top-right"
-              priority
-            />
-          )}
-          <div className="absolute inset-0 bg-linear-to-r from-black via-black/60 to-transparent" />
-        </div>
+  const introParagraphs = [data.heroParagraph1, data.heroParagraph2].filter(Boolean);
+  const waistLessIntroParagraphs = [
+    data.contentParagraph1,
+    data.contentParagraph2,
+    data.contentParagraph3,
+    data.contentParagraph4,
+  ].filter(Boolean);
 
-        <Container className="relative z-10 pt-16 pb-24 md:py-0">
-          <div className="flex flex-col gap-8 md:gap-10">
-            <div className="w-fit">
-              <h1 className="font-bebas text-6xl md:text-7xl lg:text-8xl leading-[0.9] tracking-tight uppercase text-white">
+  const waistLessSections = [
+    {
+      heading: data.contentHeading2A,
+      paragraphs: [data.contentParagraph5],
+    },
+    {
+      heading: data.contentHeading2B,
+      paragraphs: [data.contentParagraph6, data.contentParagraph7],
+    },
+    {
+      heading: data.contentHeading2C,
+      paragraphs: [data.contentParagraph8],
+    },
+  ].filter((section) => section.heading || section.paragraphs.some(Boolean));
+
+  return (
+    <main className="w-full bg-[#FBFAF7] text-[#171717] antialiased">
+      <section className="w-full py-16 md:py-24">
+        <Container>
+          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,440px)] lg:gap-16">
+            <div className="flex max-w-3xl flex-col gap-7">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#388082]">
+                About Chef Amber
+              </p>
+              <h1 className="font-bebas text-6xl leading-[0.9] tracking-wide text-[#111111] sm:text-7xl lg:text-8xl">
                 {data.heroTitle.split(/\\n|\n/).map((line, index, arr) => (
                   <span key={index}>
                     {line}
@@ -39,66 +49,95 @@ export default function AboutPageClient({ data }: AboutPageClientProps) {
                   </span>
                 ))}
               </h1>
+
+              <div className="flex flex-col gap-5 text-base leading-7 text-[#424242] md:text-lg md:leading-8">
+                {introParagraphs.map((paragraph, index) => (
+                  <p key={`intro-${index}`}>{paragraph}</p>
+                ))}
+              </div>
             </div>
 
-            <div className="w-full md:w-[608px] flex flex-col gap-6 font-metropolis text-lg md:text-xl lg:text-2xl leading-relaxed tracking-tight text-white">
-              <p className="font-medium">{data.heroParagraph1}</p>
-
-              <p className="font-medium">{data.heroParagraph2}</p>
-            </div>
+            {data.contentImagePath && (
+              <div className="relative mx-auto w-full max-w-[420px] overflow-hidden rounded-md bg-[#E7E1D8] shadow-sm lg:mx-0 lg:justify-self-end">
+                <div className="relative aspect-[4/5]">
+                  <Image
+                    src={data.contentImagePath}
+                    fill
+                    alt="Chef Amber"
+                    sizes="(min-width: 1024px) 420px, 90vw"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </Container>
       </section>
 
-      {/* --- CONTENT SECTION --- */}
       <section className="w-full bg-[#F4F4F4] py-16 md:py-24">
         <Container>
-          <Card className="border-none bg-transparent shadow-none">
-            <CardContent className="p-0 flex flex-col md:flex-row items-center gap-12 lg:gap-20">
-              <div className="w-full flex-1 max-w-[550px]">
-                <AspectRatio
-                  ratio={1 / 1}
-                  className="bg-[#D3D3D3] rounded-md overflow-hidden relative shadow-lg"
-                >
-                  {data.contentImagePath && (
-                    <Image
-                      src={data.contentImagePath}
-                      fill
-                      alt="WaistLess Foods"
-                      className="object-cover"
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-white/80" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="relative w-[35%] h-[35%]">
-                      {data.logoImagePath && (
-                        <Image
-                          src={data.logoImagePath}
-                          fill
-                          alt="Logo WaistLess"
-                          className="object-contain"
-                        />
-                      )}
-                    </div>
-                  </div>
-                </AspectRatio>
+          <div className="grid items-start gap-10 lg:grid-cols-[minmax(280px,460px)_minmax(0,1fr)] lg:gap-16">
+            {data.contentImage2Path && (
+              <div className="relative mx-auto w-full max-w-[460px] overflow-hidden rounded-md bg-[#E6E6E2] lg:sticky lg:top-28 lg:mx-0">
+                <div className="relative aspect-[4/5]">
+                  <Image
+                    src={data.contentImage2Path}
+                    fill
+                    alt="WaistLess Foods"
+                    sizes="(min-width: 1024px) 460px, 90vw"
+                    className="object-cover"
+                  />
+                </div>
               </div>
+            )}
 
-              <div className="w-full flex-1 flex flex-col gap-6">
-                <h2 className="font-sans font-bold text-3xl md:text-4xl lg:text-5xl tracking-tight text-black capitalize">
+            <div className="flex flex-col gap-8">
+              <div className="flex flex-col gap-5">
+                <h2 className="font-bebas text-5xl leading-none tracking-wide text-[#111111] md:text-6xl">
                   {data.contentHeading}
                 </h2>
 
-                <div className="flex flex-col gap-6 font-sans font-normal text-base md:text-lg lg:text-xl leading-relaxed text-gray-900">
-                  <p>{data.contentParagraph1}</p>
-
-                  <p>{data.contentParagraph2}</p>
-
-                  <p>{data.contentParagraph3}</p>
+                <div className="flex flex-col gap-4 text-base leading-7 text-[#424242]">
+                  {waistLessIntroParagraphs.map((paragraph, index) => (
+                    <p key={`waistless-intro-${index}`}>{paragraph}</p>
+                  ))}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+
+              {(data.contentHeading2 || waistLessSections.length > 0) && (
+                <div className="flex flex-col gap-6 border-t border-[#D7D4CF] pt-8">
+                  {data.contentHeading2 && (
+                    <h3 className="text-xl font-semibold leading-snug tracking-tight text-[#111111] md:text-2xl">
+                      {data.contentHeading2}
+                    </h3>
+                  )}
+
+                  <div className="flex flex-col gap-6">
+                    {waistLessSections.map((section, index) => (
+                      <section
+                        key={`${section.heading}-${index}`}
+                        className="flex flex-col gap-3"
+                      >
+                        {section.heading && (
+                          <h4 className="text-base font-semibold leading-snug text-[#00676E] md:text-lg">
+                            {section.heading}
+                          </h4>
+                        )}
+                        <div className="flex flex-col gap-4 text-sm leading-7 text-[#4A4A4A] md:text-base">
+                          {section.paragraphs.filter(Boolean).map((paragraph, paragraphIndex) => (
+                            <p key={`${section.heading}-${paragraphIndex}`}>
+                              {paragraph}
+                            </p>
+                          ))}
+                        </div>
+                      </section>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </Container>
       </section>
     </main>

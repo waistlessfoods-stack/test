@@ -205,6 +205,16 @@ export type AboutPageData = {
   contentParagraph1: string;
   contentParagraph2: string;
   contentParagraph3: string;
+  contentParagraph4: string;
+  contentHeading2: string;
+  contentHeading2A: string;
+  contentParagraph5: string;
+  contentHeading2B: string;
+  contentParagraph6: string;
+  contentParagraph7: string;
+  contentHeading2C: string;
+  contentParagraph8: string;
+  contentImage2Path: string | null;
 };
 
 export type RecipeCategory = {
@@ -665,6 +675,16 @@ async function fetchAboutPageFromContentfulRaw(): Promise<AboutPageData> {
       contentParagraph1: String(f.contentParagraph1 ?? ""),
       contentParagraph2: String(f.contentParagraph2 ?? ""),
       contentParagraph3: String(f.contentParagraph3 ?? ""),
+      contentParagraph4: String(f.contentParagraph4 ?? ""),
+      contentHeading2: String(f.title2 ?? f.contentHeading2 ?? ""),
+      contentHeading2A: String(f.contentHeading2a ?? f.contentHeading2A ?? ""),
+      contentParagraph5: String(f.contentParagraph5 ?? ""),
+      contentHeading2B: String(f.contentHeading2b ?? f.contentHeading2B ?? ""),
+      contentParagraph6: String(f.contentParagraph6 ?? ""),
+      contentParagraph7: String(f.contentParagraph7 ?? ""),
+      contentHeading2C: String(f.contentHeading2c ?? f.contentHeading2C ?? ""),
+      contentParagraph8: String(f.contentParagraph8 ?? ""),
+      contentImage2Path: getAssetUrl(f.contentImage2),
     };
     console.log("[Contentful] fetchAboutPage: result", aboutResult);
     return aboutResult;
