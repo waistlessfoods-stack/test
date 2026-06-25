@@ -14,7 +14,9 @@ function getBaseUrl(): string {
     (process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : null) ||
-    "http://localhost:3000";
+    (process.env.NODE_ENV === "development"
+      ? "http://localhost:3000"
+      : "https://www.waistlessfoods.com");
 
   return candidate.replace(/\/+$/, "");
 }
