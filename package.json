@@ -25,6 +25,7 @@
     "contentful:migrate-homepage-hero-carousel": "node scripts/contentful/migrate-homepage-hero-carousel.mjs",
     "contentful:migrate-homepage-featured-description": "node scripts/contentful/migrate-homepage-featured-description.mjs",
     "contentful:migrate-recipe-detail": "node scripts/contentful/migrate-recipe-detail-fields.mjs",
+    "contentful:migrate-service-detail": "node scripts/contentful/migrate-service-detail-fields.mjs",
     "contentful:add-recipe-slugs": "node scripts/contentful/add-recipe-slug-field.mjs",
     "contentful:migrate-recipe-categories": "node scripts/contentful/migrate-recipe-categories-to-multi.mjs",
     "contentful:migrate-recipe-rich-text": "node scripts/contentful/migrate-recipe-rich-text.mjs",

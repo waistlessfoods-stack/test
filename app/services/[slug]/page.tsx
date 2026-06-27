@@ -13,6 +13,7 @@ type ServiceDetail = {
   breadcrumbLabel: string;
   priceText: string;
   description: string;
+  benefits: string[];
   includes: string[];
   howToBook: string[];
   images: {
@@ -37,6 +38,9 @@ const toServiceDetail = (entry: {
   breadcrumbLabel: string;
   priceText: string;
   description: string;
+  benefits: string[];
+  detailDescription: string;
+  detailBenefits: string[];
   includes: string[];
   howToBook: string[];
   mainImagePath: string | null;
@@ -52,25 +56,26 @@ const toServiceDetail = (entry: {
       comment: string;
     }>;
   } | null;
-  }): ServiceDetail => {
+}): ServiceDetail => {
   if (!entry.reviews) {
-    throw new Error(`Missing reviews data for service slug \"${entry.slug}\".`);
+    throw new Error(`Missing reviews data for service slug "${entry.slug}".`);
   }
 
   return {
-  slug: entry.slug,
-  title: entry.title,
-  breadcrumbLabel: entry.breadcrumbLabel || entry.title,
-  priceText: entry.priceText,
-  description: entry.description,
-  includes: entry.includes,
-  howToBook: entry.howToBook,
-  images: {
-    main: entry.mainImagePath || entry.imagePath,
-    gallery: entry.galleryImagePaths.length
-      ? entry.galleryImagePaths
-      : [entry.imagePath].filter(Boolean),
-  },
+    slug: entry.slug,
+    title: entry.title,
+    breadcrumbLabel: entry.breadcrumbLabel || entry.title,
+    priceText: entry.priceText,
+    description: entry.detailDescription || entry.description,
+    benefits: entry.detailBenefits.length ? entry.detailBenefits : entry.benefits,
+    includes: entry.includes,
+    howToBook: entry.howToBook,
+    images: {
+      main: entry.mainImagePath || entry.imagePath,
+      gallery: entry.galleryImagePaths.length
+        ? entry.galleryImagePaths
+        : [entry.imagePath].filter(Boolean),
+    },
     reviews: entry.reviews,
   };
 };
@@ -94,7 +99,7 @@ export async function generateMetadata({
 
   return buildMetadata({
     title: service.title,
-    description: service.description,
+    description: service.detailDescription || service.description,
     path: `/services/${service.slug}`,
     image: service.mainImagePath || service.imagePath,
   });

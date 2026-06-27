@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent, ReactNode } from "react";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import {
   Dialog,
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 
 const STORAGE_KEY = "waistlessfoods-site-unlocked";
+const STORAGE_EVENT_NAME = "waistlessfoods-site-access-change";
 
 type SiteAccessGateProps = {
   children: ReactNode;
@@ -21,18 +22,39 @@ function isPublicPath(pathname: string): boolean {
   return pathname === "/";
 }
 
+function getServerUnlockSnapshot(): boolean {
+  return false;
+}
+
+function getBrowserUnlockSnapshot(): boolean {
+  return window.sessionStorage.getItem(STORAGE_KEY) === "true";
+}
+
+function subscribeToUnlockChanges(onStoreChange: () => void): () => void {
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener(STORAGE_EVENT_NAME, onStoreChange);
+
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener(STORAGE_EVENT_NAME, onStoreChange);
+  };
+}
+
+function persistUnlocked(): void {
+  window.sessionStorage.setItem(STORAGE_KEY, "true");
+  window.dispatchEvent(new Event(STORAGE_EVENT_NAME));
+}
+
 export default function SiteAccessGate({ children }: SiteAccessGateProps) {
   const pathname = usePathname();
   const isPublicRoute = isPublicPath(pathname);
 
   const [password, setPassword] = useState("");
-  const [isUnlocked, setIsUnlocked] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-
-    return window.sessionStorage.getItem(STORAGE_KEY) === "true";
-  });
+  const isUnlocked = useSyncExternalStore(
+    subscribeToUnlockChanges,
+    getBrowserUnlockSnapshot,
+    getServerUnlockSnapshot
+  );
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState("");
 
@@ -58,8 +80,7 @@ export default function SiteAccessGate({ children }: SiteAccessGateProps) {
         return;
       }
 
-      window.sessionStorage.setItem(STORAGE_KEY, "true");
-      setIsUnlocked(true);
+      persistUnlocked();
       setPassword("");
     } catch {
       setError("Failed to verify password. Please try again.");

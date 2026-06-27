@@ -42,6 +42,16 @@ export default function ServiceDetailLoading() {
                 <Skeleton className="h-6 w-5/6" />
               </div>
 
+              {/* Benefits Section */}
+              <div className="space-y-4">
+                <Skeleton className="h-7 w-40" />
+                <div className="space-y-2">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-5 w-full" />
+                  ))}
+                </div>
+              </div>
+
               {/* Includes Section */}
               <div className="space-y-4">
                 <Skeleton className="h-7 w-40" />

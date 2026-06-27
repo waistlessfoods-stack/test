@@ -118,6 +118,8 @@ export type ServiceReviews = {
 export type ServiceDetailEntry = ServiceEntry & {
   breadcrumbLabel: string;
   priceText: string;
+  detailDescription: string;
+  detailBenefits: string[];
   includes: string[];
   howToBook: string[];
   mainImagePath: string | null;
@@ -387,13 +389,15 @@ function mapServiceFields(entry: any) {
     slug: String(f.slug ?? ""),
     title: String(f.title ?? ""),
     description: String(f.description ?? ""),
-    benefits: (f.benefits as string[]) || [],
+    benefits: toStringArray(f.benefits),
     imagePath: resolvedImagePath,
     sortOrder: Number(f.sortOrder ?? 0),
     breadcrumbLabel: String(f.breadcrumbLabel ?? ""),
     priceText: String(f.priceText ?? ""),
-    includes: (f.includes as string[]) || [],
-    howToBook: (f.howToBook as string[]) || [],
+    detailDescription: String(f.detailDescription ?? ""),
+    detailBenefits: toStringArray(f.detailBenefits),
+    includes: toStringArray(f.includes),
+    howToBook: toStringArray(f.howToBook),
     mainImagePath:
       assetMainImagePath ||
       thumbnailImagePath ||

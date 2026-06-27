@@ -26,6 +26,7 @@ type ServiceDetail = {
   breadcrumbLabel: string;
   priceText: string;
   description: string;
+  benefits: string[];
   includes: string[];
   howToBook: string[];
   images: {
@@ -208,6 +209,19 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
                 {service.description}
               </p>
             </article>
+
+            {service.benefits.length > 0 && (
+              <article className="flex flex-col gap-3">
+                <h2 className="font-sans font-medium text-lg md:text-xl leading-7 tracking-tight text-black uppercase">
+                  Benefits
+                </h2>
+                <ul className="list-disc list-inside font-sans font-normal text-base md:text-lg leading-relaxed text-[#878787]">
+                  {service.benefits.map((item, index) => (
+                    <li key={`${index}-${item}`}>{item}</li>
+                  ))}
+                </ul>
+              </article>
+            )}
 
             <article className="flex flex-col gap-3">
               <h2 className="font-sans font-medium text-lg md:text-xl leading-7 tracking-tight text-black uppercase">

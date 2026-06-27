@@ -48,6 +48,19 @@ const fields = [
     items: { type: "Symbol" },
   },
   {
+    id: "detailDescription",
+    name: "Detail Description",
+    type: "Text",
+    required: false,
+  },
+  {
+    id: "detailBenefits",
+    name: "Detail Benefits",
+    type: "Array",
+    required: false,
+    items: { type: "Symbol" },
+  },
+  {
     id: "imagePath",
     name: "Image Path",
     type: "Symbol",
@@ -327,6 +340,12 @@ const toFields = (item) => ({
   title: { [DEFAULT_LOCALE]: item.title },
   description: { [DEFAULT_LOCALE]: item.description },
   benefits: { [DEFAULT_LOCALE]: item.benefits },
+  detailDescription: {
+    [DEFAULT_LOCALE]: item.detailDescription || item.description,
+  },
+  detailBenefits: {
+    [DEFAULT_LOCALE]: item.detailBenefits || item.benefits,
+  },
   imagePath: { [DEFAULT_LOCALE]: item.imagePath },
   breadcrumbLabel: { [DEFAULT_LOCALE]: item.breadcrumbLabel },
   priceText: { [DEFAULT_LOCALE]: item.priceText },
