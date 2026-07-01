@@ -224,17 +224,13 @@ export default function HomepageClient({ data }: HomepageClientProps) {
 
       {/* About Chef Amber Section */}
       <section
-        className="relative w-full min-h-[700px] md:h-[764px] flex items-center justify-center overflow-hidden"
+        className="relative w-full min-h-[700px] md:h-[764px] flex items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat md:bg-fixed"
+        style={
+          data.aboutImagePath
+            ? { backgroundImage: `url(${JSON.stringify(data.aboutImagePath)})` }
+            : undefined
+        }
       >
-        {data.aboutImagePath && (
-          <Image
-            src={data.aboutImagePath}
-            alt="Chef Amber background"
-            fill
-            sizes="100vw"
-            className="object-cover"
-          />
-        )}
         <div className="absolute inset-0 bg-black/10" />
 
         <div className="relative z-10 w-full bg-white/90 backdrop-blur-sm shadow-xl border-y border-white/20 py-10 md:py-14 flex justify-center">
