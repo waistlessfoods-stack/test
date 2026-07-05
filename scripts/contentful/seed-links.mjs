@@ -111,7 +111,7 @@ const primaryLinkData = [
   {
     title: "Cooking Classes",
     description: "Interactive classes for teams, groups, and celebrations.",
-    href: "/services/cooking-class",
+    href: "/services/cooking-classes",
     highlight: false,
     icon: "Users",
     sortOrder: 3,

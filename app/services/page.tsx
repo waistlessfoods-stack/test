@@ -30,7 +30,7 @@ const toServiceSlug = (title: string) => {
   }
 
   if (normalized.includes("cooking class")) {
-    return "cooking-class";
+    return "cooking-classes";
   }
 
   return fallbackSlugify(title);

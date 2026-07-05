@@ -17,9 +17,9 @@ import type { SocialLink } from "@/lib/contentful-links";
 import type { HeaderSettings } from "@/lib/contentful-management";
 
 const services = [
-  { label: "Private Service", href: "/services/private" },
+  { label: "Private Chef", href: "/services/private" },
   { label: "Catering", href: "/services/catering" },
-  { label: "Cooking Class", href: "/services/cooking-class" },
+  { label: "Cooking Classes", href: "/services/cooking-classes" },
 ];
 
 export default function Header({ 

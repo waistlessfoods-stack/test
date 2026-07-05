@@ -1,0 +1,59 @@
+[
+  {
+    "name": "services-overview-desktop",
+    "path": "/services",
+    "status": 200,
+    "screenshot": "docs/audit-screenshots/amber-services-2026-07-05/services-overview-desktop.png",
+    "missing": [],
+    "forbiddenFound": []
+  },
+  {
+    "name": "private-chef-desktop",
+    "path": "/services/private",
+    "status": 200,
+    "screenshot": "docs/audit-screenshots/amber-services-2026-07-05/private-chef-desktop.png",
+    "missing": [],
+    "forbiddenFound": []
+  },
+  {
+    "name": "catering-desktop",
+    "path": "/services/catering",
+    "status": 200,
+    "screenshot": "docs/audit-screenshots/amber-services-2026-07-05/catering-desktop.png",
+    "missing": [],
+    "forbiddenFound": []
+  },
+  {
+    "name": "cooking-classes-desktop",
+    "path": "/services/cooking-classes",
+    "status": 200,
+    "screenshot": "docs/audit-screenshots/amber-services-2026-07-05/cooking-classes-desktop.png",
+    "missing": [],
+    "forbiddenFound": []
+  },
+  {
+    "name": "services-overview-mobile",
+    "path": "/services",
+    "status": 200,
+    "screenshot": "docs/audit-screenshots/amber-services-2026-07-05/services-overview-mobile.png",
+    "missing": [],
+    "forbiddenFound": []
+  },
+  {
+    "name": "cooking-classes-mobile",
+    "path": "/services/cooking-classes",
+    "status": 200,
+    "screenshot": "docs/audit-screenshots/amber-services-2026-07-05/cooking-classes-mobile.png",
+    "missing": [],
+    "forbiddenFound": []
+  },
+  {
+    "name": "cooking-class-redirect",
+    "path": "/services/cooking-class",
+    "status": 200,
+    "finalUrl": "http://localhost:3002/services/cooking-classes",
+    "expectedFinalUrl": "http://localhost:3002/services/cooking-classes",
+    "missing": [],
+    "forbiddenFound": []
+  }
+]

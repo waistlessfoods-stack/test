@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
         destination: "/blog",
         permanent: true,
       },
+      {
+        source: "/services/cooking-class/:path*",
+        destination: "/services/cooking-classes/:path*",
+        permanent: true,
+      },
     ];
   },
   allowedDevOrigins: allowedDevOrigins?.length

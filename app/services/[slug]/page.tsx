@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/seo/json-ld";
-import { fetchServiceDetailFromContentful } from "@/lib/contentful-management";
+import {
+  fetchServiceDetailFromContentful,
+  type ServiceDetailSectionsData,
+} from "@/lib/contentful-management";
 import { buildMetadata, toAbsoluteUrl } from "@/lib/seo";
 import ServiceDetailClient from "./service-detail-client";
 
@@ -14,6 +17,7 @@ type ServiceDetail = {
   priceText: string;
   description: string;
   benefits: string[];
+  detailSections: ServiceDetailSectionsData | null;
   includes: string[];
   howToBook: string[];
   images: {
@@ -41,6 +45,7 @@ const toServiceDetail = (entry: {
   benefits: string[];
   detailDescription: string;
   detailBenefits: string[];
+  detailSections: ServiceDetailSectionsData | null;
   includes: string[];
   howToBook: string[];
   mainImagePath: string | null;
@@ -68,6 +73,7 @@ const toServiceDetail = (entry: {
     priceText: entry.priceText,
     description: entry.detailDescription || entry.description,
     benefits: entry.detailBenefits.length ? entry.detailBenefits : entry.benefits,
+    detailSections: entry.detailSections,
     includes: entry.includes,
     howToBook: entry.howToBook,
     images: {

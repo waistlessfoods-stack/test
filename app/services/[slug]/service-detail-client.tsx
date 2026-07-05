@@ -4,6 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Star } from "lucide-react";
+import type {
+  ServiceDetailSection,
+  ServiceDetailSectionsData,
+} from "@/lib/contentful-management";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -27,6 +31,7 @@ type ServiceDetail = {
   priceText: string;
   description: string;
   benefits: string[];
+  detailSections: ServiceDetailSectionsData | null;
   includes: string[];
   howToBook: string[];
   images: {
@@ -55,6 +60,8 @@ export default function ServiceDetailClient({
 function ServiceDetailContent({ service }: ServiceDetailClientProps) {
   const [visibleCount, setVisibleCount] = useState(2);
   const [mainImage, setMainImage] = useState(service.images.main);
+  const detailSections = service.detailSections?.sections ?? [];
+  const hasDetailSections = detailSections.length > 0;
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-6 md:py-10 bg-white">
@@ -62,7 +69,7 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
         <BreadcrumbList className="font-sans font-medium text-base md:text-lg leading-6 text-black">
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/services">Our Service</Link>
+              <Link href="/services">Our Services</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator className="text-black" />
@@ -200,50 +207,18 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
             </div>
           </header>
 
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-8">
             <article className="flex flex-col gap-3">
-              <h2 className="font-sans font-medium text-lg md:text-xl leading-7 tracking-tight text-black uppercase">
-                Description
-              </h2>
-              <p className="font-sans font-normal text-base md:text-lg leading-relaxed text-[#878787]">
+              <p className="font-sans font-normal text-base md:text-lg leading-relaxed text-[#424242]">
                 {service.description}
               </p>
             </article>
 
-            {service.benefits.length > 0 && (
-              <article className="flex flex-col gap-3">
-                <h2 className="font-sans font-medium text-lg md:text-xl leading-7 tracking-tight text-black uppercase">
-                  Benefits
-                </h2>
-                <ul className="list-disc list-inside font-sans font-normal text-base md:text-lg leading-relaxed text-[#878787]">
-                  {service.benefits.map((item, index) => (
-                    <li key={`${index}-${item}`}>{item}</li>
-                  ))}
-                </ul>
-              </article>
+            {hasDetailSections ? (
+              <ServiceSections sections={detailSections} />
+            ) : (
+              <LegacyServiceSections service={service} />
             )}
-
-            <article className="flex flex-col gap-3">
-              <h2 className="font-sans font-medium text-lg md:text-xl leading-7 tracking-tight text-black uppercase">
-                Includes
-              </h2>
-              <ul className="list-disc list-inside font-sans font-normal text-base md:text-lg leading-relaxed text-[#878787]">
-                {service.includes.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </article>
-
-            <article className="flex flex-col gap-3">
-              <h2 className="font-sans font-medium text-lg md:text-xl leading-7 tracking-tight text-black uppercase">
-                How to Book
-              </h2>
-              <ol className="list-decimal list-inside font-sans font-normal text-base md:text-lg leading-relaxed text-[#878787]">
-                {service.howToBook.map((step) => (
-                  <li key={step}>{step}</li>
-                ))}
-              </ol>
-            </article>
           </div>
 
           <Link
@@ -283,5 +258,103 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
         </section>
       </div>
     </main>
+  );
+}
+
+function ServiceSections({ sections }: { sections: ServiceDetailSection[] }) {
+  return (
+    <div className="flex flex-col gap-8">
+      {sections.map((section, sectionIndex) => {
+        const isDetailList = section.variant === "detail-list";
+
+        return (
+          <section
+            key={section.id || `${section.title}-${sectionIndex}`}
+            className={`flex flex-col gap-4 ${
+              sectionIndex > 0 ? "border-t border-[#D7D4CF] pt-7" : ""
+            }`}
+          >
+            <h2 className="font-sans text-xl font-semibold leading-snug tracking-tight text-[#111111] md:text-2xl">
+              {section.title}
+            </h2>
+
+            {isDetailList ? (
+              <ul className="list-disc space-y-2 pl-5 font-sans text-base leading-7 text-[#424242] md:text-lg md:leading-8">
+                {section.items.map((item, itemIndex) => (
+                  <li key={`${section.title}-${item.body}-${itemIndex}`}>
+                    {item.body || item.subtitle}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="flex flex-col gap-5">
+                {section.items.map((item, itemIndex) => (
+                  <article
+                    key={`${section.title}-${item.subtitle}-${itemIndex}`}
+                    className="flex flex-col gap-2"
+                  >
+                    {item.subtitle ? (
+                      <h3 className="font-sans text-base font-semibold leading-snug text-[#00676E] md:text-lg">
+                        {item.subtitle}
+                      </h3>
+                    ) : null}
+                    {item.body ? (
+                      <p className="font-sans text-sm leading-7 text-[#4A4A4A] md:text-base">
+                        {item.body}
+                      </p>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
+function LegacyServiceSections({ service }: ServiceDetailClientProps) {
+  return (
+    <div className="flex flex-col gap-6">
+      {service.benefits.length > 0 && (
+        <article className="flex flex-col gap-3">
+          <h2 className="font-sans font-medium text-lg md:text-xl leading-7 tracking-tight text-black uppercase">
+            Benefits
+          </h2>
+          <ul className="list-disc list-inside font-sans font-normal text-base md:text-lg leading-relaxed text-[#878787]">
+            {service.benefits.map((item, index) => (
+              <li key={`${index}-${item}`}>{item}</li>
+            ))}
+          </ul>
+        </article>
+      )}
+
+      {service.includes.length > 0 && (
+        <article className="flex flex-col gap-3">
+          <h2 className="font-sans font-medium text-lg md:text-xl leading-7 tracking-tight text-black uppercase">
+            Includes
+          </h2>
+          <ul className="list-disc list-inside font-sans font-normal text-base md:text-lg leading-relaxed text-[#878787]">
+            {service.includes.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </article>
+      )}
+
+      {service.howToBook.length > 0 && (
+        <article className="flex flex-col gap-3">
+          <h2 className="font-sans font-medium text-lg md:text-xl leading-7 tracking-tight text-black uppercase">
+            How to Book
+          </h2>
+          <ol className="list-decimal list-inside font-sans font-normal text-base md:text-lg leading-relaxed text-[#878787]">
+            {service.howToBook.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        </article>
+      )}
+    </div>
   );
 }

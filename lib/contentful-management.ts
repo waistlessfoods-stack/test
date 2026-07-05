@@ -115,11 +115,28 @@ export type ServiceReviews = {
   items: ServiceReviewItem[];
 };
 
+export type ServiceDetailSectionItem = {
+  subtitle?: string;
+  body?: string;
+};
+
+export type ServiceDetailSection = {
+  id?: string;
+  title: string;
+  variant?: "feature-list" | "detail-list";
+  items: ServiceDetailSectionItem[];
+};
+
+export type ServiceDetailSectionsData = {
+  sections: ServiceDetailSection[];
+};
+
 export type ServiceDetailEntry = ServiceEntry & {
   breadcrumbLabel: string;
   priceText: string;
   detailDescription: string;
   detailBenefits: string[];
+  detailSections: ServiceDetailSectionsData | null;
   includes: string[];
   howToBook: string[];
   mainImagePath: string | null;
@@ -308,6 +325,80 @@ function toStringArray(value: unknown): string[] {
   return [];
 }
 
+function parseServiceDetailSections(
+  value: unknown
+): ServiceDetailSectionsData | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const raw = value as Record<string, unknown>;
+  const sectionsValue = raw.sections;
+
+  if (!Array.isArray(sectionsValue)) {
+    return null;
+  }
+
+  const sections = sectionsValue
+    .map((sectionValue): ServiceDetailSection | null => {
+      if (!sectionValue || typeof sectionValue !== "object") {
+        return null;
+      }
+
+      const section = sectionValue as Record<string, unknown>;
+      const title =
+        typeof section.title === "string" ? section.title.trim() : "";
+      const id = typeof section.id === "string" ? section.id.trim() : "";
+      const variant =
+        section.variant === "feature-list" || section.variant === "detail-list"
+          ? section.variant
+          : undefined;
+      const itemsValue = section.items;
+      const items = Array.isArray(itemsValue)
+        ? itemsValue
+            .map((itemValue): ServiceDetailSectionItem | null => {
+              if (!itemValue || typeof itemValue !== "object") {
+                return null;
+              }
+
+              const item = itemValue as Record<string, unknown>;
+              const subtitle =
+                typeof item.subtitle === "string"
+                  ? item.subtitle.trim()
+                  : "";
+              const body =
+                typeof item.body === "string" ? item.body.trim() : "";
+
+              if (!subtitle && !body) {
+                return null;
+              }
+
+              return {
+                ...(subtitle ? { subtitle } : {}),
+                ...(body ? { body } : {}),
+              };
+            })
+            .filter(
+              (item): item is ServiceDetailSectionItem => item !== null
+            )
+        : [];
+
+      if (!title || items.length === 0) {
+        return null;
+      }
+
+      return {
+        ...(id ? { id } : {}),
+        title,
+        ...(variant ? { variant } : {}),
+        items,
+      };
+    })
+    .filter((section): section is ServiceDetailSection => section !== null);
+
+  return sections.length > 0 ? { sections } : null;
+}
+
 function parseInstructionSteps(
   value: unknown
 ): {
@@ -396,6 +487,7 @@ function mapServiceFields(entry: any) {
     priceText: String(f.priceText ?? ""),
     detailDescription: String(f.detailDescription ?? ""),
     detailBenefits: toStringArray(f.detailBenefits),
+    detailSections: parseServiceDetailSections(f.detailSections),
     includes: toStringArray(f.includes),
     howToBook: toStringArray(f.howToBook),
     mainImagePath:
@@ -848,7 +940,7 @@ export const fetchFooterSettingsFromContentful = unstable_cache(
 
 export const fetchServicesFromContentful = unstable_cache(
   fetchServicesFromContentfulRaw,
-  ["contentful-services"],
+  ["contentful-services-v2"],
   { revalidate: 300, tags: ["services"] }
 );
 
@@ -886,6 +978,6 @@ export const fetchShopPageFromContentful = unstable_cache(
 
 export const fetchServiceDetailFromContentful = unstable_cache(
   fetchServiceDetailFromContentfulRaw,
-  ["contentful-service-detail"],
+  ["contentful-service-detail-v2"],
   { revalidate: 300, tags: ["services"] }
 );

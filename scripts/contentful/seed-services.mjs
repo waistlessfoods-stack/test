@@ -61,6 +61,12 @@ const fields = [
     items: { type: "Symbol" },
   },
   {
+    id: "detailSections",
+    name: "Detail Sections",
+    type: "Object",
+    required: false,
+  },
+  {
     id: "imagePath",
     name: "Image Path",
     type: "Symbol",
@@ -214,7 +220,7 @@ const sharedReviews = {
 const seedItems = [
   {
     slug: "private",
-    title: "Private Service",
+    title: "Private Chef",
     description:
       "Enjoy a fully personalized dining experience cooked on-site by Chef Amber. Every menu is crafted around your preferences, dietary needs, and the mood of your occasion — using fresh, sustainable, and high-quality ingredients. Perfect for intimate dinners, family meals, or special celebrations at home.",
     benefits: [
@@ -225,7 +231,7 @@ const seedItems = [
       "Private, elevated experience",
     ],
     imagePath: "/services/img-1.png",
-    breadcrumbLabel: "Private Service",
+    breadcrumbLabel: "Private Chef",
     priceText: "Starting at: $XXX per person / $XXX per event",
     includes: [
       "Custom menu consultation",
@@ -293,8 +299,8 @@ const seedItems = [
     sortOrder: 2,
   },
   {
-    slug: "cooking-class",
-    title: "Cooking Class",
+    slug: "cooking-classes",
+    title: "Cooking Classes",
     description:
       "Learn practical cooking skills in a fun and interactive session. Perfect for beginners and food lovers who want to cook confidently at home.",
     benefits: [
@@ -305,7 +311,7 @@ const seedItems = [
       "Taught by a professional chef",
     ],
     imagePath: "/services/img-3.png",
-    breadcrumbLabel: "Cooking Class",
+    breadcrumbLabel: "Cooking Classes",
     priceText: "Starting at: $XXX per person",
     includes: [
       "Class prep and ingredient kits",
@@ -335,27 +341,35 @@ const seedItems = [
 
 const existing = await environment.getEntries({ content_type: "service" });
 
-const toFields = (item) => ({
-  slug: { [DEFAULT_LOCALE]: item.slug },
-  title: { [DEFAULT_LOCALE]: item.title },
-  description: { [DEFAULT_LOCALE]: item.description },
-  benefits: { [DEFAULT_LOCALE]: item.benefits },
-  detailDescription: {
-    [DEFAULT_LOCALE]: item.detailDescription || item.description,
-  },
-  detailBenefits: {
-    [DEFAULT_LOCALE]: item.detailBenefits || item.benefits,
-  },
-  imagePath: { [DEFAULT_LOCALE]: item.imagePath },
-  breadcrumbLabel: { [DEFAULT_LOCALE]: item.breadcrumbLabel },
-  priceText: { [DEFAULT_LOCALE]: item.priceText },
-  includes: { [DEFAULT_LOCALE]: item.includes },
-  howToBook: { [DEFAULT_LOCALE]: item.howToBook },
-  mainImagePath: { [DEFAULT_LOCALE]: item.mainImagePath },
-  galleryImagePaths: { [DEFAULT_LOCALE]: item.galleryImagePaths },
-  reviews: { [DEFAULT_LOCALE]: item.reviews },
-  sortOrder: { [DEFAULT_LOCALE]: item.sortOrder },
-});
+const toFields = (item) => {
+  const entryFields = {
+    slug: { [DEFAULT_LOCALE]: item.slug },
+    title: { [DEFAULT_LOCALE]: item.title },
+    description: { [DEFAULT_LOCALE]: item.description },
+    benefits: { [DEFAULT_LOCALE]: item.benefits },
+    detailDescription: {
+      [DEFAULT_LOCALE]: item.detailDescription || item.description,
+    },
+    detailBenefits: {
+      [DEFAULT_LOCALE]: item.detailBenefits || item.benefits,
+    },
+    imagePath: { [DEFAULT_LOCALE]: item.imagePath },
+    breadcrumbLabel: { [DEFAULT_LOCALE]: item.breadcrumbLabel },
+    priceText: { [DEFAULT_LOCALE]: item.priceText },
+    includes: { [DEFAULT_LOCALE]: item.includes },
+    howToBook: { [DEFAULT_LOCALE]: item.howToBook },
+    mainImagePath: { [DEFAULT_LOCALE]: item.mainImagePath },
+    galleryImagePaths: { [DEFAULT_LOCALE]: item.galleryImagePaths },
+    reviews: { [DEFAULT_LOCALE]: item.reviews },
+    sortOrder: { [DEFAULT_LOCALE]: item.sortOrder },
+  };
+
+  if (item.detailSections) {
+    entryFields.detailSections = { [DEFAULT_LOCALE]: item.detailSections };
+  }
+
+  return entryFields;
+};
 
 for (const item of seedItems) {
   const existingEntry = existing.items.find(
