@@ -24,14 +24,14 @@ export default function ServicesClientPage({
 }) {
   return (
     <div className="flex flex-col w-full">
-      <section className="bg-white py-8 px-6 md:px-12">
-        <div className="max-w-328.75 mx-auto">
-          <div className="mx-auto mb-8 flex max-w-5xl flex-col items-center gap-5 text-center">
-            <h2 className="font-['Bebas_Neue'] text-[60px] font-normal leading-tight uppercase text-black align-bottom">
+      <section className="bg-white px-6 py-6 md:px-12 md:py-8">
+        <div className="mx-auto max-w-[1315px]">
+          <div className="mx-auto mb-5 flex max-w-[1080px] flex-col items-center gap-3 text-center md:mb-6">
+            <h2 className="font-bebas text-[52px] font-normal leading-[0.9] tracking-wide text-black md:text-[60px]">
               Our Services
             </h2>
 
-            <div className="flex flex-col gap-4 text-base leading-7 text-[#424242] md:text-lg md:leading-8">
+            <div className="flex max-w-[1020px] flex-col gap-2.5 border-t border-[#E3E0DA] pt-4 text-center text-[15px] leading-6 text-[#424242] md:text-base md:leading-7">
               {servicesIntroParagraphs.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}

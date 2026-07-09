@@ -170,10 +170,10 @@ export default function HomepageClient({ data }: HomepageClientProps) {
       {/* Features Section */}
       <section className="px-6 md:px-28 py-20 bg-white space-y-10 md:space-y-[78px]">
         <div className="flex flex-col items-center gap-6 max-w-[1222px] mx-auto text-center">
-          <h2 className="text-[32px] md:text-[44px] font-medium tracking-[-0.02em] text-black leading-tight">
+          <h2 className="text-[28px] md:text-[36px] font-medium tracking-[-0.01em] text-black leading-tight">
             {data.featuresHeading}
           </h2>
-          <p className="max-w-[900px] text-[18px] md:text-[30px] tracking-[-0.02em] leading-relaxed md:leading-[34px] text-[#838383]">
+          <p className="max-w-[780px] text-[15px] leading-7 md:text-lg md:leading-8 text-[#7A7A7A]">
             {data.featuresIntro}
           </p>
         </div>
@@ -198,7 +198,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                   <h3 className="text-[24px] md:text-[28px] font-semibold tracking-[-0.02em] leading-tight text-black">
                     {item.title}
                   </h3>
-                  <p className="text-[18px] md:text-[22px] font-normal tracking-[-0.02em] leading-snug text-black">
+                  <p className="text-base font-normal leading-[26px] text-[#333333]">
                     {item.description}
                   </p>
                 </div>
@@ -224,47 +224,46 @@ export default function HomepageClient({ data }: HomepageClientProps) {
 
       {/* About Chef Amber Section */}
       <section
-        className="relative w-full min-h-[700px] md:h-[764px] flex items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat md:bg-fixed"
+        className="relative flex min-h-[720px] w-full items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat py-16 md:h-[764px] md:bg-fixed md:py-0"
         style={
           data.aboutImagePath
             ? { backgroundImage: `url(${JSON.stringify(data.aboutImagePath)})` }
             : undefined
         }
       >
-        <div className="absolute inset-0 bg-black/10" />
+        <div className="absolute inset-0 bg-black/5" />
 
-        <div className="relative z-10 w-full bg-white/90 backdrop-blur-sm shadow-xl border-y border-white/20 py-10 md:py-14 flex justify-center">
-          <div className="flex flex-col items-center w-full max-w-[810px] px-6 gap-8 md:gap-10">
-            <div className="flex flex-col items-center w-full gap-6 md:gap-[37px]">
-              <h2 className="text-[24px] md:text-[34px] font-semibold leading-tight tracking-[-0.02em] text-black text-center font-sans">
+        <div className="relative z-10 flex w-full justify-center bg-white px-6 py-10 md:py-11">
+          <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 text-center md:gap-7">
+            <div className="flex w-full flex-col items-center gap-5 md:gap-6">
+              <h2 className="text-center font-sans text-[24px] font-semibold uppercase leading-tight tracking-[-0.01em] text-black md:text-[28px]">
                 {data.aboutHeading}
               </h2>
 
-              <div className="flex flex-col gap-4 text-center max-w-full font-sans">
-                <p className="text-[17px] md:text-[20px] leading-relaxed text-black">
+              <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 text-center font-sans">
+                <p className="text-[14px] leading-[22px] text-[#222222] md:text-[15px] md:leading-6">
                   {data.aboutBodyPrimary}
                 </p>
 
-                <p className="text-[17px] md:text-[20px] leading-relaxed text-[#7A7A7A]">
+                <blockquote className="mx-auto max-w-2xl whitespace-pre-line font-serif text-[15px] italic leading-7 text-[#7A7A7A] md:text-base">
                   {data.aboutBodySecondary}
-                </p>
+                </blockquote>
 
-                <p className="text-[17px] md:text-[20px] leading-relaxed text-[#7A7A7A]">
+                <p className="text-[14px] font-medium leading-5 text-[#777777]">
                   {data.aboutBodyTertiary}
                 </p>
               </div>
 
               <div className="w-full flex justify-center">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 w-full max-w-[650px]">
+                <div className="mx-auto grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2">
                   {data.aboutBullets.map((text, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-3.5 p-3 border border-[#388082] rounded-lg
-                     bg-white min-h-[50px]"
+                      className="flex min-h-[38px] items-center gap-3 border border-[#388082] bg-white px-3 py-2 text-left"
                     >
-                      <div className="flex items-center justify-center w-5 h-5 md:w-6 md:h-6 rounded-md bg-[#388082] shrink-0">
+                      <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-[#388082]">
                         <svg
-                          className="w-3 h-3 md:w-4 md:h-4"
+                          className="h-2.5 w-2.5"
                           viewBox="0 0 18 21"
                           fill="none"
                         >
@@ -277,7 +276,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                           />
                         </svg>
                       </div>
-                      <span className="text-[14px] md:text-[16px] font-semibold text-[#388082] font-sans">
+                      <span className="font-sans text-[12px] font-semibold leading-5 text-left text-[#388082] md:text-[13px]">
                         {text}
                       </span>
                     </div>
@@ -287,7 +286,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
             </div>
 
             <Link href={data.aboutButtonHref || "/about"}>
-              <Button className="w-full max-w-[255px] h-12 md:h-14 rounded-lg bg-[#388082] text-[18px] md:text-[20px] font-medium text-white hover:brightness-110 transition-all active:scale-95">
+              <Button className="h-11 w-full min-w-[190px] rounded bg-[#388082] px-8 text-[16px] font-medium text-white transition-all hover:brightness-110 active:scale-95">
                 {data.aboutButtonLabel}
               </Button>
             </Link>
@@ -365,7 +364,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                           {displayTitle}
                         </h3>
                         <div className="w-[150px] border-t border-white/90" />
-                        <p className="text-[14px] md:text-[15px] text-white/90 leading-5 font-medium line-clamp-2 max-w-[220px]">
+                        <p className="text-[14px] md:text-[15px] text-white/90 leading-5 font-medium max-w-[220px]">
                           {item.description || "Click below to explore this recipe collection."}
                         </p>
                       </div>

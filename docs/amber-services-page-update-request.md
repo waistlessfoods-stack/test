@@ -41,6 +41,20 @@ Last local verification URL:
 http://localhost:3002/services
 ```
 
+## Follow-Up Status - 2026-07-09
+
+Amber approved the previous services updates and requested a small refinement to the main `Our Services` page because the introductory description created a lot of white space before the service cards.
+
+Implemented follow-up:
+
+- Kept Amber's intro copy unchanged.
+- Made the overview intro more compact with smaller body text and tighter spacing.
+- Kept the intro centered above the service cards while using a wider, tighter text block to reduce vertical whitespace.
+
+Pending:
+
+- Amber also mentioned homepage comments in Figma. Those comments are not captured in this repo yet, so homepage changes still need the Figma comment details before implementation.
+
 ## Main Services Page
 
 Status: implemented in `app/services/services-client.tsx`.
