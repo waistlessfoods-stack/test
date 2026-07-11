@@ -35,6 +35,15 @@ export default function HomepageClient({ data }: HomepageClientProps) {
       : data.heroImagePath
         ? [data.heroImagePath]
         : [];
+  const heroTitle = data.heroTitle.replace(/\\n/g, "\n").replace(/\s+/g, " ").trim();
+  const usesPrivateDiningHero = /private dining\s*&\s*catering/i.test(heroTitle);
+  const heroEyebrow = usesPrivateDiningHero ? "BOLD. SUSTAINABLE. ARTFUL." : "";
+  const heroHeadline = usesPrivateDiningHero
+    ? "PRIVATE DINING & CATERING"
+    : data.heroTitle;
+  const heroSubtitle = usesPrivateDiningHero
+    ? "An elegant culinary experience designed to elevate your most meaningful moments"
+    : data.heroSubtitle;
 
   useEffect(() => {
     if (!testimonialApi) return;
@@ -127,11 +136,17 @@ export default function HomepageClient({ data }: HomepageClientProps) {
 
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/55" />
 
-        <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-[1200px] px-6 py-20">
-          <div className="flex flex-col items-center gap-8 md:gap-12 max-w-[800px]">
-            <div className="flex flex-col items-center gap-4 md:gap-6">
-                <h1 className="text-5xl sm:text-7xl md:text-[100px] leading-[0.9] md:leading-24 tracking-wide uppercase text-white text-center font-['Bebas_Neue']">
-                {data.heroTitle.split(/\\n|\n/).map((line, index, arr) => (
+        <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-[1240px] px-6 py-20">
+          <div className="flex max-w-[1080px] flex-col items-center gap-8 md:gap-11">
+            <div className="flex flex-col items-center gap-4 md:gap-5">
+              {heroEyebrow && (
+                <p className="text-center font-sans text-[15px] font-semibold uppercase leading-tight tracking-[0.24em] text-[#31C5CB] md:text-[20px]">
+                  {heroEyebrow}
+                </p>
+              )}
+
+              <h1 className="text-center font-bebas text-[56px] uppercase leading-[0.86] tracking-wide text-white sm:text-[74px] md:text-[92px] lg:text-[104px]">
+                {heroHeadline.split(/\\n|\n/).map((line, index, arr) => (
                   <span key={index}>
                     {line}
                     {index < arr.length - 1 && <br />}
@@ -139,8 +154,8 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                 ))}
               </h1>
 
-              <p className="text-lg md:text-[26px] leading-relaxed text-white text-center max-w-[600px]">
-                {data.heroSubtitle}
+              <p className="max-w-[760px] text-center text-[18px] leading-7 text-white md:text-[24px] md:leading-8">
+                {heroSubtitle}
               </p>
             </div>
 
@@ -168,7 +183,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
       </section>
 
       {/* Features Section */}
-      <section className="px-6 md:px-28 py-20 bg-white space-y-10 md:space-y-[78px]">
+      <section className="px-6 md:px-28 py-14 md:py-[60px] bg-white space-y-8 md:space-y-12">
         <div className="flex flex-col items-center gap-6 max-w-[1222px] mx-auto text-center">
           <h2 className="text-[28px] md:text-[36px] font-medium tracking-[-0.01em] text-black leading-tight">
             {data.featuresHeading}
@@ -193,9 +208,9 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                 )}
               </div>
 
-              <div className="flex flex-col bg-[#F2F2F2] px-[25px] py-[34px] gap-6 grow md:min-h-[314px]">
-                <div className="flex flex-col gap-6 grow text-center md:text-left">
-                  <h3 className="text-[24px] md:text-[28px] font-semibold tracking-[-0.02em] leading-tight text-black">
+              <div className="flex flex-col bg-[#F2F2F2] px-[25px] py-6 gap-5 grow md:min-h-[280px]">
+                <div className="flex flex-col gap-5 grow text-center md:text-left">
+                  <h3 className="text-[24px] md:text-[25px] font-semibold tracking-[-0.02em] leading-tight text-black">
                     {item.title}
                   </h3>
                   <p className="text-base font-normal leading-[26px] text-[#333333]">

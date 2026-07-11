@@ -157,10 +157,12 @@ export default function Header({
   const navLinks = [
     { label: "Home", href: "/" },
     { label: "About", href: "/about" },
-    { label: "Blogs", href: "/blog" },
-    { label: "Shop", href: "/shop" },
     { label: "Recipes", href: "/recipes" },
+    { label: "Blog", href: "/blog" },
+    { label: "Shop", href: "/shop" },
   ];
+  const promotionBannerTextClass =
+    "block max-w-full truncate whitespace-nowrap px-3 text-center text-[clamp(11px,3.1vw,16px)] font-semibold leading-tight";
 
   const isLinkActive = (href: string) => {
     if (href === "/") {
@@ -208,7 +210,7 @@ export default function Header({
       {/* Banner */}
       {headerSettings?.promotionBannerEnabled && headerSettings.promotionBannerText && (
         <div 
-          className="w-full h-[45px] flex items-center justify-center"
+          className="w-full h-[45px] overflow-hidden flex items-center justify-center"
           style={{
             backgroundColor: headerSettings.promotionBannerBackgroundColor || "#00676E",
           }}
@@ -216,7 +218,7 @@ export default function Header({
           {headerSettings.promotionBannerLink ? (
             <Link 
               href={headerSettings.promotionBannerLink}
-              className="text-uppercase text-[16px] font-semibold hover:opacity-80 transition-opacity"
+              className={`${promotionBannerTextClass} hover:opacity-80 transition-opacity`}
               style={{
                 color: headerSettings.promotionBannerTextColor || "#FFFFFF",
               }}
@@ -225,7 +227,7 @@ export default function Header({
             </Link>
           ) : (
             <span 
-              className="text-uppercase text-[16px] font-semibold"
+              className={promotionBannerTextClass}
               style={{
                 color: headerSettings.promotionBannerTextColor || "#FFFFFF",
               }}
@@ -839,7 +841,7 @@ export default function Header({
 
         <SheetContent side="right" className="p-0">
           <nav className="flex h-full flex-col gap-6 overflow-y-auto p-6 py-12">
-            {navLinks.map((link) => (
+            {navLinks.slice(0, 2).map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -880,6 +882,19 @@ export default function Header({
                 ))}
               </div>
             </div>
+
+            {navLinks.slice(2).map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`${
+                  isLinkActive(link.href) ? "text-[#09686E]" : "text-[#464646]"
+                } text-xl font-bold uppercase border-b pb-2`}
+              >
+                {link.label}
+              </Link>
+            ))}
 
             <Button 
               className="bg-[#00676E] w-full mt-4 py-6 text-lg uppercase"

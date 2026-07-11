@@ -62,9 +62,9 @@ const QUICK_MENU_LINKS = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/services", label: "Chef Services" },
-  { href: "/shop", label: "Shop" },
   { href: "/recipes", label: "Recipes" },
   { href: "/blog", label: "Blog" },
+  { href: "/shop", label: "Shop" },
   { href: "/links", label: "Links" },
 ];
 
