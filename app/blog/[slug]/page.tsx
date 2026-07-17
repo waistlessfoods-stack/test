@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
 import { MarkdownContent } from "@/components/markdown-content";
+import { BlogRichText } from "@/components/blog-rich-text";
 import { fetchBlogPostBySlugFromContentful } from "@/lib/contentful-blog";
 import { buildMetadata, toAbsoluteUrl } from "@/lib/seo";
 
@@ -118,16 +119,68 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
               )}
             </div>
 
-            <div className="space-y-6 p-8 md:p-12">
+            <div className="p-8 md:p-12">
               <p className="text-sm font-medium text-[#6d6d6d]">
                 {post.readTimeMinutes} min read · {post.category}
               </p>
 
-              <h1 className="font-bebas text-5xl leading-none text-black md:text-6xl">
+              <h1 className="mt-6 font-bebas text-5xl font-bold leading-none text-black md:text-6xl">
                 {post.title}
               </h1>
 
-              <MarkdownContent content={post.excerpt} className="space-y-6" />
+              <MarkdownContent content={post.excerpt} className="mt-6 space-y-6" />
+
+              {post.triviaQuestion && (
+                <section
+                  className="relative mt-10 overflow-hidden rounded-xl border-2 border-[#35bfc4] bg-[#eaf9f8] px-6 py-7 shadow-[0_20px_45px_-36px_rgba(0,103,110,0.8)] md:px-8 md:py-8"
+                  aria-labelledby="trivia-question-heading"
+                >
+                  <div className="absolute inset-y-0 left-0 w-1.5 bg-[#35bfc4]" />
+                  <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-[#a87122]">
+                    Before you read on
+                  </p>
+                  <h2
+                    id="trivia-question-heading"
+                    className="mb-5 text-2xl font-bold leading-tight text-[#123b37] md:text-3xl"
+                  >
+                    Something to Chew On | Trivia
+                  </h2>
+                  <BlogRichText
+                    document={post.triviaQuestion}
+                    variant="callout"
+                  />
+                  <p className="mt-5 border-t border-[#b9ddda] pt-4 text-sm font-bold italic text-[#46706d]">
+                    Scroll to the answer reveal at the end of the article.
+                  </p>
+                </section>
+              )}
+
+              {post.body && (
+                <div className="mt-10">
+                  <BlogRichText document={post.body} />
+                </div>
+              )}
+
+              {post.triviaAnswer && (
+                <section
+                  className="mt-12 rounded-xl border border-[#d0bd8c] bg-[#f7f1e6] px-6 py-7 md:px-8 md:py-8"
+                  aria-labelledby="trivia-answer-heading"
+                >
+                  <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-[#238d91]">
+                    Answer reveal
+                  </p>
+                  <h2
+                    id="trivia-answer-heading"
+                    className="mb-5 text-2xl font-bold leading-tight text-[#123b37] md:text-3xl"
+                  >
+                    Trivia Answer: B — Did you guess correctly?
+                  </h2>
+                  <BlogRichText
+                    document={post.triviaAnswer}
+                    variant="callout"
+                  />
+                </section>
+              )}
             </div>
           </article>
 

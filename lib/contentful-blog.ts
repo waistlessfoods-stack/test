@@ -2,6 +2,7 @@ import "server-only";
 
 import { unstable_cache } from "next/cache";
 import { createClient as createDeliveryClient } from "contentful";
+import type { Document } from "@contentful/rich-text-types";
 
 type DeliveryConfig = {
   accessToken: string;
@@ -19,6 +20,9 @@ export type BlogPost = {
   imagePath: string;
   sortOrder: number;
   publishedAt?: string;
+  triviaQuestion?: Document;
+  body?: Document;
+  triviaAnswer?: Document;
 };
 
 export type BlogPageData = {
@@ -56,6 +60,9 @@ function mapEntryToBlogPost(
     imagePath,
     sortOrder: Number(f.sortOrder ?? index + 1),
     publishedAt: f.publishedAt ? String(f.publishedAt) : undefined,
+    triviaQuestion: getRichTextDocument(f.triviaQuestion),
+    body: getRichTextDocument(f.body),
+    triviaAnswer: getRichTextDocument(f.triviaAnswer),
   };
 }
 
@@ -104,6 +111,17 @@ function getAssetUrl(asset: unknown): string | null {
   const url = maybeAsset?.fields?.file?.url;
   if (!url || typeof url !== "string") return null;
   return url.startsWith("//") ? `https:${url}` : url;
+}
+
+function getRichTextDocument(value: unknown): Document | undefined {
+  if (!value || typeof value !== "object") return undefined;
+
+  const document = value as Partial<Document>;
+  if (document.nodeType !== "document" || !Array.isArray(document.content)) {
+    return undefined;
+  }
+
+  return document as Document;
 }
 
 function slugify(input: string): string {
@@ -222,8 +240,18 @@ export async function fetchBlogPageFromContentful(): Promise<BlogPageData> {
   return fetchBlogPageFromContentfulCached();
 }
 
-export const fetchBlogPostBySlugFromContentful = unstable_cache(
+const fetchBlogPostBySlugFromContentfulCached = unstable_cache(
   fetchBlogPostBySlugFromContentfulRaw,
   ["contentful-blog-post-by-slug"],
   { revalidate: 300, tags: ["blog-page"] }
 );
+
+export async function fetchBlogPostBySlugFromContentful(
+  slug: string
+): Promise<BlogPost | null> {
+  if (process.env.NODE_ENV !== "production") {
+    return fetchBlogPostBySlugFromContentfulRaw(slug);
+  }
+
+  return fetchBlogPostBySlugFromContentfulCached(slug);
+}
