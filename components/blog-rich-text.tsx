@@ -43,12 +43,12 @@ export function BlogRichText({
         </p>
       ),
       [BLOCKS.HEADING_2]: (_node, children: ReactNode) => (
-        <h2 className="mb-5 mt-12 font-bebas text-4xl font-bold leading-none text-[#123b37] first:mt-0 md:text-5xl">
+        <h2 className="mb-5 mt-12 font-bebas text-4xl font-bold leading-none text-black first:mt-0 md:text-5xl">
           {children}
         </h2>
       ),
       [BLOCKS.HEADING_3]: (_node, children: ReactNode) => (
-        <h3 className="mb-4 mt-9 text-2xl font-bold leading-tight text-[#173b39] md:text-3xl">
+        <h3 className="mb-4 mt-9 text-2xl font-bold leading-tight text-black md:text-3xl">
           {children}
         </h3>
       ),
@@ -75,31 +75,31 @@ export function BlogRichText({
       [BLOCKS.HR]: () => <hr className="my-10 border-[#d7e6e3]" />,
       [BLOCKS.TABLE]: (_node, children: ReactNode) => (
         <div
-          className="mb-10 overflow-x-auto rounded-xl border border-[#d8d2c3] shadow-[0_16px_34px_-30px_rgba(20,59,55,0.65)]"
+          className="mb-10 overflow-x-auto rounded-xl border border-[#d8d2c3] shadow-[0_16px_34px_-30px_rgba(0,0,0,0.35)]"
           role="region"
           aria-label="Storage guide table"
           tabIndex={0}
         >
-          <p className="border-b border-[#d8d2c3] bg-[#eef8f6] px-4 py-2 text-xs font-bold text-[#356b67] md:hidden">
+          <p className="border-b border-[#d8d2c3] bg-[#dff3f1] px-4 py-2 text-xs font-bold text-black md:hidden">
             Swipe sideways to see all columns.
           </p>
-          <table className="w-full min-w-[760px] border-collapse bg-[#fffdfa] text-left">
+          <table className="w-full min-w-[760px] border-collapse bg-white text-left">
             <tbody>{children}</tbody>
           </table>
         </div>
       ),
       [BLOCKS.TABLE_ROW]: (_node, children: ReactNode) => (
-        <tr className="border-b border-[#ded8ca] last:border-b-0 even:bg-[#f8f3e9]">
+        <tr className="border-b border-[#ded8ca] bg-white last:border-b-0 even:bg-[#f7f1e6]">
           {children}
         </tr>
       ),
       [BLOCKS.TABLE_HEADER_CELL]: (_node, children: ReactNode) => (
-        <th className="bg-[#173b39] px-5 py-4 text-sm font-bold uppercase tracking-[0.08em] text-white first:w-[20%] [&:nth-child(2)]:w-[25%] [&>p]:mb-0 [&>p]:text-sm [&>p]:font-bold [&>p]:leading-5 [&>p]:text-white">
+        <th className="bg-[#dff3f1] px-5 py-4 text-sm font-bold uppercase tracking-[0.08em] text-black first:w-[20%] [&:nth-child(2)]:w-[25%] [&>p]:mb-0 [&>p]:text-sm [&>p]:font-bold [&>p]:leading-5 [&>p]:text-black">
           {children}
         </th>
       ),
       [BLOCKS.TABLE_CELL]: (_node, children: ReactNode) => (
-        <td className="align-top px-5 py-4 text-sm leading-6 text-[#343434] first:font-bold first:text-[#173b39] [&>p]:mb-0 [&>p]:text-sm [&>p]:leading-6 [&>p]:text-current">
+        <td className="align-top px-5 py-4 text-sm leading-6 text-[#343434] first:font-bold first:text-black [&>p]:mb-0 [&>p]:text-sm [&>p]:leading-6 [&>p]:text-current">
           {children}
         </td>
       ),
