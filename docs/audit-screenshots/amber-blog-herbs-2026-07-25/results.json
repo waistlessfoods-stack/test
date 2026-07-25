@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-07-25T03:38:56.988Z",
+  "generatedAt": "2026-07-25T05:11:33.457Z",
   "environment": {
     "baseUrl": "http://localhost:3010",
     "build": "Next.js 16.1.6 production build",
     "contentSource": "Published Contentful master environment",
-    "deployment": "Not performed; production deployment and stakeholder review remain separate sign-off steps."
+    "deployment": "Verified in production on commit ca89ad6ab3833f3fa9433436cf989a39457fbe24; stakeholder review remains a separate sign-off step."
   },
   "contentful": {
     "contentTypeVersion": 8,
@@ -117,6 +117,39 @@
       "location": "/blog/the-chefs-guide-to-herbs"
     },
     "failures": []
+  },
+  "production": {
+    "verifiedAt": "2026-07-25T05:11:33.457Z",
+    "pullRequest": "https://github.com/waistlessfoods-stack/test/pull/3",
+    "deployCommit": "ca89ad6ab3833f3fa9433436cf989a39457fbe24",
+    "deploymentStatus": "success",
+    "domains": [
+      "https://www.waistlessfoods.com",
+      "https://test-teal-gamma-40.vercel.app"
+    ],
+    "articleUrl": "https://www.waistlessfoods.com/blog/the-chefs-guide-to-herbs",
+    "checks": {
+      "listingStatus": 200,
+      "articleStatus": 200,
+      "herbArticleListedFirst": true,
+      "canonicalUrl": "https://www.waistlessfoods.com/blog/the-chefs-guide-to-herbs",
+      "openGraphUrl": "https://www.waistlessfoods.com/blog/the-chefs-guide-to-herbs",
+      "blogPostingUrl": "https://www.waistlessfoods.com/blog/the-chefs-guide-to-herbs",
+      "breadcrumbUrlsUseProductionDomain": true,
+      "foodIqCopy": true,
+      "culinaryIqCopyAbsent": true,
+      "answerHeadingUsesB": true,
+      "tableCount": 2,
+      "mobileDocumentOverflow": false,
+      "mobileTablesFocusableAndScrollable": true,
+      "legacyRedirectStatus": 308,
+      "failures": []
+    },
+    "screenshots": [
+      "production-blog-desktop.png",
+      "production-herb-desktop.png",
+      "production-herb-mobile.png"
+    ]
   },
   "staticChecks": {
     "nodeSyntax": "pass",

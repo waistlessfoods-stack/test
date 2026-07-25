@@ -364,6 +364,9 @@ Acceptance criteria:
 - [x] `QA-10` Verified answer headings for all posts: herbs `B`, zero-waste `B`, and knives `A`.
 - [x] `QA-11` Verified final title, excerpt, canonical URL, Open Graph data, and BlogPosting JSON-LD title, description, category, and URL.
 - [x] `QA-12` Screenshots and machine-readable results are saved in `docs/audit-screenshots/amber-blog-herbs-2026-07-25/`.
+- [x] `QA-13` Verified the production listing and article on both the custom domain and Vercel domain.
+- [x] `QA-14` Verified the production canonical, Open Graph, BlogPosting, and breadcrumb URLs use `https://www.waistlessfoods.com`.
+- [x] `QA-15` Verified the production mobile tables remain keyboard focusable and horizontally scrollable without document-level overflow.
 
 ## Photo Ownership
 
@@ -379,6 +382,8 @@ Acceptance criteria:
 | `app/blog/[slug]/page.tsx` | Dynamic answer heading; improved trivia divider |
 | `app/blog/blog-page-client.tsx` | Display complete excerpts |
 | `next.config.ts` | Redirect the incorrect placeholder slug |
+| `lib/seo.ts` and `app/layout.tsx` | Use the official domain for production canonical and structured-data URLs |
+| `.github/workflows/fallow-audit.yml` | Run the pull-request audit with the repository's pnpm lockfile |
 | `scripts/contentful/migrate-blog-editorial-fields.mjs` | Category validation, slug help text, answer-heading field |
 | `scripts/contentful/publish-chefs-guide-to-herbs.mjs` | Idempotently populate and publish the herb article |
 | `docs/amber-blog-herbs-implementation-tracker.md` | Track status and verification evidence |
@@ -401,16 +406,20 @@ Acceptance criteria:
 | 2026-07-25 | Editorial schema migration | Complete | Published content type version 8, category validation, slug/category editor controls, answer-heading field, and three entry headings; second dry run found no changes |
 | 2026-07-25 | Herb article publication | Complete | Updated existing entry `65WfAMZYisXg3EU1F7nj3h`, published final slug/content/sort orders, and verified through the delivery API; second dry run found no changes |
 | 2026-07-25 | Final browser verification | Pass | Complete herb route, three filters, two responsive tables, Food IQ override, divider, answer headings, metadata, JSON-LD, full excerpts, and 308 redirect pass with zero assertion failures |
+| 2026-07-25 | Initial production release | Complete | Commit `87cd57a6` deployed successfully; functional audit passed and identified localhost canonical/JSON-LD URLs |
+| 2026-07-25 | Production SEO correction | Complete | Pull request [#3](https://github.com/waistlessfoods-stack/test/pull/3) merged as `ca89ad6a`; production URL fallback now uses `https://www.waistlessfoods.com` |
+| 2026-07-25 | Pull-request audit repair | Pass | Updated the Fallow workflow from npm to pnpm; the rerun and Vercel preview both passed before merge |
+| 2026-07-25 | Production verification | Pass | Both public domains return 200; canonical, Open Graph, BlogPosting, breadcrumbs, two responsive tables, Food IQ copy, answer B, and the legacy 308 redirect pass with zero assertion failures |
 |  |  |  |  |
 
 ## Final Sign-Off
 
 - [x] All CMS, content, UI, and QA implementation checklist items are complete.
 - [ ] Amber has reviewed the herb article, category labels, trivia divider, answer reveal, and full excerpts.
-- [ ] Production deployment is verified.
+- [x] Production deployment is verified.
 - [x] This tracker contains the final URL, desktop/mobile screenshots, test results, and the current deployment status.
 
 External sign-off remaining:
 
 - Amber review has not been represented as complete because no approval has been received in this thread.
-- Production deployment was not performed because the user has not yet authorized a production release.
+- Production is deployed and verified at `https://www.waistlessfoods.com/blog/the-chefs-guide-to-herbs`.
