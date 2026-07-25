@@ -10,6 +10,16 @@ type DeliveryConfig = {
   environmentId: string;
 };
 
+const APPROVED_BLOG_CATEGORIES = [
+  "Chef Inspiration",
+  "Culinary Skills & Techniques",
+  "Sustainable Cooking & Kitchen Tips",
+] as const;
+
+const DEFAULT_BLOG_CATEGORY = APPROVED_BLOG_CATEGORIES[0];
+const LEGACY_HERB_SLUG = "5-easy-meal-prep-ideas";
+const FINAL_HERB_SLUG = "the-chefs-guide-to-herbs";
+
 export type BlogPost = {
   id: string;
   title: string;
@@ -22,6 +32,7 @@ export type BlogPost = {
   publishedAt?: string;
   triviaQuestion?: Document;
   body?: Document;
+  triviaAnswerHeading?: string;
   triviaAnswer?: Document;
 };
 
@@ -45,10 +56,18 @@ function mapEntryToBlogPost(
   const f = entry.fields ?? {};
   const title = String(f.title ?? "").trim();
   const excerpt = String(f.excerpt ?? "").trim();
-  const slug = String(f.slug ?? slugify(title)).trim();
-  const category = String(f.category ?? "Healthy Living").trim();
+  const slug = normalizeBlogSlug(f.slug, title);
+  const category = normalizeBlogCategory(f.category);
   const readTimeMinutes = Number(f.readTimeMinutes ?? 5);
   const imagePath = getAssetUrl(f.coverImage) || String(f.imagePath ?? "");
+  const triviaQuestion = removeLegacyTriviaQuestionChrome(
+    getRichTextDocument(f.triviaQuestion)
+  );
+  const rawTriviaAnswer = getRichTextDocument(f.triviaAnswer);
+  const triviaAnswerHeading =
+    String(f.triviaAnswerHeading ?? "").trim() ||
+    findLegacyTriviaAnswerHeading(rawTriviaAnswer);
+  const triviaAnswer = removeLegacyTriviaAnswerChrome(rawTriviaAnswer);
 
   return {
     id: entry.sys.id,
@@ -60,10 +79,30 @@ function mapEntryToBlogPost(
     imagePath,
     sortOrder: Number(f.sortOrder ?? index + 1),
     publishedAt: f.publishedAt ? String(f.publishedAt) : undefined,
-    triviaQuestion: getRichTextDocument(f.triviaQuestion),
+    triviaQuestion,
     body: getRichTextDocument(f.body),
-    triviaAnswer: getRichTextDocument(f.triviaAnswer),
+    triviaAnswerHeading: triviaAnswerHeading || undefined,
+    triviaAnswer,
   };
+}
+
+function normalizeBlogCategory(value: unknown): string {
+  const category = String(value ?? "").trim();
+
+  if (category === "Chef-Inspiration") {
+    return "Chef Inspiration";
+  }
+
+  return APPROVED_BLOG_CATEGORIES.includes(
+    category as (typeof APPROVED_BLOG_CATEGORIES)[number]
+  )
+    ? category
+    : DEFAULT_BLOG_CATEGORY;
+}
+
+function normalizeBlogSlug(value: unknown, title: string): string {
+  const slug = String(value ?? slugify(title)).trim();
+  return slug === LEGACY_HERB_SLUG ? FINAL_HERB_SLUG : slug;
 }
 
 const warnings = new Set<string>();
@@ -122,6 +161,82 @@ function getRichTextDocument(value: unknown): Document | undefined {
   }
 
   return document as Document;
+}
+
+function getRichTextNodeText(node: unknown): string {
+  if (!node || typeof node !== "object") return "";
+
+  const candidate = node as {
+    nodeType?: unknown;
+    value?: unknown;
+    content?: unknown[];
+  };
+
+  if (candidate.nodeType === "text") {
+    return typeof candidate.value === "string" ? candidate.value : "";
+  }
+
+  return Array.isArray(candidate.content)
+    ? candidate.content.map(getRichTextNodeText).join("")
+    : "";
+}
+
+function removeTopLevelRichTextNodes(
+  document: Document | undefined,
+  shouldRemove: (nodeType: string, text: string) => boolean
+): Document | undefined {
+  if (!document) return undefined;
+
+  return {
+    ...document,
+    content: document.content.filter((node) => {
+      const nodeType = String(node.nodeType ?? "");
+      const text = getRichTextNodeText(node).trim();
+      return !shouldRemove(nodeType, text);
+    }),
+  };
+}
+
+function removeLegacyTriviaQuestionChrome(
+  document: Document | undefined
+): Document | undefined {
+  return removeTopLevelRichTextNodes(document, (nodeType, text) => {
+    const normalized = text.toLowerCase();
+    return (
+      (nodeType === "paragraph" && normalized === "before you read on") ||
+      (nodeType === "heading-2" &&
+        normalized === "something to chew on | trivia") ||
+      (nodeType === "paragraph" &&
+        normalized.startsWith("scroll to the answer reveal"))
+    );
+  });
+}
+
+function findLegacyTriviaAnswerHeading(
+  document: Document | undefined
+): string {
+  if (!document) return "";
+
+  const heading = document.content.find(
+    (node) =>
+      node.nodeType === "heading-2" &&
+      /^trivia answer:/i.test(getRichTextNodeText(node).trim())
+  );
+
+  return heading ? getRichTextNodeText(heading).trim() : "";
+}
+
+function removeLegacyTriviaAnswerChrome(
+  document: Document | undefined
+): Document | undefined {
+  return removeTopLevelRichTextNodes(document, (nodeType, text) => {
+    const normalized = text.toLowerCase();
+    return (
+      (nodeType === "paragraph" &&
+        (normalized === "answer reveal" || normalized === "")) ||
+      (nodeType === "heading-2" && /^trivia answer:/i.test(text))
+    );
+  });
 }
 
 function slugify(input: string): string {
@@ -200,12 +315,21 @@ async function fetchBlogPostBySlugFromContentfulRaw(
       environment: config.environmentId,
     });
 
-    const entries = await client.getEntries({
+    let entries = await client.getEntries({
       content_type: "blogPost",
       "fields.slug": slug,
       include: 2,
       limit: 1,
     } as Record<string, unknown>);
+
+    if (entries.items.length === 0 && slug === FINAL_HERB_SLUG) {
+      entries = await client.getEntries({
+        content_type: "blogPost",
+        "fields.slug": LEGACY_HERB_SLUG,
+        include: 2,
+        limit: 1,
+      } as Record<string, unknown>);
+    }
 
     const entry = entries.items[0];
     if (!entry) {

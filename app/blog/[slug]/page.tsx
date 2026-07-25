@@ -141,9 +141,17 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                   </p>
                   <h2
                     id="trivia-question-heading"
-                    className="mb-5 text-2xl font-bold leading-tight text-[#123b37] md:text-3xl"
+                    className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-2xl font-bold leading-tight text-[#123b37] md:text-3xl"
                   >
-                    Something to Chew On | Trivia
+                    <span>Something to Chew On</span>
+                    <span className="inline-flex items-center gap-3 whitespace-nowrap">
+                      <span
+                        aria-hidden="true"
+                        className="h-[1.35em] w-0.5 bg-[#35bfc4]"
+                      />
+                      <span className="sr-only"> — </span>
+                      <span>Trivia</span>
+                    </span>
                   </h2>
                   <BlogRichText
                     document={post.triviaQuestion}
@@ -173,7 +181,8 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                     id="trivia-answer-heading"
                     className="mb-5 text-2xl font-bold leading-tight text-[#123b37] md:text-3xl"
                   >
-                    Trivia Answer: B — Did you guess correctly?
+                    {post.triviaAnswerHeading ||
+                      "Trivia Answer — Did you guess correctly?"}
                   </h2>
                   <BlogRichText
                     document={post.triviaAnswer}

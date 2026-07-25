@@ -24,6 +24,11 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/blog/5-easy-meal-prep-ideas",
+        destination: "/blog/the-chefs-guide-to-herbs",
+        permanent: true,
+      },
+      {
         source: "/services/cooking-class/:path*",
         destination: "/services/cooking-classes/:path*",
         permanent: true,

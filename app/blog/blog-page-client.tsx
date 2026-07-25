@@ -139,15 +139,7 @@ export default function BlogPageClient({ data }: BlogPageClientProps) {
                     <h2 className="text-[16px] font-semibold leading-[1.2] text-[#151515]">
                       {post.title}
                     </h2>
-                    <p
-                      className="text-[13px] leading-5 text-[#2f2f2f]"
-                      style={{
-                        display: "-webkit-box",
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                      }}
-                    >
+                    <p className="text-[13px] leading-5 text-[#2f2f2f]">
                       {post.excerpt}
                     </p>
                   </div>

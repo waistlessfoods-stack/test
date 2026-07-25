@@ -1,0 +1,129 @@
+{
+  "generatedAt": "2026-07-25T03:38:56.988Z",
+  "environment": {
+    "baseUrl": "http://localhost:3010",
+    "build": "Next.js 16.1.6 production build",
+    "contentSource": "Published Contentful master environment",
+    "deployment": "Not performed; production deployment and stakeholder review remain separate sign-off steps."
+  },
+  "contentful": {
+    "contentTypeVersion": 8,
+    "categoryValidation": [
+      "Chef Inspiration",
+      "Culinary Skills & Techniques",
+      "Sustainable Cooking & Kitchen Tips"
+    ],
+    "answerHeadingField": {
+      "id": "triviaAnswerHeading",
+      "type": "Symbol",
+      "required": false,
+      "maxLength": 120
+    },
+    "editorControls": {
+      "slug": "slugEditor with URL guidance",
+      "category": "dropdown with approved-category guidance",
+      "triviaAnswerHeading": "singleLine with answer-heading example"
+    },
+    "entries": [
+      {
+        "id": "65WfAMZYisXg3EU1F7nj3h",
+        "slug": "the-chefs-guide-to-herbs",
+        "category": "Chef Inspiration",
+        "sortOrder": 1,
+        "answerHeading": "Trivia Answer: B — Did you guess correctly?"
+      },
+      {
+        "id": "4uFA5DTl1Hw4U8iRXbXHyZ",
+        "slug": "zero-waste-kitchen-guide",
+        "category": "Sustainable Cooking & Kitchen Tips",
+        "sortOrder": 2,
+        "answerHeading": "Trivia Answer: B — Did you guess correctly?"
+      },
+      {
+        "id": "5KBG0hOYFVcBM37Fge36nu",
+        "slug": "the-3-knives-every-home-cook-actually-needs",
+        "category": "Culinary Skills & Techniques",
+        "sortOrder": 3,
+        "answerHeading": "Trivia Answer: A — Did you guess correctly?"
+      }
+    ],
+    "herbArticle": {
+      "countAtFinalSlug": 1,
+      "countAtLegacySlug": 0,
+      "readTimeMinutes": 5,
+      "hasCoverImage": true,
+      "hasFoodIqOverride": true,
+      "hasDiscardedCulinaryIqCopy": false,
+      "tableCount": 2,
+      "tableRowCounts": [
+        7,
+        8
+      ],
+      "richTextValidation": "pass",
+      "schemaMigrationSecondDryRun": "no pending changes",
+      "contentMigrationSecondDryRun": "no pending changes",
+      "deliveryApiVerification": "pass on first attempt"
+    }
+  },
+  "browser": {
+    "listing": {
+      "status": 200,
+      "cardCount": 3,
+      "firstSlug": "/blog/the-chefs-guide-to-herbs",
+      "allExcerptsUnclamped": true,
+      "filterCounts": {
+        "Chef Inspiration": 1,
+        "Sustainable Cooking & Kitchen Tips": 1,
+        "Culinary Skills & Techniques": 1
+      }
+    },
+    "herbDesktop": {
+      "status": 200,
+      "triviaHeading": "Something to Chew On — Trivia",
+      "foodIqCount": 1,
+      "culinaryIqCount": 0,
+      "answerHeading": "Trivia Answer: B — Did you guess correctly?",
+      "tableCount": 2,
+      "tableRowCounts": [
+        7,
+        8
+      ],
+      "dividerHeight": 40.5,
+      "adjacentTriviaHeight": 37.5
+    },
+    "herbMobile": {
+      "documentHorizontalOverflow": false,
+      "tableCount": 2,
+      "tablesKeyboardFocusable": true,
+      "tablesHorizontallyScrollable": true,
+      "dividerHeight": 32.390625,
+      "adjacentTriviaHeight": 30
+    },
+    "metadata": {
+      "canonicalEndsWithFinalSlug": true,
+      "descriptionMatchesExcerpt": true,
+      "openGraphDescriptionMatchesExcerpt": true,
+      "blogPostingHeadlineMatchesTitle": true,
+      "blogPostingDescriptionMatchesExcerpt": true,
+      "blogPostingCategory": "Chef Inspiration",
+      "blogPostingUrlUsesFinalSlug": true
+    },
+    "answerHeadings": {
+      "zero-waste-kitchen-guide": "Trivia Answer: B — Did you guess correctly?",
+      "the-3-knives-every-home-cook-actually-needs": "Trivia Answer: A — Did you guess correctly?"
+    },
+    "legacyRedirect": {
+      "status": 308,
+      "location": "/blog/the-chefs-guide-to-herbs"
+    },
+    "failures": []
+  },
+  "staticChecks": {
+    "nodeSyntax": "pass",
+    "contentfulRichTextValidation": "pass",
+    "targetedEslint": "pass",
+    "typescriptNoEmit": "pass",
+    "productionBuild": "pass",
+    "gitDiffCheck": "pass"
+  }
+}

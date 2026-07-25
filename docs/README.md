@@ -3,6 +3,11 @@
 Date: 2026-06-19
 Project: `waitslessfood.com`
 
+## Active Implementation Trackers
+
+- [Amber Blog and “Chef’s Guide to Herbs” Implementation Tracker](amber-blog-herbs-implementation-tracker.md)
+  - Tracks the new herb article, Contentful category and slug changes, trivia UI refinements, editable answer headings, full blog-card excerpts, and verification.
+
 ## Core SEO Docs
 
 - [SEO Roadmap](/Volumes/samsung_980_500gb/code/macbook-m1/waitslessfood.com/docs/seo-roadmap.md)
