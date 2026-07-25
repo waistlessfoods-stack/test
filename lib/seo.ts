@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 const SITE_NAME = "WaistLess Foods";
+const PRODUCTION_SITE_URL = "https://www.waistlessfoods.com";
+const LOCAL_SITE_URL = "http://localhost:3000";
 const DEFAULT_DESCRIPTION =
   "Private Chef Amber curates fresh, flavorful meals, from pescatarian feasts to hearty family dinners, with an eco-conscious touch.";
 
@@ -17,16 +19,41 @@ function isPreviewEnvironment(): boolean {
   return process.env.VERCEL_ENV === "preview";
 }
 
-export function getBaseUrl(): string {
-  const candidate =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : null) ||
-    "http://localhost:3000";
+function normalizeBaseUrl(value: string | undefined): string | null {
+  const candidate = value?.trim();
+  if (!candidate) return null;
 
-  return candidate.replace(/\/+$/, "");
+  const withProtocol = /^https?:\/\//i.test(candidate)
+    ? candidate
+    : `https://${candidate}`;
+
+  return withProtocol.replace(/\/+$/, "");
+}
+
+function isLocalUrl(value: string): boolean {
+  try {
+    const hostname = new URL(value).hostname;
+    return hostname === "localhost" || hostname === "127.0.0.1";
+  } catch {
+    return false;
+  }
+}
+
+export function getBaseUrl(): string {
+  const configuredUrl =
+    normalizeBaseUrl(process.env.NEXT_PUBLIC_SITE_URL) ||
+    normalizeBaseUrl(process.env.NEXT_PUBLIC_APP_URL) ||
+    normalizeBaseUrl(process.env.VERCEL_PROJECT_PRODUCTION_URL);
+  const isProductionBuild =
+    process.env.NODE_ENV === "production" ||
+    process.env.VERCEL_ENV === "production" ||
+    process.env.VERCEL_ENV === "preview";
+
+  if (configuredUrl && !(isProductionBuild && isLocalUrl(configuredUrl))) {
+    return configuredUrl;
+  }
+
+  return isProductionBuild ? PRODUCTION_SITE_URL : LOCAL_SITE_URL;
 }
 
 export function toAbsoluteUrl(pathname: string): string {
