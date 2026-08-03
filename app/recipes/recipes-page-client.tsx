@@ -351,7 +351,7 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
 
                     {item.price && item.price !== "Free" && (
                       <div
-                        className="absolute top-0 right-0 bg-[#0F8DAB] w-20 h-20 lg:w-16 lg:h-16 flex justify-end items-start"
+                        className="absolute top-0 right-0 bg-[#00676E] w-20 h-20 lg:w-16 lg:h-16 flex justify-end items-start"
                         style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%)" }}
                       >
                         <span className="font-bold text-lg lg:text-base text-white pt-3 pr-3 lg:pt-2 lg:pr-2">
@@ -368,7 +368,7 @@ export default function RecipesPageClient({ data, initialCategorySlug }: Recipes
 
                     {item.featured && (
                       <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
-                        <span className="inline-flex items-center rounded-full border-[3px] border-[#0F8DAB] bg-white/35 px-7 py-1.5 text-lg lg:text-sm 2xl:text-base font-semibold uppercase tracking-wide text-[#0F8DAB] backdrop-blur-sm shadow-[0_4px_14px_rgba(15,141,171,0.25)]">
+                        <span className="inline-flex items-center rounded-full border-[3px] border-[#00676E] bg-white/80 px-7 py-1.5 text-lg lg:text-sm 2xl:text-base font-semibold uppercase tracking-wide text-[#00676E] backdrop-blur-sm shadow-[0_4px_14px_rgba(0,103,110,0.25)]">
                           Featured
                         </span>
                       </div>

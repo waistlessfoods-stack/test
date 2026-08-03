@@ -10,7 +10,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type {
   HomepageData,
@@ -28,6 +28,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
   const [heroCurrent, setHeroCurrent] = useState(0);
   const [testimonialApi, setTestimonialApi] = useState<CarouselApi>();
   const [testimonialCurrent, setTestimonialCurrent] = useState(0);
+  const chefSectionRef = useRef<HTMLElement>(null);
 
   const heroSlides =
     data.heroImagePaths?.length > 0
@@ -37,7 +38,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
         : [];
   const heroTitle = data.heroTitle.replace(/\\n/g, "\n").replace(/\s+/g, " ").trim();
   const usesPrivateDiningHero = /private dining\s*&\s*catering/i.test(heroTitle);
-  const heroEyebrow = usesPrivateDiningHero ? "BOLD. SUSTAINABLE. ARTFUL." : "";
+  const heroEyebrow = usesPrivateDiningHero ? "BOLD. SEASONAL. ARTFUL." : "";
   const heroHeadline = usesPrivateDiningHero
     ? "PRIVATE DINING & CATERING"
     : data.heroTitle;
@@ -86,6 +87,44 @@ export default function HomepageClient({ data }: HomepageClientProps) {
       window.clearInterval(intervalId);
     };
   }, [heroApi, heroSlides.length]);
+
+  useEffect(() => {
+    const section = chefSectionRef.current;
+    if (!section) return;
+
+    let animationFrame = 0;
+    const updatePortraitPosition = () => {
+      animationFrame = 0;
+      if (window.innerWidth >= 768) {
+        section.style.backgroundPosition = "center";
+        return;
+      }
+
+      const rect = section.getBoundingClientRect();
+      const viewportCenter = window.innerHeight / 2;
+      const sectionCenter = rect.top + rect.height / 2;
+      const offset = Math.max(
+        -42,
+        Math.min(42, (viewportCenter - sectionCenter) * 0.07)
+      );
+      section.style.backgroundPosition = `center calc(50% + ${offset}px)`;
+    };
+    const handleScroll = () => {
+      if (!animationFrame) {
+        animationFrame = window.requestAnimationFrame(updatePortraitPosition);
+      }
+    };
+
+    updatePortraitPosition();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+    };
+  }, []);
 
   return (
     <div className="flex flex-col w-full">
@@ -239,7 +278,8 @@ export default function HomepageClient({ data }: HomepageClientProps) {
 
       {/* About Chef Amber Section */}
       <section
-        className="relative flex min-h-[720px] w-full items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat py-16 md:h-[764px] md:bg-fixed md:py-0"
+        ref={chefSectionRef}
+        className="relative flex min-h-[1050px] w-full items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat py-20 md:min-h-[900px] md:bg-fixed md:py-16"
         style={
           data.aboutImagePath
             ? { backgroundImage: `url(${JSON.stringify(data.aboutImagePath)})` }
@@ -248,7 +288,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
       >
         <div className="absolute inset-0 bg-black/5" />
 
-        <div className="relative z-10 flex w-full justify-center bg-white px-6 py-10 md:py-11">
+        <div className="relative z-10 flex w-full justify-center bg-white/95 px-6 py-10 md:py-11">
           <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 text-center md:gap-7">
             <div className="flex w-full flex-col items-center gap-5 md:gap-6">
               <h2 className="text-center font-sans text-[24px] font-semibold uppercase leading-tight tracking-[-0.01em] text-black md:text-[28px]">
@@ -256,15 +296,24 @@ export default function HomepageClient({ data }: HomepageClientProps) {
               </h2>
 
               <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 text-center font-sans">
-                <p className="text-[14px] leading-[22px] text-[#222222] md:text-[15px] md:leading-6">
+                <p className="text-base leading-7 text-[#222222] md:text-lg md:leading-8">
                   {data.aboutBodyPrimary}
                 </p>
 
-                <blockquote className="mx-auto max-w-2xl whitespace-pre-line font-serif text-[15px] italic leading-7 text-[#7A7A7A] md:text-base">
+                <blockquote className="mx-auto max-w-2xl whitespace-pre-line font-serif text-lg italic leading-8 text-[#00676E] md:text-xl md:leading-9">
                   {data.aboutBodySecondary}
                 </blockquote>
 
-                <p className="text-[14px] font-medium leading-5 text-[#777777]">
+                <Image
+                  src="/signature/chef-amber-signature-merged-rotated.png"
+                  alt="Chef Amber's signature"
+                  width={2153}
+                  height={730}
+                  className="h-auto max-w-full self-center object-contain"
+                  style={{ width: "360px", height: "auto", marginInline: "auto" }}
+                />
+
+                <p className="text-base font-bold leading-6 text-[#333333] md:text-lg">
                   {data.aboutBodyTertiary}
                 </p>
               </div>
@@ -375,7 +424,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
 
                     <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
                       <div className="flex flex-col items-center gap-4 w-full transition-transform duration-300 group-hover:-translate-y-4">
-                        <h3 className="text-[48px] leading-[0.8] text-white uppercase tracking-wide font-['Bebas_Neue']">
+                        <h3 className="flex min-h-[78px] items-center justify-center text-[48px] leading-[0.8] text-white uppercase tracking-wide font-['Bebas_Neue']">
                           {displayTitle}
                         </h3>
                         <div className="w-[150px] border-t border-white/90" />

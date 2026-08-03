@@ -1,0 +1,26 @@
+{
+  "heroText": "BOLD. SEASONAL. ARTFUL.",
+  "signatureWidth": 360,
+  "categories": [
+    "Toggle BEEF category",
+    "Toggle FISH & SEAFOOD category",
+    "Toggle PASTA category",
+    "Toggle HEALTHY MEALS category",
+    "Toggle DESSERT category",
+    "Toggle VEGAN category",
+    "Toggle CHEF SPOTLIGHT category",
+    "Toggle BREAKFAST category",
+    "Toggle POULTRY category"
+  ],
+  "hasBreakfast": true,
+  "hasPoultry": true,
+  "screenshots": [
+    "01-home-hero.png",
+    "02-chef-message-desktop.png",
+    "03-spotlight-alignment.png",
+    "04-footer-contact.png",
+    "05-chef-message-mobile.png",
+    "06-shop-breakfast-poultry.png",
+    "07-shop-turquoise-styling.png"
+  ]
+}

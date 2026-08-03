@@ -104,7 +104,7 @@ export default function Footer({ socialLinks = [], footerSettings }: FooterProps
       setMessage("Thank you for subscribing!");
       setMessageType("success");
       setEmail("");
-    } catch (error) {
+    } catch {
       setMessage("Something went wrong. Please try again.");
       setMessageType("error");
     } finally {
@@ -182,6 +182,21 @@ export default function Footer({ socialLinks = [], footerSettings }: FooterProps
             </div>
 
             <div>
+              <div className="mb-8">
+                <h4 className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
+                  Contact Us
+                </h4>
+                <address className="flex flex-col gap-2 text-sm not-italic leading-6 text-white/90">
+                  <span>Houston, TX</span>
+                  <a className="w-fit transition hover:text-white hover:underline" href="mailto:info@waistlessfoods.com">
+                    info@waistlessfoods.com
+                  </a>
+                  <a className="w-fit transition hover:text-white hover:underline" href="tel:+12814369245">
+                    281-436-9245
+                  </a>
+                </address>
+              </div>
+
               <h4 className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
                 Follow Us
               </h4>
