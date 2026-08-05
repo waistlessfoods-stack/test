@@ -28,7 +28,8 @@ export default function HomepageClient({ data }: HomepageClientProps) {
   const [heroCurrent, setHeroCurrent] = useState(0);
   const [testimonialApi, setTestimonialApi] = useState<CarouselApi>();
   const [testimonialCurrent, setTestimonialCurrent] = useState(0);
-  const chefSectionRef = useRef<HTMLElement>(null);
+  const chefPortraitRef = useRef<HTMLElement>(null);
+  const chefPortraitLayerRef = useRef<HTMLDivElement>(null);
 
   const heroSlides =
     data.heroImagePaths?.length > 0
@@ -42,6 +43,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
   const heroHeadline = usesPrivateDiningHero
     ? "PRIVATE DINING & CATERING"
     : data.heroTitle;
+  const chefPortraitSource = data.aboutImagePath;
   const heroSubtitle = usesPrivateDiningHero
     ? "An elegant culinary experience designed to elevate your most meaningful moments"
     : data.heroSubtitle;
@@ -89,42 +91,112 @@ export default function HomepageClient({ data }: HomepageClientProps) {
   }, [heroApi, heroSlides.length]);
 
   useEffect(() => {
-    const section = chefSectionRef.current;
-    if (!section) return;
+    const portrait = chefPortraitRef.current;
+    const portraitLayer = chefPortraitLayerRef.current;
+    if (!portrait || !portraitLayer) return;
 
     let animationFrame = 0;
-    const updatePortraitPosition = () => {
+    let currentOffset = 0;
+    let targetOffset = 0;
+    let targetNeedsUpdate = false;
+    let lastFrameTime = 0;
+    const reducedMotionQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+    let prefersReducedMotion = reducedMotionQuery.matches;
+
+    const getTargetOffset = () => {
+      const rect = portrait.getBoundingClientRect();
+      const scrollRange = window.innerHeight + rect.height;
+      const progress = Math.max(
+        0,
+        Math.min(1, (window.innerHeight - rect.top) / scrollRange)
+      );
+      const maxOffset = window.innerWidth >= 1024 ? 40 : 180;
+
+      return (progress * 2 - 1) * maxOffset;
+    };
+
+    const renderPortraitPosition = (frameTime: number) => {
       animationFrame = 0;
-      if (window.innerWidth >= 768) {
-        section.style.backgroundPosition = "center";
+
+      if (targetNeedsUpdate) {
+        targetOffset = getTargetOffset();
+        targetNeedsUpdate = false;
+      }
+
+      const distance = targetOffset - currentOffset;
+      const elapsedSeconds = lastFrameTime
+        ? Math.min((frameTime - lastFrameTime) / 1000, 0.1)
+        : 1 / 60;
+      const smoothing = 1 - Math.exp(-12 * elapsedSeconds);
+      lastFrameTime = frameTime;
+
+      if (Math.abs(distance) < 0.1) {
+        currentOffset = targetOffset;
+      } else {
+        currentOffset += distance * smoothing;
+      }
+
+      portraitLayer.style.transform = `translate3d(0, ${currentOffset.toFixed(2)}px, 0)`;
+
+      if (currentOffset === targetOffset) {
+        lastFrameTime = 0;
+        portraitLayer.style.willChange = "auto";
         return;
       }
 
-      const rect = section.getBoundingClientRect();
-      const viewportCenter = window.innerHeight / 2;
-      const sectionCenter = rect.top + rect.height / 2;
-      const offset = Math.max(
-        -42,
-        Math.min(42, (viewportCenter - sectionCenter) * 0.07)
-      );
-      section.style.backgroundPosition = `center calc(50% + ${offset}px)`;
+      animationFrame = window.requestAnimationFrame(renderPortraitPosition);
     };
-    const handleScroll = () => {
+
+    const updatePortraitTarget = () => {
+      if (prefersReducedMotion) return;
+
+      targetNeedsUpdate = true;
       if (!animationFrame) {
-        animationFrame = window.requestAnimationFrame(updatePortraitPosition);
+        portraitLayer.style.willChange = "transform";
+        animationFrame = window.requestAnimationFrame(renderPortraitPosition);
       }
     };
 
-    updatePortraitPosition();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
+    const handleMotionPreferenceChange = () => {
+      prefersReducedMotion = reducedMotionQuery.matches;
+
+      if (animationFrame) {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = 0;
+      }
+      targetNeedsUpdate = false;
+      lastFrameTime = 0;
+
+      if (prefersReducedMotion) {
+        currentOffset = 0;
+        targetOffset = 0;
+        portraitLayer.style.transform = "none";
+        portraitLayer.style.willChange = "auto";
+        return;
+      }
+
+      currentOffset = getTargetOffset();
+      targetOffset = currentOffset;
+      portraitLayer.style.transform = `translate3d(0, ${currentOffset.toFixed(2)}px, 0)`;
+    };
+
+    handleMotionPreferenceChange();
+    window.addEventListener("scroll", updatePortraitTarget, { passive: true });
+    window.addEventListener("resize", updatePortraitTarget);
+    reducedMotionQuery.addEventListener("change", handleMotionPreferenceChange);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
+      window.removeEventListener("scroll", updatePortraitTarget);
+      window.removeEventListener("resize", updatePortraitTarget);
+      reducedMotionQuery.removeEventListener(
+        "change",
+        handleMotionPreferenceChange
+      );
       if (animationFrame) window.cancelAnimationFrame(animationFrame);
     };
-  }, []);
+  }, [chefPortraitSource]);
 
   return (
     <div className="flex flex-col w-full">
@@ -278,17 +350,63 @@ export default function HomepageClient({ data }: HomepageClientProps) {
 
       {/* About Chef Amber Section */}
       <section
-        ref={chefSectionRef}
-        className="relative flex min-h-[1050px] w-full items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat py-20 md:min-h-[900px] md:bg-fixed md:py-16"
-        style={
-          data.aboutImagePath
-            ? { backgroundImage: `url(${JSON.stringify(data.aboutImagePath)})` }
-            : undefined
-        }
+        ref={chefPortraitRef}
+        className="relative flex min-h-[1050px] w-full items-start justify-center overflow-hidden bg-[#E9E6E4] pb-20 pt-48 md:min-h-[900px] md:pb-24 md:pt-56"
       >
+        {chefPortraitSource && (
+          <div
+            ref={chefPortraitLayerRef}
+            aria-hidden="true"
+            className="absolute inset-0"
+          >
+            <Image
+              src="/amber-mobile-vertical.png"
+              alt=""
+              fill
+              sizes="(max-width: 1023px) 100vw, 0px"
+              className="object-cover object-top lg:hidden"
+            />
+            <div
+              className="absolute inset-x-0 hidden isolate lg:block"
+              style={{ top: "-192px", bottom: "-192px" }}
+            >
+              <Image
+                src="/amber-desktop-kitchen-plate.png"
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 100vw, 0px"
+                className="object-cover object-center"
+                style={{ transform: "scale(1.08)", zIndex: 0 }}
+              />
+              <Image
+                src={chefPortraitSource}
+                alt=""
+                width={2020}
+                height={2020}
+                sizes="(min-width: 1440px) 720px, (min-width: 1024px) 50vw, 0px"
+                className="absolute max-w-none object-contain"
+                style={{
+                  top: "clamp(160px, calc(547.7px - 26.9vw), 272px)",
+                  left: "50%",
+                  width: "min(50vw, 720px)",
+                  height: "auto",
+                  transform: "translateX(-50%)",
+                  zIndex: 1,
+                  maskMode: "alpha",
+                  maskImage:
+                    "linear-gradient(to right, transparent 0%, white 18%, white 82%, transparent 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(to right, transparent 0%, white 18%, white 82%, transparent 100%)",
+                  WebkitMaskRepeat: "no-repeat",
+                  WebkitMaskSize: "100% 100%",
+                }}
+              />
+            </div>
+          </div>
+        )}
         <div className="absolute inset-0 bg-black/5" />
 
-        <div className="relative z-10 flex w-full justify-center bg-white/95 px-6 py-10 md:py-11">
+        <div className="relative z-10 flex w-[calc(100%-2rem)] max-w-6xl justify-center bg-white px-6 py-10 md:w-[calc(100%-4rem)] md:py-11">
           <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 text-center md:gap-7">
             <div className="flex w-full flex-col items-center gap-5 md:gap-6">
               <h2 className="text-center font-sans text-[24px] font-semibold uppercase leading-tight tracking-[-0.01em] text-black md:text-[28px]">
@@ -423,7 +541,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                     <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/40 to-black/70 transition-all duration-300 group-hover:from-black/35 group-hover:to-black/60" />
 
                     <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-                      <div className="flex flex-col items-center gap-4 w-full transition-transform duration-300 group-hover:-translate-y-4">
+                      <div className="flex h-[212px] w-full flex-col items-center gap-4 transition-transform duration-300 group-hover:-translate-y-4">
                         <h3 className="flex min-h-[78px] items-center justify-center text-[48px] leading-[0.8] text-white uppercase tracking-wide font-['Bebas_Neue']">
                           {displayTitle}
                         </h3>
