@@ -1,4 +1,13 @@
-import { pgTable, text, timestamp, serial, boolean, integer, jsonb } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 
 export const enquiries = pgTable("enquiries", {
   id: serial("id").primaryKey(),
@@ -16,7 +25,10 @@ export type NewEnquiry = typeof enquiries.$inferInsert;
 export const subscribers = pgTable("subscribers", {
   id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
+  active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  unsubscribedAt: timestamp("unsubscribed_at"),
 });
 
 export type Subscriber = typeof subscribers.$inferSelect;
@@ -110,6 +122,38 @@ export const bookings = pgTable("bookings", {
 
 export type Booking = typeof bookings.$inferSelect;
 export type NewBooking = typeof bookings.$inferInsert;
+
+export const serviceReviews = pgTable(
+  "service_reviews",
+  {
+    id: serial("id").primaryKey(),
+    serviceSlug: text("service_slug").notNull(),
+    serviceTitle: text("service_title").notNull(),
+    name: text("name").notNull(),
+    email: text("email"),
+    rating: integer("rating").notNull(),
+    reviewText: text("review_text").notNull(),
+    status: text("status").notNull().default("pending"),
+    source: text("source").notNull().default("customer-submission"),
+    sourceKey: text("source_key").unique(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    moderatedAt: timestamp("moderated_at"),
+  },
+  (table) => [
+    index("service_reviews_service_status_idx").on(
+      table.serviceSlug,
+      table.status
+    ),
+    index("service_reviews_status_created_idx").on(
+      table.status,
+      table.createdAt
+    ),
+  ]
+);
+
+export type ServiceReview = typeof serviceReviews.$inferSelect;
+export type NewServiceReview = typeof serviceReviews.$inferInsert;
 
 export const appSettings = pgTable("app_settings", {
   key: text("key").primaryKey(),

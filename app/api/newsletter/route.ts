@@ -1,10 +1,11 @@
 import { db } from "@/lib/db";
 import { subscribers } from "@/lib/db/schema";
 import { sendEmail, fromEmail } from "@/lib/email/mailer";
+import { newsletterNotificationTemplate } from "@/lib/email/templates";
 import {
-  newsletterConfirmationTemplate,
-  newsletterNotificationTemplate,
-} from "@/lib/email/templates";
+  createNewsletterWelcomeEmail,
+  getNewsletterWelcomeSubject,
+} from "@/lib/email/newsletter-welcome";
 import {
   checkRateLimit,
   normalizeRateLimitEmail,
@@ -14,7 +15,7 @@ import { isHoneypotFilled } from "@/lib/honeypot";
 import { getRequestLogContext, logError, logInfo, maskEmail } from "@/lib/structured-log";
 import { validateTextFieldLengths } from "@/lib/text-field-validation";
 import { NextRequest, NextResponse } from "next/server";
-import { sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 const NEWSLETTER_SUCCESS_MESSAGE = "Successfully subscribed to newsletter";
 
@@ -116,11 +117,11 @@ export async function POST(request: NextRequest) {
       db
         .select()
         .from(subscribers)
-        .where(sql`${subscribers.email} = ${rawEmail}`)
+        .where(eq(subscribers.email, rawEmail))
         .limit(1)
     );
 
-    if (existingSubscriber.length > 0) {
+    if (existingSubscriber[0]?.active) {
       logInfo("newsletter.duplicate_submission", {
         ...getRequestLogContext(request),
         email: maskEmail(rawEmail),
@@ -131,24 +132,55 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insert into database with retry logic
-    const result = await withDbRetry(() =>
-      db
-        .insert(subscribers)
-        .values({
-          email: rawEmail,
-        })
-        .returning()
-    );
+    const now = new Date();
+    const subscriber = existingSubscriber[0]
+      ? (
+          await withDbRetry(() =>
+            db
+              .update(subscribers)
+              .set({
+                active: true,
+                updatedAt: now,
+                unsubscribedAt: null,
+              })
+              .where(eq(subscribers.id, existingSubscriber[0].id))
+              .returning()
+          )
+        )[0]
+      : (
+          await withDbRetry(() =>
+            db
+              .insert(subscribers)
+              .values({ email: rawEmail })
+              .onConflictDoNothing({ target: subscribers.email })
+              .returning()
+          )
+        )[0];
 
-    const subscriber = result[0];
+    // A concurrent request may have inserted the same address first. Treat it
+    // exactly like a normal duplicate and do not send a second welcome email.
+    if (!subscriber) {
+      logInfo("newsletter.concurrent_duplicate_submission", {
+        ...getRequestLogContext(request),
+        email: maskEmail(rawEmail),
+      });
+      return NextResponse.json(
+        { success: true, message: NEWSLETTER_SUCCESS_MESSAGE, data: null },
+        { status: 200 }
+      );
+    }
+
     const adminEmail = process.env.ADMIN_EMAIL || fromEmail;
+    const welcomeSubject = getNewsletterWelcomeSubject();
 
     const [confirmationEmail, notificationEmail] = await Promise.all([
       sendEmail({
         to: rawEmail,
-        subject: "Welcome to WaistLess Foods",
-        html: newsletterConfirmationTemplate({ email: rawEmail }),
+        subject: welcomeSubject,
+        react: createNewsletterWelcomeEmail({
+          subscriberId: subscriber.id,
+          email: rawEmail,
+        }),
       }),
       sendEmail({
         to: adminEmail,

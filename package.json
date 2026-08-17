@@ -24,6 +24,7 @@
     "contentful:seed-footer-settings": "node scripts/contentful/seed-footer-settings.mjs",
     "contentful:migrate-homepage-hero-carousel": "node scripts/contentful/migrate-homepage-hero-carousel.mjs",
     "contentful:migrate-homepage-featured-description": "node scripts/contentful/migrate-homepage-featured-description.mjs",
+    "contentful:migrate-homepage-message": "node scripts/contentful/enable-homepage-editable-message.mjs",
     "contentful:migrate-recipe-detail": "node scripts/contentful/migrate-recipe-detail-fields.mjs",
     "contentful:migrate-service-detail": "node scripts/contentful/migrate-service-detail-fields.mjs",
     "contentful:migrate-service-detail-sections": "node scripts/contentful/migrate-service-detail-sections.mjs",
@@ -33,6 +34,8 @@
     "contentful:migrate-recipe-rich-text": "node scripts/contentful/migrate-recipe-rich-text.mjs",
     "contentful:migrate-blog-article": "node scripts/contentful/migrate-blog-article-content.mjs",
     "contentful:update-links-hidden": "node scripts/contentful/update-links-hidden.mjs",
+    "contentful:migrate-service-reviews": "node scripts/migrate-contentful-service-reviews.mjs",
+    "db:migrate-newsletter-subscribers": "node scripts/migrate-newsletter-subscribers.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
@@ -75,7 +78,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
-    "@react-email/preview-server": "^5.2.10",
+    "@react-email/preview-server": "^5.2.11",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^25",
     "@types/react": "^19",

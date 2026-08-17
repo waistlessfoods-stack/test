@@ -135,3 +135,11 @@ body {
   box-shadow: none !important;
   border: 0 !important;
 }
+
+/* Keep the About portrait below the complete responsive site header. */
+@media (min-width: 1024px) {
+  .about-sticky-portrait {
+    position: sticky;
+    top: calc(var(--site-header-height, 197px) + 1rem);
+  }
+}

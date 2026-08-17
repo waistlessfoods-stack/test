@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { render } from '@react-email/render';
+import { render, toPlainText } from '@react-email/render';
 import React from 'react';
 import { logError, logInfo, logWarn, maskEmail } from '@/lib/structured-log';
 
@@ -15,6 +15,9 @@ if (!gmailUser || !gmailAppPassword) {
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
+  connectionTimeout: 10_000,
+  greetingTimeout: 10_000,
+  socketTimeout: 20_000,
   auth: {
     user: gmailUser,
     pass: gmailAppPassword,
@@ -28,12 +31,14 @@ export async function sendEmail({
   to,
   subject,
   html,
+  text,
   react,
   replyTo,
 }: {
   to: string | string[];
   subject: string;
   html?: string;
+  text?: string;
   react?: React.ReactElement;
   replyTo?: string | string[];
 }) {
@@ -50,8 +55,10 @@ export async function sendEmail({
 
   // Render React component to HTML if provided
   let emailHtml = html;
+  let emailText = text;
   if (react) {
     emailHtml = await render(react);
+    emailText = emailText || await render(react, { plainText: true });
   }
 
   if (!emailHtml) {
@@ -65,6 +72,8 @@ export async function sendEmail({
     };
   }
 
+  emailText = emailText || toPlainText(emailHtml);
+
   const toAddresses = Array.isArray(to) ? to.join(',') : to;
   const replyToAddresses = replyTo
     ? Array.isArray(replyTo) ? replyTo.join(',') : replyTo
@@ -76,6 +85,7 @@ export async function sendEmail({
       to: toAddresses,
       subject,
       html: emailHtml,
+      text: emailText,
       replyTo: replyToAddresses,
     });
 

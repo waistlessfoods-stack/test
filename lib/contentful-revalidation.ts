@@ -8,6 +8,7 @@ export const CONTENTFUL_TAGS = [
   "blog-page",
   "header-settings",
   "footer-settings",
+  "authentication-settings",
 ] as const;
 
 export type ContentfulTag = (typeof CONTENTFUL_TAGS)[number];
@@ -24,6 +25,7 @@ const CONTENT_TYPE_TAGS: Record<string, readonly ContentfulTag[]> = {
   primaryLink: ["links-page"],
   headerSettings: ["header-settings"],
   footerSettings: ["footer-settings"],
+  authenticationSettings: ["authentication-settings"],
   blogPost: ["blog-page"],
 };
 

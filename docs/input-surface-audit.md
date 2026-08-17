@@ -187,9 +187,7 @@ Relevant code:
 - `lib/rate-limit.ts`
 - `lib/text-field-validation.ts`
 
-Remaining gap:
-
-- `app/api/newsletter/route.ts` duplicate handling is still not race-safe under concurrency.
+Newsletter duplicate handling now uses a conflict-aware insert. Concurrent requests for the same active address return the same generic success shape without sending duplicate welcome emails.
 
 ### Structured Logging For Forms, Rate Limits, And Email Failures
 
@@ -341,4 +339,4 @@ Relevant code:
 ## Current Open Fixes
 
 - [ ] Require a dedicated `ADMIN_SESSION_SECRET` in production.
-- [ ] Make newsletter duplicate handling race-safe with conflict-aware insert logic.
+- [x] Make newsletter duplicate handling race-safe with conflict-aware insert logic.

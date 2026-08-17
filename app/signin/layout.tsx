@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { AuthenticationSettingsProvider } from "@/components/auth/auth-image-provider";
+import { fetchAuthenticationSettingsFromContentful } from "@/lib/contentful-management";
 import { buildNoIndexMetadata } from "@/lib/seo";
 
 export const metadata = buildNoIndexMetadata(
@@ -6,6 +8,12 @@ export const metadata = buildNoIndexMetadata(
   "Customer sign-in page for WaistLess Foods."
 );
 
-export default function SignInLayout({ children }: { children: ReactNode }) {
-  return children;
+export default async function SignInLayout({ children }: { children: ReactNode }) {
+  const settings = await fetchAuthenticationSettingsFromContentful();
+
+  return (
+    <AuthenticationSettingsProvider settings={settings}>
+      {children}
+    </AuthenticationSettingsProvider>
+  );
 }

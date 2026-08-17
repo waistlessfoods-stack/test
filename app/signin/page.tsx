@@ -6,6 +6,7 @@ import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useClerk, useSignIn } from "@clerk/nextjs";
+import { useAuthenticationSettings } from "@/components/auth/auth-image-provider";
 
 type SignInStep = "identifier" | "password";
 
@@ -65,6 +66,7 @@ function getClerkErrorMessage(error: unknown) {
 }
 
 export default function SignInPage() {
+  const authenticationSettings = useAuthenticationSettings();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signIn } = useSignIn();
@@ -180,8 +182,8 @@ export default function SignInPage() {
       {/* Left Side - Image with Gradient Overlay */}
       <div className="relative hidden w-1/2 lg:block">
         <Image
-          src="/about/food-img.png"
-          alt="Delicious Food"
+          src={authenticationSettings?.signInImagePath || "/about/food-img.png"}
+          alt={authenticationSettings?.signInImageAltText || "Delicious food presentation"}
           fill
           className="object-cover"
           priority
@@ -189,11 +191,12 @@ export default function SignInPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-[#00676E]/90 via-[#00676E]/70 to-[#00676E]/90" />
         
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-12 text-white">
-          <h2 className="mb-4 text-center font-['Bebas_Neue'] text-6xl uppercase leading-tight tracking-wide">
-            Waste Less.<br />Taste More.
+          <h2 className="mb-4 whitespace-pre-line text-center font-['Bebas_Neue'] text-6xl uppercase leading-tight tracking-wide">
+            {authenticationSettings?.signInImageHeading || "Waste Less.\nTaste More."}
           </h2>
           <p className="max-w-md text-center text-lg opacity-90">
-            Join our community for exclusive recipes, chef tips, and sustainable cooking inspiration.
+            {authenticationSettings?.signInImageDescription ||
+              "Join our community for exclusive recipes, chef tips, and sustainable cooking inspiration."}
           </p>
         </div>
       </div>
@@ -203,11 +206,14 @@ export default function SignInPage() {
         <div className="w-full max-w-md">
           <div className="mb-8">
             <h1 className="mb-2 font-['Bebas_Neue'] text-5xl uppercase tracking-wide text-black">
-              {step === "identifier" ? "Welcome Back" : "Enter Password"}
+              {step === "identifier"
+                ? authenticationSettings?.signInFormHeading || "Welcome Back"
+                : "Enter Password"}
             </h1>
             <p className="text-gray-600">
               {step === "identifier"
-                ? "Sign in to continue your culinary journey"
+                ? authenticationSettings?.signInFormDescription ||
+                  "Sign in to continue your culinary journey"
                 : `Signing in as ${identifier}`}
             </p>
           </div>

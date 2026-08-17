@@ -50,6 +50,27 @@
       "when": 1781680735898,
       "tag": "0006_rate_limit_buckets",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1786941800000,
+      "tag": "0007_service_reviews",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1786951200000,
+      "tag": "0008_manage_legacy_service_reviews",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1786960800000,
+      "tag": "0009_newsletter_subscription_status",
+      "breakpoints": true
     }
   ]
 }

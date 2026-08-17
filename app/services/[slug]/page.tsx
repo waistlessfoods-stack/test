@@ -6,9 +6,15 @@ import {
   type ServiceDetailSectionsData,
 } from "@/lib/contentful-management";
 import { buildMetadata, toAbsoluteUrl } from "@/lib/seo";
+import {
+  fetchApprovedServiceReviews,
+  type ApprovedServiceReview,
+} from "@/lib/service-reviews";
 import ServiceDetailClient from "./service-detail-client";
 
-export const revalidate = 300;
+// Review moderation must be reflected immediately. Contentful fetchers retain
+// their own cache, while the approved review query runs for every page request.
+export const dynamic = "force-dynamic";
 
 type ServiceDetail = {
   slug: string;
@@ -28,6 +34,7 @@ type ServiceDetail = {
     averageRating: number;
     totalReviews: number;
     items: Array<{
+      id?: number;
       name: string;
       rating: number;
       date: string;
@@ -51,20 +58,15 @@ const toServiceDetail = (entry: {
   mainImagePath: string | null;
   imagePath: string | null;
   galleryImagePaths: string[];
-  reviews: {
-    averageRating: number;
-    totalReviews: number;
-    items: Array<{
-      name: string;
-      rating: number;
-      date: string;
-      comment: string;
-    }>;
-  } | null;
-}): ServiceDetail => {
-  if (!entry.reviews) {
-    throw new Error(`Missing reviews data for service slug "${entry.slug}".`);
-  }
+  reviews: unknown;
+}, approvedReviews: ApprovedServiceReview[] = []): ServiceDetail => {
+  const approvedRatingTotal = approvedReviews.reduce(
+    (sum, review) => sum + review.rating,
+    0
+  );
+  const approvedAverage = approvedReviews.length
+    ? Number((approvedRatingTotal / approvedReviews.length).toFixed(1))
+    : 0;
 
   return {
     slug: entry.slug,
@@ -82,7 +84,11 @@ const toServiceDetail = (entry: {
         ? entry.galleryImagePaths
         : [entry.imagePath].filter(Boolean),
     },
-    reviews: entry.reviews,
+    reviews: {
+      averageRating: approvedAverage,
+      totalReviews: approvedReviews.length,
+      items: approvedReviews,
+    },
   };
 };
 
@@ -117,12 +123,15 @@ export default async function ServiceDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const contentfulService = await fetchServiceDetailFromContentful(slug);
+  const [contentfulService, approvedReviews] = await Promise.all([
+    fetchServiceDetailFromContentful(slug),
+    fetchApprovedServiceReviews(slug),
+  ]);
   if (!contentfulService) {
     notFound();
   }
 
-  const service = toServiceDetail(contentfulService);
+  const service = toServiceDetail(contentfulService, approvedReviews);
   const serviceUrl = toAbsoluteUrl(`/services/${service.slug}`);
   const jsonLd = [
     {

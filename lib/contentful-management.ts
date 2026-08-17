@@ -38,6 +38,20 @@ function createContentfulClient(config: ContentfulConfig) {
   return createClient({ space: config.spaceId, accessToken: config.accessToken });
 }
 
+export const HOMEPAGE_HERO_FALLBACKS = {
+  eyebrow: "BOLD. SEASONAL. ARTFUL.",
+  title: "PRIVATE DINING & CATERING",
+  subtitle:
+    "Elegant culinary experiences designed to elevate your most meaningful moments",
+} as const;
+
+function getTextOrFallback(value: unknown, fallback: string): string {
+  if (typeof value !== "string") return fallback;
+
+  const normalizedValue = value.trim();
+  return normalizedValue || fallback;
+}
+
 // --- Asset URL helper ---
 
 function getAssetUrl(asset: any): string | null {
@@ -172,6 +186,7 @@ export type Testimonial = {
 };
 
 export type HomepageData = {
+  heroEyebrow: string;
   heroTitle: string;
   heroSubtitle: string;
   heroImagePaths: string[];
@@ -204,6 +219,21 @@ export type HeaderSettings = {
   promotionBannerBackgroundColor: string;
   promotionBannerTextColor: string;
   promotionBannerLink: string;
+};
+
+export type AuthenticationSettings = {
+  signInImagePath: string | null;
+  signInImageAltText: string;
+  signInImageHeading: string;
+  signInImageDescription: string;
+  signInFormHeading: string;
+  signInFormDescription: string;
+  signUpImagePath: string | null;
+  signUpImageAltText: string;
+  signUpImageHeading: string;
+  signUpImageDescription: string;
+  signUpFormHeading: string;
+  signUpFormDescription: string;
 };
 
 export type FooterSettings = {
@@ -707,8 +737,18 @@ async function fetchHomepageFromContentfulRaw(): Promise<HomepageData> {
       .slice(0, 3);
 
     const homepageResult = {
-      heroTitle: String(f.heroTitle ?? ""),
-      heroSubtitle: String(f.heroSubtitle ?? ""),
+      heroEyebrow: getTextOrFallback(
+        f.heroEyebrow,
+        HOMEPAGE_HERO_FALLBACKS.eyebrow
+      ),
+      heroTitle: getTextOrFallback(
+        f.heroTitle,
+        HOMEPAGE_HERO_FALLBACKS.title
+      ),
+      heroSubtitle: getTextOrFallback(
+        f.heroSubtitle,
+        HOMEPAGE_HERO_FALLBACKS.subtitle
+      ),
       heroImagePaths,
       heroImagePath: heroImagePaths[0] || legacyHeroImagePath,
       heroPrimaryCtaLabel: String(f.heroPrimaryCtaLabel ?? ""),
@@ -875,6 +915,83 @@ async function fetchHeaderSettingsFromContentfulRaw(): Promise<HeaderSettings | 
   }
 }
 
+async function fetchAuthenticationSettingsFromContentfulRaw(): Promise<AuthenticationSettings | null> {
+  const config = getContentfulConfig();
+
+  if (!config) {
+    return null;
+  }
+
+  try {
+    const client = createContentfulClient(config);
+    const entries = await client.getEntries({
+      content_type: "authenticationSettings",
+      include: 1,
+      limit: 1,
+    });
+    const entry = entries.items[0];
+
+    if (!entry) {
+      return null;
+    }
+
+    const fields = entry.fields as Record<string, unknown>;
+    const signInAssetFields = (
+      fields.image as { fields?: Record<string, unknown> } | undefined
+    )?.fields;
+    const signUpAssetFields = (
+      fields.signUpImage as { fields?: Record<string, unknown> } | undefined
+    )?.fields;
+
+    return {
+      signInImagePath: getAssetUrl(fields.image),
+      signInImageAltText: String(
+      fields.imageAltText ||
+          signInAssetFields?.description ||
+          signInAssetFields?.title ||
+          "Delicious food presentation"
+      ),
+      signInImageHeading: String(
+        fields.signInImageHeading || "Waste Less.\nTaste More."
+      ),
+      signInImageDescription: String(
+        fields.signInImageDescription ||
+          "Join our community for exclusive recipes, chef tips, and sustainable cooking inspiration."
+      ),
+      signInFormHeading: String(fields.signInFormHeading || "Welcome Back"),
+      signInFormDescription: String(
+        fields.signInFormDescription ||
+          "Sign in to continue your culinary journey"
+      ),
+      signUpImagePath: getAssetUrl(fields.signUpImage),
+      signUpImageAltText: String(
+        fields.signUpImageAltText ||
+          signUpAssetFields?.description ||
+          signUpAssetFields?.title ||
+          "Delicious recipes"
+      ),
+      signUpImageHeading: String(
+        fields.signUpImageHeading || "Join Our\nCommunity"
+      ),
+      signUpImageDescription: String(
+        fields.signUpImageDescription ||
+          "Get access to exclusive recipes, cooking tips, and sustainable living inspiration from Chef Amber."
+      ),
+      signUpFormHeading: String(fields.signUpFormHeading || "Create Account"),
+      signUpFormDescription: String(
+        fields.signUpFormDescription ||
+          "Start your journey to mindful, delicious cooking"
+      ),
+    };
+  } catch (error) {
+    logContentfulFetchError(
+      "Unable to load authentication settings from Contentful; using local fallback image:",
+      error
+    );
+    return null;
+  }
+}
+
 async function fetchFooterSettingsFromContentfulRaw(): Promise<FooterSettings | null> {
   console.log("[Contentful] fetchFooterSettings: start");
   const config = getRequiredContentfulConfig();
@@ -932,6 +1049,20 @@ export const fetchHeaderSettingsFromContentful = unstable_cache(
   { revalidate: 300, tags: ["header-settings"] }
 );
 
+const fetchAuthenticationSettingsFromContentfulCached = unstable_cache(
+  fetchAuthenticationSettingsFromContentfulRaw,
+  ["contentful-authentication-settings"],
+  { revalidate: 300, tags: ["authentication-settings"] }
+);
+
+export async function fetchAuthenticationSettingsFromContentful(): Promise<AuthenticationSettings | null> {
+  if (process.env.NODE_ENV !== "production") {
+    return fetchAuthenticationSettingsFromContentfulRaw();
+  }
+
+  return fetchAuthenticationSettingsFromContentfulCached();
+}
+
 export const fetchFooterSettingsFromContentful = unstable_cache(
   fetchFooterSettingsFromContentfulRaw,
   ["contentful-footer-settings"],
@@ -944,11 +1075,19 @@ export const fetchServicesFromContentful = unstable_cache(
   { revalidate: 300, tags: ["services"] }
 );
 
-export const fetchHomepageFromContentful = unstable_cache(
+const fetchHomepageFromContentfulCached = unstable_cache(
   fetchHomepageFromContentfulRaw,
   ["contentful-homepage"],
   { revalidate: 300, tags: ["homepage"] }
 );
+
+export async function fetchHomepageFromContentful(): Promise<HomepageData> {
+  if (process.env.NODE_ENV !== "production") {
+    return fetchHomepageFromContentfulRaw();
+  }
+
+  return fetchHomepageFromContentfulCached();
+}
 
 const fetchAboutPageFromContentfulCached = unstable_cache(
   fetchAboutPageFromContentfulRaw,

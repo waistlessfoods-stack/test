@@ -10,7 +10,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type {
   HomepageData,
@@ -28,8 +28,6 @@ export default function HomepageClient({ data }: HomepageClientProps) {
   const [heroCurrent, setHeroCurrent] = useState(0);
   const [testimonialApi, setTestimonialApi] = useState<CarouselApi>();
   const [testimonialCurrent, setTestimonialCurrent] = useState(0);
-  const chefPortraitRef = useRef<HTMLElement>(null);
-  const chefPortraitLayerRef = useRef<HTMLDivElement>(null);
 
   const heroSlides =
     data.heroImagePaths?.length > 0
@@ -37,16 +35,10 @@ export default function HomepageClient({ data }: HomepageClientProps) {
       : data.heroImagePath
         ? [data.heroImagePath]
         : [];
-  const heroTitle = data.heroTitle.replace(/\\n/g, "\n").replace(/\s+/g, " ").trim();
-  const usesPrivateDiningHero = /private dining\s*&\s*catering/i.test(heroTitle);
-  const heroEyebrow = usesPrivateDiningHero ? "BOLD. SEASONAL. ARTFUL." : "";
-  const heroHeadline = usesPrivateDiningHero
-    ? "PRIVATE DINING & CATERING"
-    : data.heroTitle;
+  const heroEyebrow = data.heroEyebrow;
+  const heroHeadline = data.heroTitle;
   const chefPortraitSource = data.aboutImagePath;
-  const heroSubtitle = usesPrivateDiningHero
-    ? "An elegant culinary experience designed to elevate your most meaningful moments"
-    : data.heroSubtitle;
+  const heroSubtitle = data.heroSubtitle;
 
   useEffect(() => {
     if (!testimonialApi) return;
@@ -89,114 +81,6 @@ export default function HomepageClient({ data }: HomepageClientProps) {
       window.clearInterval(intervalId);
     };
   }, [heroApi, heroSlides.length]);
-
-  useEffect(() => {
-    const portrait = chefPortraitRef.current;
-    const portraitLayer = chefPortraitLayerRef.current;
-    if (!portrait || !portraitLayer) return;
-
-    let animationFrame = 0;
-    let currentOffset = 0;
-    let targetOffset = 0;
-    let targetNeedsUpdate = false;
-    let lastFrameTime = 0;
-    const reducedMotionQuery = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    );
-    let prefersReducedMotion = reducedMotionQuery.matches;
-
-    const getTargetOffset = () => {
-      const rect = portrait.getBoundingClientRect();
-      const scrollRange = window.innerHeight + rect.height;
-      const progress = Math.max(
-        0,
-        Math.min(1, (window.innerHeight - rect.top) / scrollRange)
-      );
-      const maxOffset = window.innerWidth >= 1024 ? 40 : 180;
-
-      return (progress * 2 - 1) * maxOffset;
-    };
-
-    const renderPortraitPosition = (frameTime: number) => {
-      animationFrame = 0;
-
-      if (targetNeedsUpdate) {
-        targetOffset = getTargetOffset();
-        targetNeedsUpdate = false;
-      }
-
-      const distance = targetOffset - currentOffset;
-      const elapsedSeconds = lastFrameTime
-        ? Math.min((frameTime - lastFrameTime) / 1000, 0.1)
-        : 1 / 60;
-      const smoothing = 1 - Math.exp(-12 * elapsedSeconds);
-      lastFrameTime = frameTime;
-
-      if (Math.abs(distance) < 0.1) {
-        currentOffset = targetOffset;
-      } else {
-        currentOffset += distance * smoothing;
-      }
-
-      portraitLayer.style.transform = `translate3d(0, ${currentOffset.toFixed(2)}px, 0)`;
-
-      if (currentOffset === targetOffset) {
-        lastFrameTime = 0;
-        portraitLayer.style.willChange = "auto";
-        return;
-      }
-
-      animationFrame = window.requestAnimationFrame(renderPortraitPosition);
-    };
-
-    const updatePortraitTarget = () => {
-      if (prefersReducedMotion) return;
-
-      targetNeedsUpdate = true;
-      if (!animationFrame) {
-        portraitLayer.style.willChange = "transform";
-        animationFrame = window.requestAnimationFrame(renderPortraitPosition);
-      }
-    };
-
-    const handleMotionPreferenceChange = () => {
-      prefersReducedMotion = reducedMotionQuery.matches;
-
-      if (animationFrame) {
-        window.cancelAnimationFrame(animationFrame);
-        animationFrame = 0;
-      }
-      targetNeedsUpdate = false;
-      lastFrameTime = 0;
-
-      if (prefersReducedMotion) {
-        currentOffset = 0;
-        targetOffset = 0;
-        portraitLayer.style.transform = "none";
-        portraitLayer.style.willChange = "auto";
-        return;
-      }
-
-      currentOffset = getTargetOffset();
-      targetOffset = currentOffset;
-      portraitLayer.style.transform = `translate3d(0, ${currentOffset.toFixed(2)}px, 0)`;
-    };
-
-    handleMotionPreferenceChange();
-    window.addEventListener("scroll", updatePortraitTarget, { passive: true });
-    window.addEventListener("resize", updatePortraitTarget);
-    reducedMotionQuery.addEventListener("change", handleMotionPreferenceChange);
-
-    return () => {
-      window.removeEventListener("scroll", updatePortraitTarget);
-      window.removeEventListener("resize", updatePortraitTarget);
-      reducedMotionQuery.removeEventListener(
-        "change",
-        handleMotionPreferenceChange
-      );
-      if (animationFrame) window.cancelAnimationFrame(animationFrame);
-    };
-  }, [chefPortraitSource]);
 
   return (
     <div className="flex flex-col w-full">
@@ -349,76 +233,43 @@ export default function HomepageClient({ data }: HomepageClientProps) {
       </section>
 
       {/* About Chef Amber Section */}
-      <section
-        ref={chefPortraitRef}
-        className="relative flex min-h-[1050px] w-full items-start justify-center overflow-hidden bg-[#E9E6E4] pb-20 pt-48 md:min-h-[900px] md:pb-24 md:pt-56"
-      >
-        {chefPortraitSource && (
+      <section className="w-full bg-[#F6F3EF] px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-20">
+        <div className="mx-auto grid w-full max-w-6xl overflow-hidden border border-[#E4DED7] bg-[#FFFDFC] lg:grid-cols-2">
           <div
-            ref={chefPortraitLayerRef}
-            aria-hidden="true"
-            className="absolute inset-0"
+            className="relative overflow-hidden bg-[#D8D1CB]"
+            style={{ minHeight: "clamp(400px, 64vw, 560px)" }}
           >
-            <Image
-              src="/amber-mobile-vertical.png"
-              alt=""
-              fill
-              sizes="(max-width: 1023px) 100vw, 0px"
-              className="object-cover object-top lg:hidden"
-            />
-            <div
-              className="absolute inset-x-0 hidden isolate lg:block"
-              style={{ top: "-192px", bottom: "-192px" }}
-            >
-              <Image
-                src="/amber-desktop-kitchen-plate.png"
-                alt=""
-                fill
-                sizes="(min-width: 1024px) 100vw, 0px"
-                className="object-cover object-center"
-                style={{ transform: "scale(1.08)", zIndex: 0 }}
-              />
+            {chefPortraitSource ? (
               <Image
                 src={chefPortraitSource}
-                alt=""
-                width={2020}
-                height={2020}
-                sizes="(min-width: 1440px) 720px, (min-width: 1024px) 50vw, 0px"
-                className="absolute max-w-none object-contain"
+                alt="Chef Amber"
+                fill
+                sizes="(min-width: 1280px) 576px, (min-width: 1024px) 50vw, 100vw"
+                className="object-cover"
                 style={{
-                  top: "clamp(160px, calc(547.7px - 26.9vw), 272px)",
-                  left: "50%",
-                  width: "min(50vw, 720px)",
-                  height: "auto",
-                  transform: "translateX(-50%)",
-                  zIndex: 1,
-                  maskMode: "alpha",
-                  maskImage:
-                    "linear-gradient(to right, transparent 0%, white 18%, white 82%, transparent 100%)",
-                  WebkitMaskImage:
-                    "linear-gradient(to right, transparent 0%, white 18%, white 82%, transparent 100%)",
-                  WebkitMaskRepeat: "no-repeat",
-                  WebkitMaskSize: "100% 100%",
+                  objectPosition: "50% 42%",
+                  transform: "translateX(3%) scale(1.08)",
                 }}
               />
-            </div>
+            ) : (
+              <div className="flex h-full items-center justify-center px-6 text-center font-sans text-sm text-[#5B5B5B]">
+                Chef Amber portrait
+              </div>
+            )}
           </div>
-        )}
-        <div className="absolute inset-0 bg-black/5" />
 
-        <div className="relative z-10 flex w-[calc(100%-2rem)] max-w-6xl justify-center bg-white px-6 py-10 md:w-[calc(100%-4rem)] md:py-11">
-          <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 text-center md:gap-7">
-            <div className="flex w-full flex-col items-center gap-5 md:gap-6">
-              <h2 className="text-center font-sans text-[24px] font-semibold uppercase leading-tight tracking-[-0.01em] text-black md:text-[28px]">
+          <div className="flex items-center px-5 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12 xl:px-12">
+            <div className="flex w-full flex-col items-start gap-4 text-left">
+              <h2 className="font-sans text-2xl font-semibold uppercase leading-tight tracking-[-0.01em] text-black">
                 {data.aboutHeading}
               </h2>
 
-              <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 text-center font-sans">
-                <p className="text-base leading-7 text-[#222222] md:text-lg md:leading-8">
+              <div className="flex w-full flex-col gap-3 font-sans">
+                <p className="text-[15px] leading-7 text-[#333333]">
                   {data.aboutBodyPrimary}
                 </p>
 
-                <blockquote className="mx-auto max-w-2xl whitespace-pre-line font-serif text-lg italic leading-8 text-[#00676E] md:text-xl md:leading-9">
+                <blockquote className="whitespace-pre-line font-serif text-[17px] italic leading-7 text-[#00676E]">
                   {data.aboutBodySecondary}
                 </blockquote>
 
@@ -427,21 +278,21 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                   alt="Chef Amber's signature"
                   width={2153}
                   height={730}
-                  className="h-auto max-w-full self-center object-contain"
-                  style={{ width: "360px", height: "auto", marginInline: "auto" }}
+                  className="h-auto object-contain"
+                  style={{ width: "min(42vw, 190px)" }}
                 />
 
-                <p className="text-base font-bold leading-6 text-[#333333] md:text-lg">
+                <p className="text-[15px] font-bold leading-6 text-[#333333]">
                   {data.aboutBodyTertiary}
                 </p>
               </div>
 
-              <div className="w-full flex justify-center">
-                <div className="mx-auto grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="w-full">
+                <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
                   {data.aboutBullets.map((text, index) => (
                     <div
                       key={index}
-                      className="flex min-h-[38px] items-center gap-3 border border-[#388082] bg-white px-3 py-2 text-left"
+                      className="flex min-h-9 items-center gap-2.5 border border-[#388082] bg-[#FAFCFC] px-3 py-2 text-left"
                     >
                       <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-[#388082]">
                         <svg
@@ -458,20 +309,19 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                           />
                         </svg>
                       </div>
-                      <span className="font-sans text-[12px] font-semibold leading-5 text-left text-[#388082] md:text-[13px]">
+                      <span className="text-left font-sans text-xs font-semibold leading-4 text-[#388082]">
                         {text}
                       </span>
                     </div>
                   ))}
                 </div>
               </div>
+              <Link href={data.aboutButtonHref || "/about"}>
+                <Button className="h-11 w-full min-w-[190px] rounded bg-[#388082] px-8 text-[16px] font-medium text-white transition-all hover:brightness-110 active:scale-95">
+                  {data.aboutButtonLabel}
+                </Button>
+              </Link>
             </div>
-
-            <Link href={data.aboutButtonHref || "/about"}>
-              <Button className="h-11 w-full min-w-[190px] rounded bg-[#388082] px-8 text-[16px] font-medium text-white transition-all hover:brightness-110 active:scale-95">
-                {data.aboutButtonLabel}
-              </Button>
-            </Link>
           </div>
         </div>
       </section>

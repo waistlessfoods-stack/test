@@ -5,6 +5,7 @@ import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useClerk, useSignUp } from "@clerk/nextjs";
+import { useAuthenticationSettings } from "@/components/auth/auth-image-provider";
 
 type SignUpStep = "credentials" | "verify";
 
@@ -73,6 +74,7 @@ function getClerkErrorMessage(error: unknown) {
 }
 
 export default function SignUpPage() {
+  const authenticationSettings = useAuthenticationSettings();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signUp } = useSignUp();
@@ -227,8 +229,8 @@ export default function SignUpPage() {
       {/* Left Side - Image with Gradient Overlay */}
       <div className="relative hidden w-1/2 lg:block">
         <Image
-          src="/highlight/recipe.png"
-          alt="Delicious Recipes"
+          src={authenticationSettings?.signUpImagePath || "/highlight/recipe.png"}
+          alt={authenticationSettings?.signUpImageAltText || "Delicious recipes"}
           fill
           className="object-cover"
           priority
@@ -236,11 +238,12 @@ export default function SignUpPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-[#00676E]/90 via-[#00676E]/70 to-[#00676E]/90" />
         
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-12 text-white">
-          <h2 className="mb-4 text-center font-['Bebas_Neue'] text-6xl uppercase leading-tight tracking-wide">
-            Join Our<br />Community
+          <h2 className="mb-4 whitespace-pre-line text-center font-['Bebas_Neue'] text-6xl uppercase leading-tight tracking-wide">
+            {authenticationSettings?.signUpImageHeading || "Join Our\nCommunity"}
           </h2>
           <p className="max-w-md text-center text-lg opacity-90">
-            Get access to exclusive recipes, cooking tips, and sustainable living inspiration from Chef Amber.
+            {authenticationSettings?.signUpImageDescription ||
+              "Get access to exclusive recipes, cooking tips, and sustainable living inspiration from Chef Amber."}
           </p>
         </div>
       </div>
@@ -250,11 +253,14 @@ export default function SignUpPage() {
         <div className="w-full max-w-md">
           <div className="mb-8">
             <h1 className="mb-2 font-['Bebas_Neue'] text-5xl uppercase tracking-wide text-[#00676E]">
-              {step === "credentials" ? "Create Account" : "Verify Email"}
+              {step === "credentials"
+                ? authenticationSettings?.signUpFormHeading || "Create Account"
+                : "Verify Email"}
             </h1>
             <p className="text-gray-600">
               {step === "credentials"
-                ? "Start your journey to mindful, delicious cooking"
+                ? authenticationSettings?.signUpFormDescription ||
+                  "Start your journey to mindful, delicious cooking"
                 : `Enter the verification code sent to ${emailAddress}`}
             </p>
           </div>

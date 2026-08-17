@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { Star } from "lucide-react";
+import { useRef, useState } from "react";
+import { ArrowUp, Star } from "lucide-react";
+import ReviewDialog from "@/components/review-dialog";
 import type {
   ServiceDetailSection,
   ServiceDetailSectionsData,
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/breadcrumb";
 
 type Review = {
+  id?: number;
   name: string;
   rating: number;
   date: string;
@@ -60,6 +62,8 @@ export default function ServiceDetailClient({
 function ServiceDetailContent({ service }: ServiceDetailClientProps) {
   const [visibleCount, setVisibleCount] = useState(2);
   const [mainImage, setMainImage] = useState(service.images.main);
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const reviewsHeadingRef = useRef<HTMLHeadingElement>(null);
   const detailSections = service.detailSections?.sections ?? [];
   const hasDetailSections = detailSections.length > 0;
 
@@ -123,7 +127,10 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
           </div>
 
           <div className="mt-6 pt-6 border-t border-gray-100 w-full lg:w-[520px]">
-            <h2 className="font-sans font-medium text-lg md:text-xl text-black mb-4">
+            <h2
+              ref={reviewsHeadingRef}
+              className="font-sans font-medium text-lg md:text-xl text-black mb-4 scroll-mt-28"
+            >
               Ratings & Reviews
             </h2>
 
@@ -146,7 +153,11 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
                   Based on {service.reviews.totalReviews} reviews
                 </p>
               </div>
-              <button className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-100 transition">
+              <button
+                type="button"
+                onClick={() => setReviewDialogOpen(true)}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-100 transition"
+              >
                 Write a review
               </button>
             </div>
@@ -156,7 +167,7 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
                 .slice(0, visibleCount)
                 .map((review, idx) => (
                   <div
-                    key={`${review.name}-${idx}`}
+                    key={review.id ?? `${review.name}-${idx}`}
                     className="border border-gray-100 rounded-md p-4 hover:shadow-sm transition"
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -190,6 +201,22 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
                 className="w-full mt-3 py-2.5 rounded-lg border border-gray-200 text-sm font-medium hover:bg-gray-50 transition"
               >
                 Load more reviews
+              </button>
+            )}
+
+            {visibleCount > 2 && (
+              <button
+                type="button"
+                onClick={() =>
+                  reviewsHeadingRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  })
+                }
+                className="mx-auto mt-3 flex items-center gap-1.5 text-sm font-medium text-[#388082] hover:text-[#2e6b6d]"
+              >
+                <ArrowUp className="h-4 w-4" />
+                Back to reviews
               </button>
             )}
           </div>
@@ -257,6 +284,13 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
           </section>
         </section>
       </div>
+
+      <ReviewDialog
+        open={reviewDialogOpen}
+        onOpenChange={setReviewDialogOpen}
+        serviceSlug={service.slug}
+        serviceTitle={service.title}
+      />
     </main>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
@@ -29,6 +29,7 @@ export default function Header({
   socialLinks?: SocialLink[];
   headerSettings?: HeaderSettings | null;
 }) {
+  const headerRef = useRef<HTMLElement>(null);
   const router = useRouter();
   const { signOut } = useClerk();
   const [isOpen, setIsOpen] = useState(false);
@@ -205,8 +206,32 @@ export default function Header({
     return links;
   })();
 
+  useEffect(() => {
+    const header = headerRef.current;
+
+    if (!header) return;
+
+    const updateHeaderHeight = () => {
+      document.documentElement.style.setProperty(
+        "--site-header-height",
+        `${Math.ceil(header.getBoundingClientRect().height)}px`
+      );
+    };
+
+    updateHeaderHeight();
+
+    const resizeObserver = new ResizeObserver(updateHeaderHeight);
+    resizeObserver.observe(header);
+    window.addEventListener("resize", updateHeaderHeight);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateHeaderHeight);
+    };
+  }, []);
+
   return (
-    <header className="sticky top-0 w-full bg-white z-50">
+    <header ref={headerRef} className="sticky top-0 w-full bg-white z-50">
       {/* Banner */}
       {headerSettings?.promotionBannerEnabled && headerSettings.promotionBannerText && (
         <div 

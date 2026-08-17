@@ -79,7 +79,7 @@ export default function AboutPageClient({ data }: AboutPageClientProps) {
         <Container>
           <div className="grid items-start gap-10 lg:grid-cols-[minmax(280px,460px)_minmax(0,1fr)] lg:gap-16">
             {data.contentImage2Path && (
-              <div className="relative mx-auto w-full max-w-[460px] overflow-hidden rounded-md bg-[#E6E6E2] lg:sticky lg:top-28 lg:mx-0">
+              <div className="about-sticky-portrait relative mx-auto w-full max-w-[460px] overflow-hidden rounded-md bg-[#E6E6E2] lg:mx-0">
                 <div className="relative aspect-[4/5]">
                   <Image
                     src={data.contentImage2Path}
