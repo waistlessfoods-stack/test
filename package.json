@@ -10,6 +10,7 @@
     "restart": "pnpm killdev && pnpm dev",
     "build": "next build",
     "start": "next start",
+    "qa:production": "node scripts/production-qa.mjs",
     "lint": "eslint",
     "fallow": "fallow",
     "fallow:dead-code": "fallow dead-code",

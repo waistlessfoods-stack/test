@@ -52,17 +52,17 @@ Completion note: the published Breakfast and Dessert `recipeCategory` entries we
 
 Completion note: all three published service entries were sharing the same three `subImages` assets. Catering retained the original assets, while Private Chef and Cooking Classes each received three separately published copies of the same visible artwork. The nine secondary-image links now use nine unique Contentful asset IDs, so each service can be edited independently without changing another service. The existing service thumbnail asset IDs were verified unchanged. All three service-detail pages were then verified on localhost and production with the expected main thumbnail and independent gallery assets.
 
-### 5. Make the Homepage Message Editable — Completed Locally August 17, 2026
+### 5. Make the Homepage Message Editable — Completed and Deployed August 17, 2026
 
 - [x] Confirm the intended homepage headline and supporting message from Amber's published entry and written feedback.
 - [x] Add or reuse Contentful fields for the headline and subheadline.
 - [x] Connect the fields to the homepage frontend.
 - [x] Preserve sensible fallback copy when fields are empty.
-- [x] Verify copy such as `Waste Less, Taste More` and `Join our community for exclusive recipes...` can be changed without a code deployment after this frontend release is deployed.
+- [x] Verify copy such as `Waste Less, Taste More` and `Join our community for exclusive recipes...` can be changed without a code deployment.
 
-Completion note: the existing `heroTitle` and `heroSubtitle` fields were already present, but the frontend replaced their values with hard-coded copy whenever the headline mentioned Private Dining & Catering. That override was removed. The Contentful model now presents three clearly labeled, optional fields: `HOMEPAGE — Eyebrow`, `HOMEPAGE — Main Headline`, and `HOMEPAGE — Supporting Message`. The active combined title was separated while preserving Amber's published presentation: `BOLD. SEASONAL. ARTFUL.` above `PRIVATE DINING & CATERING`, followed by the published supporting message. Empty or missing values use safe frontend fallbacks. Localhost was revalidated and verified against the published Contentful values. The public site still runs the earlier hard-coded frontend build, so this code must be included in the next deployment; after that one deployment, future copy changes only require editing and publishing the Homepage entry in Contentful.
+Completion note: the existing `heroTitle` and `heroSubtitle` fields were already present, but the frontend replaced their values with hard-coded copy whenever the headline mentioned Private Dining & Catering. That override was removed. The Contentful model now presents three clearly labeled, optional fields: `HOMEPAGE — Eyebrow`, `HOMEPAGE — Main Headline`, and `HOMEPAGE — Supporting Message`. The active combined title was separated while preserving Amber's published presentation: `BOLD. SEASONAL. ARTFUL.` above `PRIVATE DINING & CATERING`, followed by the published supporting message. Empty or missing values use safe frontend fallbacks. Production now renders the published Contentful values, so future copy changes only require editing and publishing the Homepage entry in Contentful.
 
-### 6. Complete the Review Workflow — Completed Locally August 17, 2026
+### 6. Complete the Review Workflow — Completed and Deployed August 17, 2026
 
 - [x] Make the **Write a review** button open a working form or modal.
 - [x] Collect the reviewer's name, email address, rating, and review text.
@@ -75,9 +75,9 @@ Completion note: the existing `heroTitle` and `heroSubtitle` fields were already
 - [x] Add a convenient way to return to the top when a long review list is expanded.
 - [x] Treat existing testimonials and service-review submissions as separate content where appropriate.
 
-Completion note: moderation now uses the existing custom admin area at `/admin/reviews`. The **Write a review** modal collects the reviewer's name, private email address, one-to-five-star rating, and review text. The public submission endpoint validates allowed services, field lengths, email format, rating, minimum review length, and excessive links; it also uses a hidden honeypot plus per-IP and per-email rate limits. Every accepted submission is stored in the `service_reviews` database table with `pending` status and cannot appear publicly until an administrator approves it. Administrators can filter pending, approved, and rejected reviews; approve, reject, or return any review to pending; and permanently delete a review after confirmation. The nine reviews previously embedded in the three published Contentful service entries were imported as individually managed records. Service pages now use only approved database reviews, and the displayed average and count are calculated only from those visible records—the old shared `4.8 / 27 reviews` placeholder aggregate is ignored. Contentful imports are idempotent and identified in the admin area, while homepage testimonials remain a separate content type. Progressive **Load more reviews** remains in place, with a **Back to reviews** control after expansion. The database migrations were applied, and pending visibility, approval restoration, permanent deletion, TypeScript, ESLint, and a clean production build were verified; all nine imported records were restored to approved after testing and no temporary review remains. The frontend and admin additions still require the next normal deployment before they are available on the public site.
+Completion note: moderation now uses the existing custom admin area at `/admin/reviews`. The **Write a review** modal collects the reviewer's name, private email address, one-to-five-star rating, and review text. The public submission endpoint validates allowed services, field lengths, email format, rating, minimum review length, and excessive links; it also uses a hidden honeypot plus per-IP and per-email rate limits. Every accepted submission is stored in the `service_reviews` database table with `pending` status and cannot appear publicly until an administrator approves it. Administrators can filter pending, approved, and rejected reviews; approve, reject, or return any review to pending; and permanently delete a review after confirmation. The nine reviews previously embedded in the three published Contentful service entries were imported as individually managed records. Service pages now use only approved database reviews, and the displayed average and count are calculated only from those visible records—the old shared `4.8 / 27 reviews` placeholder aggregate is ignored. Contentful imports are idempotent and identified in the admin area, while homepage testimonials remain a separate content type. Progressive **Load more reviews** remains in place, with a **Back to reviews** control after expansion. The database migrations and frontend/admin additions are deployed. Production QA verified the complete submit, pending, hidden, approve, public display, return-to-pending, hidden-again, and permanent-delete lifecycle.
 
-### 7. Connect the New Welcome Email to Subscriptions — Implemented Locally; Inbox Matrix Pending
+### 7. Connect the New Welcome Email to Subscriptions — Deployed; Inbox Matrix Pending
 
 - [x] Use Amber's August 14 revised `The WaistLess Table` copy.
 - [x] Use the prepared branded React Email template and WaistLess Foods logo.
@@ -104,14 +104,18 @@ Completion note: a client-facing proposal now defines a small Events MVP using C
 
 ### 9. Final Production Verification
 
-- Review all agreed fixes on the production website.
-- Check desktop, tablet, and mobile layouts.
-- Verify Contentful edits are published and rendered correctly.
-- Check image independence across homepage categories and service pages.
-- Test the subscription and welcome-email flow.
-- Test review submission and moderation after implementation.
-- Check important navigation, recipe slugs, authentication, and service-detail pages.
-- Record the final handoff state and formally close the original website punch list.
+- [x] Review all agreed fixes on the production website.
+- [x] Check desktop, tablet, and mobile layouts.
+- [x] Verify Contentful edits are published and rendered correctly.
+- [x] Check image independence across homepage categories and service pages.
+- [x] Test the subscription and unsubscribe endpoint/database lifecycle.
+- [ ] Complete real-inbox welcome-email rendering checks.
+- [x] Complete the final production review approve/display/hide round trip.
+- [x] Check important navigation, recipe slugs, authentication, and service-detail pages.
+- [ ] Fix the broken Yelp icon, remove the published Sign In test copy, and confirm the preview-gate launch decision.
+- [ ] Record the final handoff state and formally close the original website punch list.
+
+QA note: the August 17 production pass covered 23 routes and 22 desktop/tablet/mobile browser combinations. The deployed implementation is largely working, but the original punch list is not formally closed. See `docs/production-qa-report-2026-08-17.md` for evidence, cleanup confirmation, and the remaining launch blockers.
 
 ## Content and Access Needed from Amber or John
 
@@ -187,14 +191,11 @@ Amber needs to:
 
 ## Open Decisions
 
-- Where should review submissions be moderated?
-- Which subject line should be used for the welcome email?
 - Which email-marketing or delivery provider should be used?
 - Should all cooking-class videos remain unlisted, or should selected videos be public?
 - Which page or section should receive each cooking-class video?
 - Should Google Calendar handle consultations, service availability, or both?
-- What is the precise Events MVP and client-approved price?
-- Will Events registration begin with Google Calendar, Eventbrite, another external provider, or an on-site flow?
+- Will Amber and John approve the proposed Events MVP, price, and external Eventbrite registration approach?
 
 ## Readiness Summary
 
@@ -204,11 +205,11 @@ Amber needs to:
 - Contentful-managed authentication-page image work. Completed August 17, 2026.
 - Breakfast/Dessert asset verification and separation. Completed August 17, 2026.
 - Service secondary-image separation. Completed August 17, 2026.
-- Homepage editable-message fields. Completed locally August 17, 2026; pending deployment.
-- Review form and moderation workflow. Completed locally August 17, 2026; pending deployment.
-- Welcome-email integration work.
+- Homepage editable-message fields. Completed and deployed August 17, 2026.
+- Review form and moderation workflow. Completed and deployed August 17, 2026.
+- Welcome-email integration work. Deployed; real-inbox matrix pending.
 - Events MVP scoping and quotation. Proposal prepared August 17, 2026; awaiting client approval.
-- Production verification planning.
+- Production verification. Conditional pass August 17, 2026; closeout blockers documented.
 
 ### Blocked or Partially Blocked
 
@@ -218,6 +219,7 @@ Amber needs to:
 - Email and scheduling integration: awaiting authorized account access and Calendar decisions.
 - Events implementation: awaiting scope and commercial approval.
 - Final recipe and image population: awaiting remaining content from Amber.
+- Public launch: awaiting Yelp icon repair, published Sign In test-copy cleanup, and preview-gate removal approval.
 
 ## Access Note
 

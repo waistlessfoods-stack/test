@@ -1,0 +1,135 @@
+{
+  "runId": "2026-08-17T13-17-24-762Z-8472a7",
+  "scope": "lifecycle",
+  "startedAt": "2026-08-17T13:17:24.762Z",
+  "baseUrl": "https://www.waistlessfoods.com",
+  "summary": {
+    "passed": 14,
+    "failed": 0,
+    "warnings": 0
+  },
+  "checks": [
+    {
+      "name": "Review endpoint rejects invalid input",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 400
+      }
+    },
+    {
+      "name": "Review endpoint accepts a valid submission as pending",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 201,
+        "email": "qa***@example.com"
+      }
+    },
+    {
+      "name": "Production review administrator login works",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Submitted review is stored as pending in moderation",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "listingStatus": 200,
+        "listingError": null,
+        "reviewCount": 11,
+        "found": true,
+        "status": "pending"
+      }
+    },
+    {
+      "name": "Pending review is hidden from the public service page",
+      "passed": true,
+      "severity": "error",
+      "details": {}
+    },
+    {
+      "name": "Administrator can approve a pending review",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Approved review appears publicly after revalidation",
+      "passed": true,
+      "severity": "error",
+      "details": {}
+    },
+    {
+      "name": "Administrator can return an approved review to pending and hide it",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Administrator can permanently delete a review",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Newsletter endpoint rejects an invalid email",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 400
+      }
+    },
+    {
+      "name": "Newsletter endpoint accepts a new subscriber",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 201,
+        "email": "in***@waistlessfoods.com",
+        "subscriberCreated": true
+      }
+    },
+    {
+      "name": "Duplicate active subscription is handled without a second record",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Unsubscribe endpoint rejects an invalid signed token",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 303,
+        "location": "https://www.waistlessfoods.com/unsubscribe?status=invalid"
+      }
+    },
+    {
+      "name": "Signed unsubscribe link deactivates the subscriber",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 303,
+        "databaseActive": false
+      }
+    }
+  ],
+  "browser": [],
+  "notes": [
+    "The live newsletter endpoint accepted the QA mailbox and attempted the branded welcome email. The HTTP response cannot prove inbox placement because email delivery errors are logged server-side without failing subscription creation."
+  ],
+  "finishedAt": "2026-08-17T13:17:38.986Z"
+}

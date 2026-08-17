@@ -1,0 +1,876 @@
+{
+  "runId": "2026-08-17T12-59-22-399Z-33054a",
+  "startedAt": "2026-08-17T12:59:22.400Z",
+  "baseUrl": "https://www.waistlessfoods.com",
+  "summary": {
+    "passed": 16,
+    "failed": 2,
+    "warnings": 0
+  },
+  "checks": [
+    {
+      "name": "All required and sitemap routes return a non-error response",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "tested": 23,
+        "failures": []
+      }
+    },
+    {
+      "name": "Production sitemap is available",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 200,
+        "discoveredRoutes": 9
+      }
+    },
+    {
+      "name": "Breakfast and Dessert use independent published Contentful assets",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "breakfastFound": true,
+        "dessertFound": true,
+        "breakfastAssetCount": 1,
+        "dessertAssetCount": 1,
+        "sameAsset": false
+      }
+    },
+    {
+      "name": "Private Chef, Catering, and Cooking Classes use independent secondary assets",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "counts": {
+          "private": 3,
+          "catering": 3,
+          "cooking-classes": 3
+        },
+        "totalAssets": 9,
+        "uniqueAssets": 9
+      }
+    },
+    {
+      "name": "Responsive browser matrix has no page, overflow, image, or runtime failures",
+      "passed": false,
+      "severity": "error",
+      "details": {
+        "pagesTested": 22,
+        "failures": [
+          {
+            "viewport": "mobile",
+            "route": "/",
+            "status": 200,
+            "title": "Waste Less. Taste More. | WaistLess Foods",
+            "h1": "PRIVATE DINING & CATERING",
+            "horizontalOverflow": 0,
+            "brokenImages": [
+              "https://www.waistlessfoods.com/_next/image?url=https%3A%2F%2Fcdn.simpleicons.org%2Fyelp%2Fffffff&w=32&q=75"
+            ],
+            "runtimeErrors": [],
+            "failedRequests": [
+              {
+                "url": "https://www.waistlessfoods.com/?_rsc=p37cr",
+                "reason": "net::ERR_ABORTED"
+              },
+              {
+                "url": "https://www.waistlessfoods.com/shop?_rsc=bno6j",
+                "reason": "net::ERR_ABORTED"
+              },
+              {
+                "url": "https://www.waistlessfoods.com/services?_rsc=5yivd",
+                "reason": "net::ERR_ABORTED"
+              },
+              {
+                "url": "https://www.waistlessfoods.com/signin?_rsc=p37cr",
+                "reason": "net::ERR_ABORTED"
+              },
+              {
+                "url": "https://www.waistlessfoods.com/recipes?category=pasta&_rsc=1r34m",
+                "reason": "net::ERR_ABORTED"
+              },
+              {
+                "url": "https://www.waistlessfoods.com/blog?_rsc=p37cr",
+                "reason": "net::ERR_ABORTED"
+              },
+              {
+                "url": "https://www.waistlessfoods.com/recipes?_rsc=wbt06",
+                "reason": "net::ERR_ABORTED"
+              }
+            ],
+            "badResponses": [
+              {
+                "url": "https://www.waistlessfoods.com/_next/image?url=https%3A%2F%2Fcdn.simpleicons.org%2Fyelp%2Fffffff&w=32&q=75",
+                "status": 502
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Homepage chef portrait appears left of the message on desktop",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "portraitFound": true,
+        "headingFound": true
+      }
+    },
+    {
+      "name": "Homepage chef portrait appears before the message on mobile",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "portraitFound": true,
+        "headingFound": true
+      }
+    },
+    {
+      "name": "About-page sticky portrait clears the measured sticky header",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "headerTop": 0,
+        "headerBottom": 0,
+        "portraitTop": 213
+      }
+    },
+    {
+      "name": "Review endpoint rejects invalid input",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 400
+      }
+    },
+    {
+      "name": "Review endpoint accepts a valid submission as pending",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 201,
+        "email": "qa***@example.com"
+      }
+    },
+    {
+      "name": "Production review administrator login works",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Submitted review is stored as pending in moderation",
+      "passed": false,
+      "severity": "error",
+      "details": {
+        "listingStatus": 200,
+        "listingError": null,
+        "reviewCount": 11,
+        "found": false,
+        "status": null
+      }
+    },
+    {
+      "name": "Pending review is hidden from the public service page",
+      "passed": true,
+      "severity": "error",
+      "details": {}
+    },
+    {
+      "name": "Newsletter endpoint rejects an invalid email",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 400
+      }
+    },
+    {
+      "name": "Newsletter endpoint accepts a new subscriber",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 201,
+        "email": "in***@waistlessfoods.com",
+        "subscriberCreated": true
+      }
+    },
+    {
+      "name": "Duplicate active subscription is handled without a second record",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Unsubscribe endpoint rejects an invalid signed token",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 303,
+        "location": "https://www.waistlessfoods.com/unsubscribe?status=invalid"
+      }
+    },
+    {
+      "name": "Signed unsubscribe link deactivates the subscriber",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "status": 303,
+        "databaseActive": false
+      }
+    }
+  ],
+  "browser": [
+    {
+      "viewport": "desktop",
+      "route": "/",
+      "status": 200,
+      "title": "Waste Less. Taste More. | WaistLess Foods",
+      "h1": "PRIVATE DINING & CATERING",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=bno6j",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/blog?_rsc=p37cr",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes?_rsc=wbt06",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=p37cr",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/about",
+      "status": 200,
+      "title": "About | WaistLess Foods",
+      "h1": "Meet Chef Amber!",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=1z7k0",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=17qq4",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/blog?_rsc=tg835",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes?_rsc=1m49i",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/services/private",
+      "status": 200,
+      "title": "Private Chef | WaistLess Foods",
+      "h1": "Private Chef",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/recipes?_rsc=bt2h6",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=bt2h6",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=awotv",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=16nft",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/blog?_rsc=awotv",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes?_rsc=1lajx",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/services/catering",
+      "status": 200,
+      "title": "Catering | WaistLess Foods",
+      "h1": "Catering",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=xj2q9",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes?_rsc=xj2q9",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/blog?_rsc=xj2q9",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=xj2q9",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/about?_rsc=xj2q9",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=3ukcu",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=1kxqk",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/services/cooking-classes",
+      "status": 200,
+      "title": "Cooking Classes | WaistLess Foods",
+      "h1": "Cooking Classes",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/blog?_rsc=ik76s",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/about?_rsc=ik76s",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=h5n5h",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/recipes",
+      "status": 200,
+      "title": "The WaistLess Kitchen | WaistLess Foods",
+      "h1": "The WaistLess Kitchen",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/shop",
+      "status": 200,
+      "title": "The WaistLess Shop | WaistLess Foods",
+      "h1": "The WaistLess Shop",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=3hlgq",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes/detail/herby-pasta-primavera?_rsc=3hlgq",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=3hlgq",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes/detail/herby-pasta-primavera?_rsc=12u4z",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/signin",
+      "status": 200,
+      "title": "Sign In | WaistLess Foods",
+      "h1": "Welcome Back",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=ynvfo",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=60zf7",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes?_rsc=buuky",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/blog?_rsc=1o94a",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=1m7sy",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/signup?_rsc=1o94a",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/signup",
+      "status": 200,
+      "title": "Sign Up | WaistLess Foods",
+      "h1": "Create Account",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=ynvfz",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=ynvfz",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=60zfi",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/blog?_rsc=1o94a",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes?_rsc=buul9",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "tablet",
+      "route": "/",
+      "status": 200,
+      "title": "Waste Less. Taste More. | WaistLess Foods",
+      "h1": "PRIVATE DINING & CATERING",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=1r34m",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=bno6j",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/signin?_rsc=1r34m",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "tablet",
+      "route": "/about",
+      "status": 200,
+      "title": "About | WaistLess Foods",
+      "h1": "Meet Chef Amber!",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=17qq4",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=1z7k0",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=tg835",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/blog?_rsc=17qq4",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=17qq4",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "tablet",
+      "route": "/services/private",
+      "status": 200,
+      "title": "Private Chef | WaistLess Foods",
+      "h1": "Private Chef",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=bt2h6",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/links?_rsc=bt2h6",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "tablet",
+      "route": "/recipes",
+      "status": 200,
+      "title": "The WaistLess Kitchen | WaistLess Foods",
+      "h1": "The WaistLess Kitchen",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=1ie3b",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes/detail/thai-red-vegetable-curry?_rsc=1ie3b",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes/detail/apple-peanut-donut-bites?_rsc=1ie3b",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes/detail/herby-pasta-primavera?_rsc=wpgj8",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes/detail/mango-mint-chia-parfait?_rsc=1ii4i",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes/detail/sweet-potato-chickpea?_rsc=72nkw",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes/detail/thai-red-vegetable-curry?_rsc=15sgy",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "tablet",
+      "route": "/signin",
+      "status": 200,
+      "title": "Sign In | WaistLess Foods",
+      "h1": "Welcome Back",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=ynvfo",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=60zf7",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=1o94a",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/signup?_rsc=1o94a",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/blog?_rsc=ynvfo",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "tablet",
+      "route": "/signup",
+      "status": 200,
+      "title": "Sign Up | WaistLess Foods",
+      "h1": "Create Account",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/",
+      "status": 200,
+      "title": "Waste Less. Taste More. | WaistLess Foods",
+      "h1": "PRIVATE DINING & CATERING",
+      "horizontalOverflow": 0,
+      "brokenImages": [
+        "https://www.waistlessfoods.com/_next/image?url=https%3A%2F%2Fcdn.simpleicons.org%2Fyelp%2Fffffff&w=32&q=75"
+      ],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=p37cr",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=bno6j",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=5yivd",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/signin?_rsc=p37cr",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes?category=pasta&_rsc=1r34m",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/blog?_rsc=p37cr",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes?_rsc=wbt06",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": [
+        {
+          "url": "https://www.waistlessfoods.com/_next/image?url=https%3A%2F%2Fcdn.simpleicons.org%2Fyelp%2Fffffff&w=32&q=75",
+          "status": 502
+        }
+      ]
+    },
+    {
+      "viewport": "mobile",
+      "route": "/about",
+      "status": 200,
+      "title": "About | WaistLess Foods",
+      "h1": "Meet Chef Amber!",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=tg835",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=1z7k0",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes?_rsc=17qq4",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=17qq4",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/services/private",
+      "status": 200,
+      "title": "Private Chef | WaistLess Foods",
+      "h1": "Private Chef",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=bt2h6",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=16nft",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=awotv",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/services?_rsc=awotv",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes?_rsc=bt2h6",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/blog?_rsc=bt2h6",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/services/private/book?_rsc=bt2h6",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/recipes",
+      "status": 200,
+      "title": "The WaistLess Kitchen | WaistLess Foods",
+      "h1": "The WaistLess Kitchen",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/shop",
+      "status": 200,
+      "title": "The WaistLess Shop | WaistLess Foods",
+      "h1": "The WaistLess Shop",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/signin",
+      "status": 200,
+      "title": "Sign In | WaistLess Foods",
+      "h1": "Welcome Back",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=ynvfo",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=ynvfo",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=60zf7",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/signup?_rsc=1o94a",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=1o94a",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/signup",
+      "status": 200,
+      "title": "Sign Up | WaistLess Foods",
+      "h1": "Create Account",
+      "horizontalOverflow": 0,
+      "brokenImages": [],
+      "runtimeErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.waistlessfoods.com/?_rsc=1o94a",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/shop?_rsc=60zfi",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/recipes?_rsc=ynvfz",
+          "reason": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://www.waistlessfoods.com/blog?_rsc=ynvfz",
+          "reason": "net::ERR_ABORTED"
+        }
+      ],
+      "badResponses": []
+    }
+  ],
+  "notes": [
+    "The live newsletter endpoint accepted the QA mailbox and attempted the branded welcome email. The HTTP response cannot prove inbox placement because email delivery errors are logged server-side without failing subscription creation."
+  ],
+  "finishedAt": "2026-08-17T13:01:29.007Z"
+}
