@@ -31,12 +31,13 @@ type ServiceDetail = {
     gallery: (string | null)[];
   };
   reviews: {
-    averageRating: number;
+    averageRating: number | null;
+    ratedReviews: number;
     totalReviews: number;
     items: Array<{
       id?: number;
       name: string;
-      rating: number;
+      rating: number | null;
       date: string;
       comment: string;
     }>;
@@ -60,13 +61,17 @@ const toServiceDetail = (entry: {
   galleryImagePaths: string[];
   reviews: unknown;
 }, approvedReviews: ApprovedServiceReview[] = []): ServiceDetail => {
-  const approvedRatingTotal = approvedReviews.reduce(
+  const ratedReviews = approvedReviews.filter(
+    (review): review is ApprovedServiceReview & { rating: number } =>
+      review.rating !== null
+  );
+  const approvedRatingTotal = ratedReviews.reduce(
     (sum, review) => sum + review.rating,
     0
   );
-  const approvedAverage = approvedReviews.length
-    ? Number((approvedRatingTotal / approvedReviews.length).toFixed(1))
-    : 0;
+  const approvedAverage = ratedReviews.length
+    ? Number((approvedRatingTotal / ratedReviews.length).toFixed(1))
+    : null;
 
   return {
     slug: entry.slug,
@@ -86,6 +91,7 @@ const toServiceDetail = (entry: {
     },
     reviews: {
       averageRating: approvedAverage,
+      ratedReviews: ratedReviews.length,
       totalReviews: approvedReviews.length,
       items: approvedReviews,
     },

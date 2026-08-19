@@ -71,6 +71,13 @@
       "when": 1786960800000,
       "tag": "0009_newsletter_subscription_status",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1787147476416,
+      "tag": "0010_long_firelord",
+      "breakpoints": true
     }
   ]
 }

@@ -188,7 +188,7 @@ export default function SignInPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#00676E]/90 via-[#00676E]/70 to-[#00676E]/90" />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/55 via-black/30 to-black/55" />
         
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-12 text-white">
           <h2 className="mb-4 whitespace-pre-line text-center font-['Bebas_Neue'] text-6xl uppercase leading-tight tracking-wide">

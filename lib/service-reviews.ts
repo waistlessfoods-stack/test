@@ -8,7 +8,7 @@ import { logError } from "@/lib/structured-log";
 export type ApprovedServiceReview = {
   id: number;
   name: string;
-  rating: number;
+  rating: number | null;
   date: string;
   comment: string;
 };

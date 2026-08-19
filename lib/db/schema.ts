@@ -131,7 +131,7 @@ export const serviceReviews = pgTable(
     serviceTitle: text("service_title").notNull(),
     name: text("name").notNull(),
     email: text("email"),
-    rating: integer("rating").notNull(),
+    rating: integer("rating"),
     reviewText: text("review_text").notNull(),
     status: text("status").notNull().default("pending"),
     source: text("source").notNull().default("customer-submission"),

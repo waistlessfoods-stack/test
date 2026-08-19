@@ -36,6 +36,7 @@
     "contentful:migrate-blog-article": "node scripts/contentful/migrate-blog-article-content.mjs",
     "contentful:update-links-hidden": "node scripts/contentful/update-links-hidden.mjs",
     "contentful:migrate-service-reviews": "node scripts/migrate-contentful-service-reviews.mjs",
+    "db:import-client-service-reviews": "node scripts/import-client-service-reviews.mjs",
     "db:migrate-newsletter-subscribers": "node scripts/migrate-newsletter-subscribers.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

@@ -17,11 +17,20 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type Review = {
   id?: number;
   name: string;
-  rating: number;
+  rating: number | null;
   date: string;
   comment: string;
 };
@@ -41,7 +50,8 @@ type ServiceDetail = {
     gallery: (string | null)[];
   };
   reviews: {
-    averageRating: number;
+    averageRating: number | null;
+    ratedReviews: number;
     totalReviews: number;
     items: Review[];
   };
@@ -63,6 +73,7 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
   const [visibleCount, setVisibleCount] = useState(2);
   const [mainImage, setMainImage] = useState(service.images.main);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [bookingNoticeOpen, setBookingNoticeOpen] = useState(false);
   const reviewsHeadingRef = useRef<HTMLHeadingElement>(null);
   const detailSections = service.detailSections?.sections ?? [];
   const hasDetailSections = detailSections.length > 0;
@@ -136,21 +147,29 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
 
             <div className="bg-gray-50 rounded-md p-4 mb-4 flex items-center justify-between">
               <div className="flex flex-col gap-2">
-                <div className="flex items-end gap-3">
-                  <span className="text-3xl font-semibold text-black">
-                    {service.reviews.averageRating}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${i < Math.round(service.reviews.averageRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
-                      />
-                    ))}
+                {service.reviews.averageRating !== null ? (
+                  <div className="flex items-end gap-3">
+                    <span className="text-3xl font-semibold text-black">
+                      {service.reviews.averageRating}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-4 h-4 ${i < Math.round(service.reviews.averageRating!) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <p className="font-medium text-black">Customer reviews</p>
+                )}
                 <p className="text-sm text-gray-500">
-                  Based on {service.reviews.totalReviews} reviews
+                  {service.reviews.totalReviews} review{service.reviews.totalReviews === 1 ? "" : "s"}
+                  {service.reviews.ratedReviews > 0 &&
+                  service.reviews.ratedReviews < service.reviews.totalReviews
+                    ? ` (${service.reviews.ratedReviews} with star ratings)`
+                    : ""}
                 </p>
               </div>
               <button
@@ -179,14 +198,19 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
                           {review.date}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-4 h-4 ${i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
-                          />
-                        ))}
-                      </div>
+                      {review.rating !== null ? (
+                        <div
+                          className="flex items-center gap-1"
+                          aria-label={`${review.rating} out of 5 stars`}
+                        >
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-4 h-4 ${i < review.rating! ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                            />
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
                     <p className="text-sm text-gray-600 leading-relaxed">
                       {review.comment}
@@ -248,14 +272,26 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
             )}
           </div>
 
-          <Link
-            href={`/services/${service.slug}/book`}
-            className="w-[132px] h-12 flex items-center justify-center bg-[#388082] rounded-[14px] hover:opacity-90 transition-all active:scale-95"
-          >
-            <span className="font-['Helvetica_Neue'] font-medium text-base md:text-lg leading-[110%] tracking-tight text-white">
-              Book now
-            </span>
-          </Link>
+          {service.slug === "cooking-classes" ? (
+            <button
+              type="button"
+              onClick={() => setBookingNoticeOpen(true)}
+              className="w-[132px] h-12 flex items-center justify-center bg-[#388082] rounded-[14px] hover:opacity-90 transition-all active:scale-95"
+            >
+              <span className="font-['Helvetica_Neue'] font-medium text-base md:text-lg leading-[110%] tracking-tight text-white">
+                Book now
+              </span>
+            </button>
+          ) : (
+            <Link
+              href={`/services/${service.slug}/book`}
+              className="w-[132px] h-12 flex items-center justify-center bg-[#388082] rounded-[14px] hover:opacity-90 transition-all active:scale-95"
+            >
+              <span className="font-['Helvetica_Neue'] font-medium text-base md:text-lg leading-[110%] tracking-tight text-white">
+                Book now
+              </span>
+            </Link>
+          )}
 
           <section className="flex flex-col gap-4 border-t border-gray-100 pt-6">
             <h2 className="font-sans font-medium text-lg md:text-xl leading-7 tracking-tight text-black uppercase">
@@ -291,6 +327,35 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
         serviceSlug={service.slug}
         serviceTitle={service.title}
       />
+      <Dialog open={bookingNoticeOpen} onOpenChange={setBookingNoticeOpen}>
+        <DialogContent className="border-[#d7e3e2] bg-white sm:max-w-[480px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-[#0e2f31]">
+              Cooking Classes
+            </DialogTitle>
+            <DialogDescription className="pt-2 text-base leading-7 text-[#5b6b69]">
+              No public classes are currently available. In-home cooking classes
+              are available for booking.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 pt-2">
+            <DialogClose asChild>
+              <button
+                type="button"
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Close
+              </button>
+            </DialogClose>
+            <Link
+              href={`/services/${service.slug}/book`}
+              className="rounded-lg bg-[#388082] px-4 py-2 text-center text-sm font-medium text-white hover:opacity-90"
+            >
+              Book an in-home class
+            </Link>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }

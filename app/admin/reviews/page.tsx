@@ -13,7 +13,7 @@ type ModeratedReview = {
   serviceTitle: string;
   name: string;
   email: string | null;
-  rating: number;
+  rating: number | null;
   reviewText: string;
   status: ReviewStatus;
   createdAt: string;
@@ -256,9 +256,12 @@ export default function AdminReviewsPage() {
                       >
                         {review.status}
                       </span>
-                      {review.source === "contentful-import" ? (
+                      {review.source === "contentful-import" ||
+                      review.source === "client-supplied" ? (
                         <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-                          Imported existing review
+                          {review.source === "client-supplied"
+                            ? "Client-supplied review"
+                            : "Imported existing review"}
                         </span>
                       ) : null}
                     </div>
@@ -278,18 +281,22 @@ export default function AdminReviewsPage() {
                       {review.serviceTitle} · Submitted {formatDate(review.createdAt)}
                     </p>
                   </div>
-                  <div className="flex gap-0.5" aria-label={`${review.rating} out of 5 stars`}>
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <Star
-                        key={index}
-                        className={`h-5 w-5 ${
-                          index < review.rating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    ))}
-                  </div>
+                  {review.rating !== null ? (
+                    <div className="flex gap-0.5" aria-label={`${review.rating} out of 5 stars`}>
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <Star
+                          key={index}
+                          className={`h-5 w-5 ${
+                            index < review.rating!
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-sm text-gray-500">Rating not supplied</span>
+                  )}
                 </div>
 
                 <p className="mt-5 whitespace-pre-wrap text-sm leading-7 text-gray-700">
