@@ -1,6 +1,6 @@
 # Client Email — Latest Website Updates and Final Milestone
 
-**Status:** Ready to send after production deployment  
+**Status:** Ready to send  
 **Audience:** Amber and John
 
 **Subject:** WaistLess Foods Website Updates and Final Milestone
@@ -20,7 +20,7 @@ The reason your review update in Contentful did not appear on the website is tha
 
 I also tested the `info@waistlessfoods.com` password you supplied using secure Google mail login checks without sending or deleting any email. Google rejected the credential for both incoming and outgoing mail access. It may be the normal account password rather than a Google app password, or mail access may need to be enabled. For the website email connection, a 16-character Google app password is the recommended option when two-step verification is enabled. Google Calendar access can be shared directly with my Google account instead of sharing the mailbox password.
 
-With these latest website changes addressed, the remaining closeout work is limited to final production verification, any missing review attribution or ratings you would like to provide, and the email or Calendar access once valid access is available.
+These latest website changes are now live and verified. The remaining closeout items are limited to any missing review attribution or ratings you would like to provide, the new video footage when it is ready, and the email or Calendar connection once valid access is available.
 
 There is one administrative item I also wanted to check with you about. The last website invoice I sent was **Invoice #WF-0002** on February 11, 2026, for the 30% mid-project milestone. It has now been a little over six months since that invoice, and under our original USD $700 payment schedule, the remaining final milestone is **USD $280**.
 
