@@ -4,7 +4,7 @@ Created: 2026-08-16
 Status: Superseded pricing draft; retained for historical context and not for sending  
 Prepared for: Muhammad Zulzidan (Zul)
 
-> **Superseded August 17, 2026:** This working draft predates review of the original $700 website proposal. Its $750-per-month recommendation and broader Events/email assumptions have been replaced by the smaller options in `docs/waistless-foods-events-email-retainer-client-proposal-2026-08-17.md`. Do not send pricing from this file to Amber or John.
+> **Superseded August 17, 2026:** This working draft predates review of the original $700 website proposal. Its $750-per-month recommendation and broader Events/email assumptions have been replaced by the smaller options in [the current client proposal](../client-proposal.md). Do not send pricing from this file to Amber or John.
 
 ## Purpose
 

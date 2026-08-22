@@ -1,10 +1,11 @@
-# Events Proposal — Internal Notes and Email Draft
+# Events Proposal — Internal Pricing and Scope Notes
 
 Created: August 17, 2026  
 Audience: Internal only  
-Status: Review before sending anything to Amber or John
+Status: Internal reference; do not send to Amber or John
 
-Full historical scope comparison: `docs/original-proposal-vs-delivered-scope-audit-2026-08-17.md`
+Proposal entry point: [Proposal — Start Here](README.md)  
+Full historical scope comparison: [Original Scope vs. Delivered Audit](original-scope-vs-delivered-audit.md)
 
 ## Source Context Added to the Proposal
 
@@ -74,45 +75,6 @@ The retainer should begin only after the original website punch list is closed o
 - Review the original agreement and payment history before declaring the first project closed.
 - Keep the personal family paragraph out of this first email; lead with scope clarity, continuity, and predictable costs.
 
-## Recommended Email to Amber and John
+## Client Communication
 
-**Subject:** Focused Events Tab Quote and Ongoing Support Options
-
-Hi Amber and John,
-
-Following our recent discussion, I reviewed the original WaistLess Foods proposal before finalizing the Events quote. The original package already described a basic Events and Classes calendar and newsletter foundation, so I revised the new proposal to avoid making this add-on larger or more expensive than it needs to be.
-
-The focused Events MVP includes an Events navigation tab, one events listing page, one reusable event-detail template, Contentful editing, an image or optional video link, event dates and location, and a registration button. I recommend using Eventbrite or another external registration service for the first version so we do not need to build custom payments, capacity, waitlists, reminders, cancellations, and attendee administration before those features are needed.
-
-The relationship-based fixed price for this Events MVP is **$400**, with an estimated one-to-two-week delivery period after approval, access, and final content for the first event.
-
-I also included a separate **$400 basic newsletter workflow** option. This builds on the subscription, welcome email, and unsubscribe work already in the website and adds one reusable branded newsletter, editable content, test sending, and sending to active subscribers through a professional delivery provider.
-
-If both small projects are approved together, the combined fixed price is **$700**. Alternatively, I included a small ongoing-support option at **$300 per month for six months**, covering approximately five to six reserved hours each month for Events, email, Contentful support, maintenance, and other small agreed improvements.
-
-These are options for review only. I will not begin the Events implementation until we agree on the scope, price, registration approach, and schedule in writing.
-
-Please review the attached proposal together and let me know which option feels most appropriate.
-
-Thank you again for trusting me with the continued development of WaistLess Foods.
-
-Best regards,  
-Muhammad Zulzidan M  
-Web Developer
-
-## Short Email Alternative
-
-**Subject:** Revised Events Tab Quote
-
-Hi Amber and John,
-
-I reviewed the original WaistLess Foods proposal and reduced the Events scope so it stays proportionate to the original website package.
-
-The revised Events MVP is **$400 fixed** and includes the navigation tab, listing page, reusable detail page, Contentful editing, event media and dates, and an external registration button. Custom payments, capacity, waitlists, reminders, cancellations, and attendee administration are not included in this first version.
-
-I also included a $400 basic newsletter option, a $700 combined option, and a small $300/month retainer option for ongoing Events, email, Contentful, and website support.
-
-No Events work will begin until you both approve the scope and price in writing.
-
-Best regards,  
-Muhammad Zulzidan M
+The single recommended email is maintained separately in [Client Email](client-email.md). Keeping client copy out of this internal memo prevents older email variants and internal pricing rationale from being sent accidentally.

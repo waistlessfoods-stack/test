@@ -398,12 +398,11 @@ After closure:
 
 ## Related Documents
 
-- `docs/waistless-foods-events-email-retainer-client-proposal-2026-08-17.md`
-- `docs/waistless-foods-events-proposal-internal-notes-and-email-2026-08-17.md`
-- `docs/waistless-foods-retainer-proposal-draft-2026-08-16.md`
+- [Current client proposal](client-proposal.md)
+- [Internal pricing and scope notes](internal-pricing-and-scope-notes.md)
+- [Superseded retainer draft](archive/superseded-retainer-draft-2026-08-16.md)
 - `docs/final-website-punch-list-2026-08-16.md`
 - `docs/amber-email-correspondence-context-2025-09-to-2026-08.md`
 - `docs/meeting-notes-website-planning-2026-08-15.md`
 - `docs/figma-comments-export-2026-08-14.md`
 - `docs/app-sitemap.md`
-

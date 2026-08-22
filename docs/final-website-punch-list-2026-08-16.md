@@ -231,7 +231,8 @@ The live Gmail connector currently requires reauthentication. The saved correspo
 - `docs/amber-email-correspondence-context-2025-09-to-2026-08.md`
 - `docs/amber-welcome-email-copy-2026-08-14.md`
 - `docs/figma-comments-export-2026-08-14.md`
-- `docs/waistless-foods-retainer-proposal-draft-2026-08-16.md`
+- `docs/proposal/README.md`
+- `docs/proposal/client-proposal.md`
 - `lib/email/templates/waistless-table-welcome-email.tsx`
 - `app/api/newsletter/route.ts`
 - `app/homepage-client.tsx`
