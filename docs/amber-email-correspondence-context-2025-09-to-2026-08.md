@@ -1,18 +1,19 @@
 # Amber Email Correspondence Context
 
-Date compiled: 2026-08-14  
-Correspondence period: September 2025 through August 13, 2026  
+Date compiled: 2026-08-28
+Correspondence period: September 2025 through late August 2026
 Primary participants: Amber Fitzgerald, Muhammad Zulzidan (Zul), and—where noted—John Fitzgerald
 
 ## Purpose and Source Handling
 
-This document summarizes the project-related email history supplied as four pasted Gmail exports on August 14, 2026.
+This document summarizes the project-related email history supplied as four pasted Gmail exports on August 14, 2026, plus a later follow-up thread supplied on August 28, 2026.
 
 - One export contains the most complete thread through August 13, 2026.
 - Two exports are earlier partial views of the same thread.
 - The remaining two files are exact duplicates of one another.
 - Gmail navigation text, AI-generated summaries, repeated quoted chains, and attachment placeholders were excluded.
 - Obsolete credentials, private phone numbers, meeting links, and other sensitive details were intentionally not copied into this document.
+- The August 28 source repeats an old credential inside its quoted history. That credential is intentionally excluded here and should be treated as exposed and rotated if it is still active.
 
 This is a working context summary, not a verbatim legal or communications archive.
 
@@ -20,7 +21,7 @@ This is a working context summary, not a verbatim legal or communications archiv
 
 The correspondence documents the ongoing design, content, CMS, commerce, and launch preparation for the WaistLess Foods website. Amber has generally reviewed and approved the major About, Services, and Blog improvements. By August 2026, the remaining content work was centered on final images, service imagery, recipe entry, the subscriber welcome email, and final visual review.
 
-The latest confirmed plan in the supplied thread was to meet on Friday, August 14, 2026, at 9:00 AM Central Time to review the recipes, images, welcome message, and remaining website work.
+In the latest supplied reply, Amber said the website had turned out "fantastic," planned to continue entering recipes before launch, clarified her expected membership/newsletter experience, asked whether Events could synchronize with Google Calendar, and proposed a screen-sharing meeting the following Tuesday after she reviews the scope of work.
 
 ## Project Timeline
 
@@ -129,6 +130,21 @@ Amber initially reported that the chef portrait and category-card alignment stil
 
 On August 11, Amber said she was finishing recipes, images, and the welcome message. The meeting for August 14 at 9:00 AM CT was confirmed. On August 13, Amber separately supplied the provisional copy for `Welcome to The WaistLess Table!`.
 
+### Late August 2026: Membership, Newsletter Archive, and Events Clarification
+
+After discussing the work with John, Amber described the intended member communication workflow as follows:
+
+- Members sign in and receive access to a members-only page.
+- That page provides downloadable access to older newsletters.
+- Each newly sent newsletter goes to all current members; distribution is not segmented by the date on which a member joined.
+- A person who joins later does not need older newsletters resent by email because the archive provides access to them.
+
+This is more than the public newsletter signup and welcome-email lifecycle already implemented. It combines broadcast campaign sending, an authenticated archive, downloadable newsletter files or entries, and a defined relationship between website accounts, membership status, and marketing-email eligibility.
+
+Amber attributed this workflow to John's reading of the scope of work. The source materials currently summarized in the repository verify that authentication and newsletter signup were contemplated, but they do not independently verify a precise promise to deliver a members-only downloadable newsletter archive. The original scope document should therefore be reviewed before treating that interpretation as an accepted contractual requirement.
+
+For Events, Amber asked whether Google Calendar can be synchronized and requested a screen-share walkthrough. "Google Calendar sync" remains undefined: it could mean displaying a public calendar, adding an event to a visitor's calendar, showing Chef Amber's availability, creating bookings on an internal calendar, or synchronizing event registration. These are different implementations and should be demonstrated and selected before scope or price is finalized.
+
 ## Confirmed Product and Content Decisions
 
 - Content should be editable through Contentful wherever practical.
@@ -141,6 +157,8 @@ On August 11, Amber said she was finishing recipes, images, and the welcome mess
 - Premium recipe checkout requires authentication.
 - Google Workspace was preferred for the initial website email-sending setup, with Resend retained as a possible future scaling option.
 - Unavailable features may be hidden until ready instead of being deleted.
+- Amber's desired newsletter model is one broadcast to all eligible current members, regardless of join date, with older issues available from an authenticated member archive.
+- Google Calendar integration is a requested discussion item, but the exact Events use case and synchronization direction are not yet approved.
 
 ## Current Handoff State
 
@@ -160,6 +178,11 @@ On August 11, Amber said she was finishing recipes, images, and the welcome mess
 - Final visual approval of the `A Message from the Chef` portrait behavior on desktop and mobile.
 - Review and implementation details for the provisional welcome email.
 - Confirmation that the Google Workspace website email-sending integration was completed; the supplied thread records it as pending earlier and does not clearly document final completion.
+- Verification of the original scope language concerning the claimed members-only newsletter archive.
+- Definition of who qualifies as a member, how membership relates to the existing subscriber list, and what consent rules govern broadcast email.
+- Decision on the archive format, publishing workflow, and whether older newsletters are files, web pages, or both.
+- Definition of the requested Google Calendar behavior, followed by a screen-share walkthrough.
+- Confirmation of the proposed Tuesday meeting time and time zone.
 - Attachment contents referenced by the emails or Figma threads that were not separately supplied. The Figma comment text itself is available in `docs/figma-comments-export-2026-08-14.md`.
 
 ## Related Repository Context

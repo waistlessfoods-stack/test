@@ -1,0 +1,24 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//WaistLess Foods//Planning Meeting//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:waistless-foods-planning-20260901T143000Z@waistlessfoods.com
+DTSTAMP:20260830T000000Z
+DTSTART:20260901T143000Z
+DTEND:20260901T153000Z
+SUMMARY:WaistLess Foods Website Planning Meeting
+DESCRIPTION:Agenda:\n1. Review the original website scope and launch items.\n2. Clarify the membership and newsletter archive workflow.\n3. Review Events and Google Calendar integration options.\n4. Agree on scope\, pricing\, ongoing support\, and next steps.\n\nTime: 9:30-10:30 AM Central Time / 10:30-11:30 PM WITA.\n\nGoogle Meet link to be added after the meeting time is confirmed.
+LOCATION:Google Meet - link to follow
+ORGANIZER;CN=Muhammad Zulzidan M:mailto:zulzdn@gmail.com
+ATTENDEE;CN=Amber Fitzgerald;ROLE=REQ-PARTICIPANT;RSVP=TRUE:mailto:amberfitzgerald22@gmail.com
+STATUS:TENTATIVE
+TRANSP:OPAQUE
+BEGIN:VALARM
+TRIGGER:-PT30M
+ACTION:DISPLAY
+DESCRIPTION:WaistLess Foods meeting begins in 30 minutes
+END:VALARM
+END:VEVENT
+END:VCALENDAR

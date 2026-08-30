@@ -34,6 +34,16 @@ The original WaistLess Foods website package was priced at USD $700 and was inte
 
 This proposal does not reprice or recreate that existing platform. It defines a contained extension that reuses the current website architecture and advances a feature already identified in the original digital strategy. The investment has therefore been positioned as a relationship-based add-on price, provided that the scope remains limited to the deliverables stated in this document.
 
+## Client Clarification Received After This Proposal Was Prepared
+
+Amber subsequently clarified that the desired membership and email experience is broader than newsletter campaign preparation alone. The expected workflow is that all eligible current members receive the same newly issued newsletter, regardless of when they joined, and signed-in members can visit a protected members page to download prior newsletters.
+
+That clarification introduces work not expressly included in Option B below: a protected newsletter archive, archive publishing and file management, membership-based access rules, and a reliable relationship between authenticated member accounts and the email recipient list. It also requires confirmation of who qualifies as a member, whether existing newsletter subscribers automatically become members, how unsubscribe and marketing-consent choices affect delivery, and whether archived issues are downloadable files, web pages, or both.
+
+Amber also asked whether the Events experience can synchronize with Google Calendar and requested a screen-share walkthrough. Calendar synchronization is excluded from the current Small Events MVP. Before it can be estimated, the intended behavior must be selected—for example, an **Add to Google Calendar** action for visitors, a public calendar display, Chef Amber's availability, automatic creation of internal calendar entries, or two-way booking synchronization. These options solve different problems and have different access, privacy, and implementation requirements.
+
+The statements above record the latest client expectation for discussion. They do not add those capabilities to the fixed-price scope unless the proposal is revised and approved in writing.
+
 ## Project Objectives
 
 The Events MVP is intended to:
@@ -220,6 +230,8 @@ The scope includes:
 
 This option excludes advanced segmentation, multi-step automation, drag-and-drop campaign building, detailed campaign analytics, unlimited design or copywriting, unspecified subscriber migration, guaranteed inbox placement, and third-party sending charges.
 
+**Scope alignment note:** This option covers campaign preparation and sending only. It does not include the subsequently requested members-only page, downloadable archive of prior newsletters, account-to-membership entitlement logic, or migration of existing newsletters into an archive. Those items require a revised scope and estimate after the member and archive workflow is confirmed.
+
 ### Option C — Combined Events and Newsletter Project
 
 **Combined fixed investment: USD $700**
@@ -265,6 +277,8 @@ Before work begins, WaistLess Foods will confirm in writing:
 3. Whether the first event is free or paid.
 4. The complete content and desired launch date for the first event.
 5. The person authorized to provide consolidated feedback and final launch approval.
+6. Whether Google Calendar is required and, if so, the exact visitor and administrator workflow it must support.
+7. Whether the requested member newsletter archive should be scoped now, including the member definition, access rules, archive format, and treatment of existing subscribers and past issues.
 
 No Events implementation or Contentful Events model will be created until the scope and investment are approved in writing.
 

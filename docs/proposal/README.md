@@ -22,6 +22,7 @@ Only these two documents are client-facing.
 
 ## Internal Reference Only
 
+- [September 1 Meeting Prep](meeting-prep-2026-09-01.md) contains the internal agenda, scope evidence, newsletter questions, Google Calendar options, talking points, and live decision log for the client meeting.
 - [Internal Pricing and Scope Notes](internal-pricing-and-scope-notes.md) explains the $400 Events price, optional newsletter pricing, retainer positioning, and scope boundaries.
 - [Original Scope vs. Delivered Audit](original-scope-vs-delivered-audit.md) contains the detailed historical comparison with the original $700 website proposal.
 - [Superseded Retainer Draft](archive/superseded-retainer-draft-2026-08-16.md) is retained only as history. Do not send or quote its $750/month pricing.

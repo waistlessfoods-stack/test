@@ -1,0 +1,30 @@
+flowchart LR
+    subgraph MEMBER[Member access and consent]
+        A[Create website account] --> B[Verify email address]
+        B --> C{Qualifies as a member?}
+        C -- No --> D[Standard account\nNo archive access]
+        C -- Yes --> E[Protected newsletter archive access]
+        E --> F{Active marketing consent?}
+        F -- Yes --> G[Active newsletter recipient]
+        F -- No or unsubscribed --> H[No campaign email\nArchive access retained if approved]
+    end
+
+    subgraph PUBLISH[Newsletter publishing]
+        I[Amber prepares one new issue] --> J[Test and review]
+        J --> K[Approve and publish once]
+        K --> L[Add issue to protected archive]
+        K --> M[Send current issue to active recipients]
+        L --> N[Members can read or download current and past issues]
+        M --> O[All eligible active recipients receive the same current issue]
+    end
+
+    E -. access .-> N
+    G -. recipient list .-> M
+
+    classDef action fill:#E8F7F6,stroke:#0F8D8F,color:#073D3E,stroke-width:2px;
+    classDef decision fill:#FFF4D6,stroke:#C38A18,color:#563C08,stroke-width:2px;
+    classDef outcome fill:#F6EFE5,stroke:#A77A45,color:#4A321B,stroke-width:2px;
+    class A,B,E,G,I,J,K,L,M,N,O action;
+    class C,F decision;
+    class D,H outcome;
+
