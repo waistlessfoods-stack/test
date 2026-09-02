@@ -26,6 +26,7 @@ interface OrderConfirmationEmailProps {
   orderTotal: string;
   items: OrderItem[];
   orderDate: string;
+  includesCookingClass?: boolean;
 }
 
 export default function OrderConfirmationEmail({
@@ -34,6 +35,7 @@ export default function OrderConfirmationEmail({
   orderTotal,
   items,
   orderDate,
+  includesCookingClass = false,
 }: OrderConfirmationEmailProps) {
   return (
     <Html>
@@ -57,8 +59,15 @@ export default function OrderConfirmationEmail({
           <Section style={content}>
             <Text style={paragraph}>Hi {customerName},</Text>
             <Text style={paragraph}>
-              Thank you for your order! We're excited to prepare your premium recipes.
+              Thank you for your order. Your payment has been confirmed.
             </Text>
+            {includesCookingClass && (
+              <Text style={paragraph}>
+                Your cooking class seat is reserved. The class information is
+                listed below and in your WaistLess Foods order history. We&apos;ll
+                send any class updates or reminders separately.
+              </Text>
+            )}
 
             <Heading as="h3" style={subHeading}>
               Order Details
@@ -109,11 +118,9 @@ export default function OrderConfirmationEmail({
               </Row>
             </Section>
 
-            <Text style={{ ...paragraph, marginTop: "30px" }}>
-              We'll send you a tracking update as soon as your order ships.
-            </Text>
             <Text style={paragraph}>
-              If you have any questions, feel free to reach out!
+              If you have any questions, reply to this email and we&apos;ll be happy
+              to help.
             </Text>
           </Section>
 
@@ -121,11 +128,11 @@ export default function OrderConfirmationEmail({
 
           <Section style={footer}>
             <Text style={footerText}>
-              © 2026 Waistless Foods. All rights reserved.
+              © 2026 WaistLess Foods. All rights reserved.
             </Text>
             <Text style={footerText}>
-              <Link href="https://waitslessfood.com" style={link}>
-                Visit our website
+              <Link href="https://waistlessfoods.com/orders" style={link}>
+                View your orders
               </Link>
             </Text>
           </Section>
@@ -142,6 +149,7 @@ export default function OrderConfirmationEmail({
   orderNumber: "ORD-1042",
   orderTotal: "$49.99",
   orderDate: "June 10, 2026",
+  includesCookingClass: true,
   items: [
     { name: "Premium Recipe Pack", price: "$29.99", quantity: 1 },
     { name: "Weekly Meal Plan", price: "$20.00", quantity: 1 },

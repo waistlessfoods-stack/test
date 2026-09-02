@@ -260,17 +260,17 @@ export function bookingConfirmationTemplate({
       <body>
         <div class="container">
           <div class="header">
-            <h1 style="margin:0; font-size:22px;">Booking Request Received</h1>
+            <h1 style="margin:0; font-size:22px;">Service Request Received</h1>
           </div>
           <div class="content">
-            <p>Hi ${firstName},</p>
-            <p>Thank you for your booking request for <strong>${serviceTitle}</strong>. We've received your details and will be in touch shortly to confirm availability.</p>
+            <p>Hi ${escapeHtml(firstName)},</p>
+            <p>Thank you for your request for <strong>${escapeHtml(serviceTitle)}</strong>. We've received your details and will be in touch shortly with availability and next steps. Your event is not confirmed until the required agreement and payment are complete.</p>
             <div class="detail-box">
-              <div class="detail-row"><span class="detail-label">Service:</span> ${serviceTitle}</div>
-              <div class="detail-row"><span class="detail-label">Preferred Date:</span> ${preferredDate}</div>
-              ${alternativeDate ? `<div class="detail-row"><span class="detail-label">Alternative Date:</span> ${alternativeDate}</div>` : ""}
+              <div class="detail-row"><span class="detail-label">Service:</span> ${escapeHtml(serviceTitle)}</div>
+              <div class="detail-row"><span class="detail-label">Preferred Date:</span> ${escapeHtml(preferredDate)}</div>
+              ${alternativeDate ? `<div class="detail-row"><span class="detail-label">Alternative Date:</span> ${escapeHtml(alternativeDate)}</div>` : ""}
               <div class="detail-row"><span class="detail-label">Number of Guests:</span> ${guests}</div>
-              <div class="detail-row"><span class="detail-label">Notes:</span> ${notes}</div>
+              <div class="detail-row"><span class="detail-label">Details:</span> ${escapeHtml(notes).replaceAll("\n", "<br />")}</div>
             </div>
             <p>If you have any questions in the meantime, feel free to reply to this email.</p>
             <p>We look forward to cooking for you!</p>
@@ -326,21 +326,21 @@ export function bookingNotificationTemplate({
       <body>
         <div class="container">
           <div class="header">
-            <h1 style="margin:0; font-size:20px; color:white;">New Booking Request #${bookingId}</h1>
+            <h1 style="margin:0; font-size:20px; color:white;">New Service Request #${bookingId}</h1>
           </div>
           <div class="detail-box" style="margin-top:24px;">
             <h3 style="margin-top:0;">Customer Details</h3>
-            <div class="detail-row"><span class="detail-label">Name:</span> ${firstName} ${lastName}</div>
-            <div class="detail-row"><span class="detail-label">Email:</span> <a href="mailto:${email}">${email}</a></div>
-            <div class="detail-row"><span class="detail-label">Phone:</span> ${phone}</div>
+            <div class="detail-row"><span class="detail-label">Name:</span> ${escapeHtml(firstName)} ${escapeHtml(lastName)}</div>
+            <div class="detail-row"><span class="detail-label">Email:</span> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></div>
+            <div class="detail-row"><span class="detail-label">Phone:</span> ${escapeHtml(phone)}</div>
           </div>
           <div class="detail-box">
             <h3 style="margin-top:0;">Event Details</h3>
-            <div class="detail-row"><span class="detail-label">Service:</span> ${serviceTitle}</div>
-            <div class="detail-row"><span class="detail-label">Preferred Date:</span> ${preferredDate}</div>
-            ${alternativeDate ? `<div class="detail-row"><span class="detail-label">Alternative Date:</span> ${alternativeDate}</div>` : ""}
+            <div class="detail-row"><span class="detail-label">Service:</span> ${escapeHtml(serviceTitle)}</div>
+            <div class="detail-row"><span class="detail-label">Preferred Date:</span> ${escapeHtml(preferredDate)}</div>
+            ${alternativeDate ? `<div class="detail-row"><span class="detail-label">Alternative Date:</span> ${escapeHtml(alternativeDate)}</div>` : ""}
             <div class="detail-row"><span class="detail-label">Guests:</span> ${guests}</div>
-            <div class="detail-row"><span class="detail-label">Notes:</span> ${notes}</div>
+            <div class="detail-row"><span class="detail-label">Details:</span> ${escapeHtml(notes).replaceAll("\n", "<br />")}</div>
           </div>
           <div class="footer">
             <p>© 2026 Waistless Foods. All rights reserved.</p>

@@ -10,7 +10,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useClerk } from "@clerk/nextjs";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/lib/cart-context";
-import EnquiryDialog from "@/components/enquiry-dialog";
+import ConsultationDialog from "@/components/consultation-dialog";
 import { useSession } from "@/lib/auth-client";
 import { getIconPath } from "@/lib/social-links";
 import type { SocialLink } from "@/lib/contentful-links";
@@ -954,12 +954,10 @@ export default function Header({
         </SheetContent>
       </Sheet>
 
-      <EnquiryDialog
+      <ConsultationDialog
         isOpen={isEnquiryDialogOpen}
         onOpenChange={setIsEnquiryDialogOpen}
-        enquiryType="private_chef"
-        title="Book a Complimentary Consultation"
-        description="Let's discuss how Chef Amber can create a personalized culinary experience for you. Fill out the form below and we'll get back to you soon."
+        schedulingUrl={process.env.NEXT_PUBLIC_GOOGLE_BOOKING_URL}
       />
     </header>
   );

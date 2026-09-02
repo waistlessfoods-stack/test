@@ -38,6 +38,7 @@ export default function BookingPageClient({
   const [phone, setPhone] = useState("");
   const [guests, setGuests] = useState<number>(0);
   const [notes, setNotes] = useState("");
+  const [budgetRange, setBudgetRange] = useState("");
   const [companyWebsite, setCompanyWebsite] = useState("");
   const [preferredDate, setPreferredDate] = useState<Date>();
   const [alternativeDate, setAlternativeDate] = useState<Date>();
@@ -45,6 +46,10 @@ export default function BookingPageClient({
   const [submitted, setSubmitted] = useState(false);
   const [confirmationEmailSent, setConfirmationEmailSent] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const requestTitle =
+    serviceSlug === "cooking-classes"
+      ? "Request Cooking Class"
+      : `Request ${serviceTitle}`;
 
   const handleIncrement = () =>
     setGuests((prev) => Math.min(prev + 1, MAX_BOOKING_GUESTS));
@@ -55,7 +60,16 @@ export default function BookingPageClient({
     e.preventDefault();
     setError(null);
 
-    if (!firstName || !lastName || !email || !phone || !guests || !preferredDate || !notes) {
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !phone ||
+      !guests ||
+      !preferredDate ||
+      !budgetRange ||
+      !notes
+    ) {
       setError("Please fill in all required fields.");
       return;
     }
@@ -82,7 +96,7 @@ export default function BookingPageClient({
           guests,
           preferredDate: format(preferredDate, "PPP"),
           alternativeDate: alternativeDate ? format(alternativeDate, "PPP") : null,
-          notes,
+          notes: `Budget range: ${budgetRange}\n\nEvent details:\n${notes}`,
           [HONEYPOT_FIELD]: companyWebsite,
         }),
       });
@@ -150,10 +164,12 @@ export default function BookingPageClient({
       <main className="flex-1 w-full py-4 md:py-6 max-w-[760px] mx-auto lg:mx-0">
         <header className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-4xl font-medium leading-tight tracking-tight mb-3 text-black">
-            Book {serviceTitle}
+            {requestTitle}
           </h1>
           <p className="text-base md:text-lg font-normal leading-relaxed tracking-tight text-[#878787]">
-            Fill in your details and we'll contact you to confirm availability.
+            Tell us about your event. This is a request for a quote and
+            availability; your date is not confirmed until we contact you and
+            the required agreement and payment are complete.
           </p>
         </header>
 
@@ -168,11 +184,11 @@ export default function BookingPageClient({
             <p className="text-[#878787] text-base md:text-lg">
               {confirmationEmailSent ? (
                 <>
-                  Thank you, {firstName}. We've received your booking request and sent a confirmation to <strong>{email}</strong>. We'll be in touch shortly.
+                  Thank you, {firstName}. We&apos;ve received your service request and sent a confirmation to <strong>{email}</strong>. We&apos;ll be in touch with availability and next steps.
                 </>
               ) : (
                 <>
-                  Thank you, {firstName}. We've received your booking request, but the confirmation email could not be sent. We'll still be in touch shortly.
+                  Thank you, {firstName}. We&apos;ve received your service request, but the confirmation email could not be sent. We&apos;ll still be in touch shortly.
                 </>
               )}
             </p>
@@ -363,13 +379,25 @@ export default function BookingPageClient({
 
             <div className="flex flex-col gap-3 md:gap-3.5 lg:col-span-2">
               <Label className="text-base md:text-lg font-medium tracking-tight text-black">
-                Additional Notes <span className="text-red-500">*</span>
+                Budget Range <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                value={budgetRange}
+                onChange={(e) => setBudgetRange(e.target.value)}
+                className="h-12 md:h-14 bg-[#F4F4F4] border-none rounded-lg px-4 text-base md:text-lg placeholder:text-[#878787] focus-visible:ring-1 focus-visible:ring-[#388082]"
+                placeholder="Please provide your estimated budget range"
+              />
+            </div>
+
+            <div className="flex flex-col gap-3 md:gap-3.5 lg:col-span-2">
+              <Label className="text-base md:text-lg font-medium tracking-tight text-black">
+                Event Details <span className="text-red-500">*</span>
               </Label>
               <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 className="min-h-[130px] md:min-h-[165px] bg-[#F4F4F4] border-none rounded-lg p-4 md:p-5 text-base md:text-lg placeholder:text-[#878787] focus-visible:ring-1 focus-visible:ring-[#388082] resize-none"
-                placeholder="Add notes here"
+                placeholder="Tell us about the occasion, menu ideas, location, and any other details that will help us prepare your quote."
               />
             </div>
 
@@ -384,7 +412,7 @@ export default function BookingPageClient({
               disabled={isSubmitting}
               className="mt-3 md:mt-4 w-full h-12 md:h-14 lg:col-span-2 lg:w-[240px] lg:justify-self-end bg-[#388082] hover:bg-[#2d6668] disabled:opacity-60 disabled:cursor-not-allowed text-white text-base md:text-lg font-medium rounded-lg transition-all duration-200 active:scale-[0.98]"
             >
-              {isSubmitting ? "Submitting..." : "Confirm Booking"}
+              {isSubmitting ? "Submitting..." : "Submit Request"}
             </button>
           </form>
         )}

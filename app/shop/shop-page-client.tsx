@@ -15,15 +15,44 @@ import { CarouselArrowButton } from "@/components/ui/carousel-arrow-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSession } from "@/lib/auth-client";
-import type { ShopPageData, RecipeCategory, Recipe } from "@/lib/contentful-management";
+import {
+  isCookingClassProduct,
+  type ShopPageData,
+  type RecipeCategory,
+  type Recipe,
+} from "@/lib/contentful-management";
 
 type ShopPageClientProps = {
   data: ShopPageData;
+  initialCategory?: string;
 };
 
-export default function ShopPageClient({ data }: ShopPageClientProps) {
+function normalizeCategory(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export default function ShopPageClient({
+  data,
+  initialCategory,
+}: ShopPageClientProps) {
+  const initialCategoryMatch = initialCategory
+    ? data.categories.find(
+        (item) =>
+          normalizeCategory(item.name) === normalizeCategory(initialCategory)
+      )
+    : undefined;
   const [api, setApi] = useState<CarouselApi>();
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
+    () => (initialCategoryMatch ? new Set([initialCategoryMatch.id]) : new Set())
+  );
+  const [onlyCookingClasses, setOnlyCookingClasses] = useState(
+    () =>
+      normalizeCategory(initialCategory ?? "") === "cooking-classes" &&
+      !initialCategoryMatch
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [unlockedRecipeIds, setUnlockedRecipeIds] = useState<Set<string>>(new Set());
   const { data: session, isPending } = useSession();
@@ -84,6 +113,7 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
   }, [session?.user?.id, isPending]);
 
   const toggleCategory = (categoryId: string) => {
+    setOnlyCookingClasses(false);
     const newSelected = new Set(selectedCategories);
     if (newSelected.has(categoryId)) {
       newSelected.delete(categoryId);
@@ -110,7 +140,10 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
       recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       recipe.description.toLowerCase().includes(searchQuery.toLowerCase());
     
-    return categoryMatch && searchMatch;
+    const productTypeMatch =
+      !onlyCookingClasses || isCookingClassProduct(recipe);
+
+    return categoryMatch && searchMatch && productTypeMatch;
   });
 
   const visibleUnlockedRecipeIds = session?.user?.id
@@ -158,12 +191,12 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
       <section className="bg-[#F4F4F4] py-20 lg:py-12 2xl:py-14">
         <Container className="flex flex-col items-center">
           <h2 className="font-bebas text-6xl md:text-7xl lg:text-5xl 2xl:text-5xl text-black mb-10 lg:mb-6 2xl:mb-6 leading-none">
-            PREMIUM RECIPES
+            SHOP
           </h2>
 
           <div className="relative w-full mb-12 lg:mb-8 2xl:mb-8">
             <Input
-              placeholder="Search premium recipes"
+              placeholder="Search recipes, classes, and products"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-20 lg:h-14 2xl:h-16 bg-white rounded-lg px-10 lg:px-7 2xl:px-8 border-none shadow-sm text-xl lg:text-base 2xl:text-lg placeholder:text-black/40"
@@ -171,13 +204,18 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
             <Search className="absolute right-10 lg:right-7 2xl:right-8 top-1/2 -translate-y-1/2 w-8 lg:w-5 2xl:w-6 h-8 lg:h-5 2xl:h-6 text-[#0F8DAB] stroke-[2.5]" />
           </div>
 
-          {selectedCategories.size > 0 && (
+          {(selectedCategories.size > 0 || onlyCookingClasses) && (
             <div className="mb-12 lg:mb-8 2xl:mb-8 flex flex-col sm:flex-row items-center justify-center gap-6 lg:gap-3 2xl:gap-4 px-4">
               <span className="text-lg lg:text-sm 2xl:text-base font-semibold text-gray-700">
-                Filtering by {selectedCategories.size} categor{selectedCategories.size === 1 ? 'y' : 'ies'}
+                {onlyCookingClasses
+                  ? "Viewing public cooking classes"
+                  : `Filtering by ${selectedCategories.size} categor${selectedCategories.size === 1 ? "y" : "ies"}`}
               </span>
               <Button 
-                onClick={() => setSelectedCategories(new Set())}
+                onClick={() => {
+                  setSelectedCategories(new Set());
+                  setOnlyCookingClasses(false);
+                }}
                 className="bg-[#0F8DAB] hover:bg-[#0d7a94] text-white font-bold px-8 lg:px-5 2xl:px-6 py-3 lg:py-1.5 2xl:py-2 rounded-lg lg:rounded-md 2xl:rounded-md text-base lg:text-xs 2xl:text-sm transition-colors"
               >
                 Clear Filters
@@ -272,14 +310,20 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
 
           {filteredRecipes.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-2xl text-gray-500">No premium recipes found</p>
+              <p className="text-2xl text-gray-500">
+                {onlyCookingClasses
+                  ? "No public classes are currently available."
+                  : "No shop items found"}
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-5 2xl:gap-6 w-full">
               {filteredRecipes.map((item: Recipe) => {
-                const recipeHref = visibleUnlockedRecipeIds.has(item.id)
-                  ? `/recipes/detail/${item.slug}/full`
-                  : `/recipes/detail/${item.slug}`;
+                const isCookingClass = isCookingClassProduct(item);
+                const recipeHref =
+                  !isCookingClass && visibleUnlockedRecipeIds.has(item.id)
+                    ? `/recipes/detail/${item.slug}/full`
+                    : `/shop/${item.slug}`;
 
                 return (
                 <div
@@ -303,15 +347,15 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
 
                         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
                           <span className="text-lg lg:text-base 2xl:text-lg font-bebas tracking-[0.12em] text-white">
-                            VIEW RECIPE
+                            VIEW DETAILS
                           </span>
                         </div>
 
                         <div
-                          className="absolute top-0 right-0 bg-[#00676E] w-20 h-20 lg:w-16 lg:h-16 flex justify-end items-start"
+                          className="absolute top-0 right-0 bg-[#00676E] w-24 h-24 lg:w-20 lg:h-20 flex justify-end items-start"
                           style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%)" }}
                         >
-                          <span className="font-bold text-lg lg:text-base text-white pt-3 pr-3 lg:pt-2 lg:pr-2">
+                          <span className="whitespace-nowrap font-bold text-base lg:text-sm text-white pt-3 pr-2.5 lg:pt-2.5 lg:pr-2">
                             {item.price}
                           </span>
                         </div>
@@ -326,6 +370,13 @@ export default function ShopPageClient({ data }: ShopPageClientProps) {
                           <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
                             <span className="inline-flex items-center rounded-full border-[3px] border-[#00676E] bg-white/80 px-7 py-1.5 text-lg lg:text-sm 2xl:text-base font-semibold uppercase tracking-wide text-[#00676E] backdrop-blur-sm shadow-[0_4px_14px_rgba(0,103,110,0.25)]">
                               Featured
+                            </span>
+                          </div>
+                        )}
+                        {isCookingClass && (
+                          <div className="absolute bottom-3 left-3">
+                            <span className="inline-flex rounded-full bg-[#00676E] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow-sm">
+                              Cooking class
                             </span>
                           </div>
                         )}

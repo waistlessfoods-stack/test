@@ -3,9 +3,13 @@ import Stripe from "stripe";
 export type StoredOrderItem = {
   id: string;
   name: string;
+  slug?: string;
   price: number;
   quantity: number;
   imagePath?: string;
+  kind?: "recipe" | "cooking_class";
+  capacity?: number;
+  eventDate?: string;
 };
 
 export type OrderCheckoutSnapshot = {
@@ -51,7 +55,16 @@ export function isStoredOrderItems(value: unknown): value is StoredOrderItem[] {
         typeof item.quantity === "number" &&
         Number.isInteger(item.quantity) &&
         item.quantity > 0 &&
-        (item.imagePath === undefined || typeof item.imagePath === "string"),
+        (item.slug === undefined || typeof item.slug === "string") &&
+        (item.imagePath === undefined || typeof item.imagePath === "string") &&
+        (item.kind === undefined ||
+          item.kind === "recipe" ||
+          item.kind === "cooking_class") &&
+        (item.capacity === undefined ||
+          (typeof item.capacity === "number" &&
+            Number.isInteger(item.capacity) &&
+            item.capacity > 0)) &&
+        (item.eventDate === undefined || typeof item.eventDate === "string"),
     )
   );
 }
@@ -148,6 +161,7 @@ export function buildStripeLineItemsFromSnapshot(
         product_data: {
           name: item.name,
           ...(item.imagePath ? { images: [item.imagePath] } : {}),
+          ...(item.eventDate ? { description: `Class date: ${item.eventDate}` } : {}),
         },
       },
     }));

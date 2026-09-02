@@ -12,7 +12,12 @@ import {
 } from "@/lib/order-checkout-snapshot";
 import { calculateCartTotals } from "@/lib/pricing";
 import { getServerSalesTaxRate } from "@/lib/tax-settings";
-import { fetchShopPageFromContentful } from "@/lib/contentful-management";
+import {
+  fetchShopPageFromContentful,
+  isCookingClassProduct,
+} from "@/lib/contentful-management";
+import { arePublicCookingClassesEnabled } from "@/lib/public-cooking-classes";
+import { eq } from "drizzle-orm";
 
 const stripeSecretKey =
     process.env.sandbox_secret_key_stripe || process.env.STRIPE_SECRET_KEY;
@@ -28,6 +33,9 @@ type CheckoutItem = {
   price: number;
   quantity: number;
   imagePath?: string;
+  kind?: "recipe" | "cooking_class";
+  capacity?: number;
+  eventDate?: string;
 };
 
 type CheckoutItemRequest = {
@@ -97,6 +105,10 @@ async function resolveCheckoutItems(rawItems: unknown): Promise<CheckoutItem[]> 
 
   const shopData = await fetchShopPageFromContentful();
   const paidRecipes = shopData.recipes
+    .filter(
+      (recipe) =>
+        arePublicCookingClassesEnabled() || !isCookingClassProduct(recipe)
+    )
     .map((recipe) => ({
       ...recipe,
       numericPrice: parseRecipePrice(recipe.price),
@@ -106,6 +118,50 @@ async function resolveCheckoutItems(rawItems: unknown): Promise<CheckoutItem[]> 
   const byId = new Map(paidRecipes.map((recipe) => [recipe.id, recipe]));
   const bySlug = new Map(paidRecipes.map((recipe) => [recipe.slug, recipe]));
   const resolvedItems = new Map<string, CheckoutItem>();
+  const completedOrderItems = paidRecipes.some(
+    (recipe) => recipe.productKind === "cooking_class"
+  )
+    ? await db
+        .select({ items: orders.items })
+        .from(orders)
+        .where(eq(orders.status, "completed"))
+    : [];
+  const cookingClassTitleById = new Map(
+    paidRecipes
+      .filter((recipe) => recipe.productKind === "cooking_class")
+      .map((recipe) => [recipe.id, recipe.title.trim().toLowerCase()])
+  );
+  const soldQuantityByProductId = new Map<string, number>();
+
+  for (const order of completedOrderItems) {
+    if (!Array.isArray(order.items)) continue;
+
+    for (const storedItem of order.items) {
+      if (!storedItem || typeof storedItem !== "object") continue;
+      const item = storedItem as {
+        id?: unknown;
+        name?: unknown;
+        quantity?: unknown;
+        kind?: unknown;
+      };
+      if (typeof item.id !== "string") continue;
+      const currentClassTitle = cookingClassTitleById.get(item.id);
+      const storedTitle =
+        typeof item.name === "string" ? item.name.trim().toLowerCase() : "";
+      const belongsToCurrentClass =
+        item.kind === "cooking_class" ||
+        (Boolean(currentClassTitle) && storedTitle === currentClassTitle);
+      if (!belongsToCurrentClass) continue;
+
+      const quantity = Number(item.quantity);
+      if (!Number.isInteger(quantity) || quantity <= 0) continue;
+
+      soldQuantityByProductId.set(
+        item.id,
+        (soldQuantityByProductId.get(item.id) ?? 0) + quantity
+      );
+    }
+  }
 
   for (const item of requestedItems) {
     const recipe =
@@ -117,10 +173,28 @@ async function resolveCheckoutItems(rawItems: unknown): Promise<CheckoutItem[]> 
     }
 
     const existing = resolvedItems.get(recipe.id);
-    const nextQuantity = Math.min(
-      (existing?.quantity ?? 0) + item.quantity,
-      20,
-    );
+    const nextQuantity = (existing?.quantity ?? 0) + item.quantity;
+    const capacity =
+      recipe.productKind === "cooking_class" ? recipe.capacity ?? 10 : 20;
+    const soldQuantity = soldQuantityByProductId.get(recipe.id) ?? 0;
+    const availableQuantity = Math.max(capacity - soldQuantity, 0);
+
+    if (
+      recipe.productKind === "cooking_class" &&
+      nextQuantity > availableQuantity
+    ) {
+      if (availableQuantity === 0) {
+        throw new Error(`${recipe.title} is sold out.`);
+      }
+
+      throw new Error(
+        `Only ${availableQuantity} seat${availableQuantity === 1 ? " is" : "s are"} still available for ${recipe.title}.`
+      );
+    }
+
+    if (nextQuantity > capacity) {
+      throw new Error(`The maximum quantity for ${recipe.title} is ${capacity}.`);
+    }
 
     resolvedItems.set(recipe.id, {
       id: recipe.id,
@@ -129,6 +203,10 @@ async function resolveCheckoutItems(rawItems: unknown): Promise<CheckoutItem[]> 
       price: recipe.numericPrice,
       quantity: nextQuantity,
       imagePath: recipe.imagePath ?? undefined,
+      kind: recipe.productKind,
+      capacity:
+        recipe.productKind === "cooking_class" ? capacity : undefined,
+      eventDate: recipe.eventDate,
     });
   }
 
@@ -180,7 +258,6 @@ async function withDbRetry<T>(
 
 export async function POST(request: Request) {
   const startTime = Date.now();
-  const REQUEST_TIMEOUT = 5000; // 5 second timeout for entire request
   console.log("[Checkout] Request started");
 
   if (!stripe) {
@@ -190,15 +267,6 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
-
-  // Helper to check if we've exceeded timeout
-  const checkTimeout = (phase: string) => {
-    const elapsed = Date.now() - startTime;
-    if (elapsed > REQUEST_TIMEOUT) {
-      console.error(`[Checkout] Timeout exceeded in ${phase}: ${elapsed}ms > ${REQUEST_TIMEOUT}ms`);
-      throw new Error(`Request timeout in ${phase} (${elapsed}ms)`);
-    }
-  };
 
   try {
     // Check authentication
@@ -227,7 +295,8 @@ export async function POST(request: Request) {
       );
     }
 
-    await syncCurrentClerkUser();
+    const syncResult = await syncCurrentClerkUser();
+    const orderOwnerId = syncResult.skipped ? userId : syncResult.userId;
 
     const customerEmail = user.primaryEmailAddress.emailAddress;
     const appUrl = getCanonicalAppUrl();
@@ -244,7 +313,12 @@ export async function POST(request: Request) {
     const items = await resolveCheckoutItems(rawItems);
     console.log(`[Checkout] Body parsed in ${Date.now() - bodyStart}ms`, {
       itemCount: items?.length || 0,
-      totalPrice: items?.reduce((sum: number, i: any) => sum + (i.price * i.quantity), 0) || 0,
+      totalPrice:
+        items?.reduce(
+          (sum: number, item: CheckoutItem) =>
+            sum + item.price * item.quantity,
+          0
+        ) || 0,
     });
 
     const taxRate = await getServerSalesTaxRate();
@@ -321,7 +395,7 @@ export async function POST(request: Request) {
         line_items: lineItems,
         customer_email: customerEmail,
         metadata: {
-          userId,
+          userId: orderOwnerId,
           subtotalCents: String(totals.subtotalCents),
           taxCents: String(totals.taxCents),
         },
@@ -343,7 +417,7 @@ export async function POST(request: Request) {
     await withDbRetry(
       () =>
         db.insert(orders).values({
-          userId,
+          userId: orderOwnerId,
           stripeSessionId: stripeSession.id,
           status: "pending",
           amount: totalAmount,

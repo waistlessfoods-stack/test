@@ -113,14 +113,17 @@ export async function POST(request: NextRequest) {
       return rateLimitResponse(emailLimit);
     }
 
-    await syncCurrentClerkUser();
+    const syncResult = await syncCurrentClerkUser();
+    const databaseUserId = syncResult.skipped ? userId : syncResult.userId;
 
     // Find the signed-in user only; never trust request-body email for this flow.
     const existingUser = await withDbRetry(() =>
       db
         .select()
         .from(userTable)
-        .where(and(eq(userTable.id, userId), eq(userTable.email, email)))
+        .where(
+          and(eq(userTable.id, databaseUserId), eq(userTable.email, email))
+        )
         .limit(1)
     );
 

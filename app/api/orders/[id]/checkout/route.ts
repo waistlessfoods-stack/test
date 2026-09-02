@@ -1,15 +1,19 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
-import { syncCurrentClerkUser } from "@/lib/clerk-user-sync";
+import {
+  getClerkUserIdentityIds,
+  syncCurrentClerkUser,
+} from "@/lib/clerk-user-sync";
 import { getCanonicalAppUrl } from "@/lib/app-url";
 import {
   buildStripeLineItemsFromSnapshot,
   resolveOrderCheckoutSnapshot,
 } from "@/lib/order-checkout-snapshot";
+import { arePublicCookingClassesEnabled } from "@/lib/public-cooking-classes";
 
 const stripeSecretKey =
   process.env.sandbox_secret_key_stripe || process.env.STRIPE_SECRET_KEY;
@@ -38,7 +42,8 @@ export async function POST(
       );
     }
 
-    await syncCurrentClerkUser();
+    const syncResult = await syncCurrentClerkUser();
+    const ownerIds = getClerkUserIdentityIds(userId, syncResult);
     const appUrl = getCanonicalAppUrl();
 
     const { id } = await context.params;
@@ -49,7 +54,7 @@ export async function POST(
     }
 
     const existingOrder = await db.query.orders.findFirst({
-      where: and(eq(orders.id, orderId), eq(orders.userId, userId)),
+      where: and(eq(orders.id, orderId), inArray(orders.userId, ownerIds)),
     });
 
     if (!existingOrder) {
@@ -61,18 +66,6 @@ export async function POST(
         { error: "Only pending orders can be paid." },
         { status: 400 }
       );
-    }
-
-    // Reuse existing open checkout session if Stripe still has a valid URL.
-    try {
-      const existingSession = await stripe.checkout.sessions.retrieve(
-        existingOrder.stripeSessionId
-      );
-      if (existingSession.status === "open" && existingSession.url) {
-        return NextResponse.json({ url: existingSession.url, reused: true });
-      }
-    } catch {
-      // If retrieval fails, we create a new session below.
     }
 
     const checkoutSnapshot = resolveOrderCheckoutSnapshot({
@@ -89,6 +82,28 @@ export async function POST(
       );
     }
 
+    if (
+      !arePublicCookingClassesEnabled() &&
+      checkoutSnapshot.items.some((item) => item.kind === "cooking_class")
+    ) {
+      return NextResponse.json(
+        { error: "Public cooking classes are not currently available." },
+        { status: 400 }
+      );
+    }
+
+    // Reuse existing open checkout session if Stripe still has a valid URL.
+    try {
+      const existingSession = await stripe.checkout.sessions.retrieve(
+        existingOrder.stripeSessionId
+      );
+      if (existingSession.status === "open" && existingSession.url) {
+        return NextResponse.json({ url: existingSession.url, reused: true });
+      }
+    } catch {
+      // If retrieval fails, we create a new session below.
+    }
+
     const lineItems = buildStripeLineItemsFromSnapshot(checkoutSnapshot);
 
     const stripeSession = await stripe.checkout.sessions.create({
@@ -97,7 +112,7 @@ export async function POST(
       line_items: lineItems,
       customer_email: existingOrder.customerEmail || undefined,
       metadata: {
-        userId,
+        userId: existingOrder.userId,
         orderId: String(existingOrder.id),
       },
       success_url: `${appUrl}/orders?success=1`,

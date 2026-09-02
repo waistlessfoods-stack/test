@@ -2,8 +2,11 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
-import { syncCurrentClerkUser } from "@/lib/clerk-user-sync";
-import { eq, desc } from "drizzle-orm";
+import {
+  getClerkUserIdentityIds,
+  syncCurrentClerkUser,
+} from "@/lib/clerk-user-sync";
+import { desc, inArray } from "drizzle-orm";
 
 // Helper to detect transient database errors
 function isTransientDbError(error: unknown): boolean {
@@ -48,7 +51,7 @@ async function withDbRetry<T>(
   throw lastError;
 }
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     // Check authentication
     const { userId } = await auth();
@@ -60,14 +63,15 @@ export async function GET(request: Request) {
       );
     }
 
-    await syncCurrentClerkUser();
+    const syncResult = await syncCurrentClerkUser();
+    const ownerIds = getClerkUserIdentityIds(userId, syncResult);
 
     // Fetch user's orders with retry logic
     const userOrders = await withDbRetry(() =>
       db
         .select()
         .from(orders)
-        .where(eq(orders.userId, userId))
+        .where(inArray(orders.userId, ownerIds))
         .orderBy(desc(orders.createdAt))
     );
 

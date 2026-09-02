@@ -18,6 +18,8 @@ type CartItem = {
   price: number;
   quantity: number;
   imagePath?: string | null;
+  kind?: "recipe" | "cooking_class";
+  maxQuantity?: number;
 };
 
 type CartState = {
@@ -53,15 +55,34 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case "ADD_ITEM": {
       const existing = state.items.find((item) => item.id === action.item.id);
       if (existing) {
+        const maxQuantity = existing.maxQuantity ?? action.item.maxQuantity ?? 20;
         return {
           items: state.items.map((item) =>
             item.id === action.item.id
-              ? { ...item, quantity: item.quantity + action.item.quantity }
+              ? {
+                  ...item,
+                  quantity: Math.min(
+                    item.quantity + action.item.quantity,
+                    maxQuantity
+                  ),
+                  maxQuantity,
+                }
               : item
           ),
         };
       }
-      return { items: [...state.items, action.item] };
+      return {
+        items: [
+          ...state.items,
+          {
+            ...action.item,
+            quantity: Math.min(
+              action.item.quantity,
+              action.item.maxQuantity ?? 20
+            ),
+          },
+        ],
+      };
     }
     case "REMOVE_ITEM":
       return { items: state.items.filter((item) => item.id !== action.id) };
@@ -70,7 +91,13 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         items: state.items
           .map((item) =>
             item.id === action.id
-              ? { ...item, quantity: action.quantity }
+              ? {
+                  ...item,
+                  quantity: Math.min(
+                    action.quantity,
+                    item.maxQuantity ?? 20
+                  ),
+                }
               : item
           )
           .filter((item) => item.quantity > 0),

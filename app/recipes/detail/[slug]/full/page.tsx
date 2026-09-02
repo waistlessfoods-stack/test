@@ -5,11 +5,16 @@ import Link from "next/link";
 import {
   fetchRecipesPageFromContentful,
   findRecipeBySlug,
+  isCookingClassProduct,
 } from "@/lib/contentful-management";
 import { auth } from "@clerk/nextjs/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
+import {
+  getClerkUserIdentityIds,
+  syncCurrentClerkUser,
+} from "@/lib/clerk-user-sync";
 import { redirect } from "next/navigation";
 import { buildMetadata, toAbsoluteUrl } from "@/lib/seo";
 import RecipeFullClient from "./recipe-full-client";
@@ -139,6 +144,10 @@ export default async function RecipeFullPage({ params }: RecipeFullPageProps) {
     );
   }
 
+  if (isCookingClassProduct(recipe)) {
+    redirect(`/shop/${recipe.slug}`);
+  }
+
   if (recipe.slug !== slug) {
     redirect(`/recipes/detail/${recipe.slug}/full`);
   }
@@ -148,11 +157,18 @@ export default async function RecipeFullPage({ params }: RecipeFullPageProps) {
 
   if (!canAccessFullContent && userId) {
     try {
+      const syncResult = await syncCurrentClerkUser();
+      const ownerIds = getClerkUserIdentityIds(userId, syncResult);
       const completedOrders = await withDbRetry(() =>
         db
           .select({ items: orders.items })
           .from(orders)
-          .where(and(eq(orders.userId, userId), eq(orders.status, "completed")))
+          .where(
+            and(
+              inArray(orders.userId, ownerIds),
+              eq(orders.status, "completed")
+            )
+          )
       );
 
       canAccessFullContent = completedOrders.some((order) =>

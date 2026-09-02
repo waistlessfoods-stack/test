@@ -13,10 +13,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const service = await fetchServiceDetailFromContentful(slug);
+  const requestTitle =
+    slug === "cooking-classes"
+      ? "Request Cooking Class"
+      : service
+        ? `Request ${service.title}`
+        : "Request Service";
 
   return buildMetadata({
-    title: service ? `Book ${service.title}` : "Book Service",
-    description: "Booking request page for WaistLess Foods services.",
+    title: requestTitle,
+    description: "Service request page for WaistLess Foods services.",
     path: `/services/${slug}/book`,
     noIndex: true,
     image: service?.mainImagePath || service?.imagePath || null,

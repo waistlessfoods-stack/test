@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Container } from "@/components/ui/container";
@@ -17,6 +17,8 @@ type OrderItem = {
   price: number;
   quantity: number;
   imagePath?: string;
+  kind?: "recipe" | "cooking_class";
+  eventDate?: string;
 };
 
 type Order = {
@@ -28,10 +30,21 @@ type Order = {
   currency: string;
   items: OrderItem[];
   customerEmail: string | null;
-  metadata: any;
+  metadata: ({ paymentStatus?: string } & Record<string, unknown>) | null;
   createdAt: string;
   updatedAt: string;
 };
+
+async function requestOrders(): Promise<Order[]> {
+  const response = await fetch("/api/orders");
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch orders");
+  }
+
+  const data = (await response.json()) as { orders?: Order[] };
+  return data.orders || [];
+}
 
 export default function OrdersPage() {
   const router = useRouter();
@@ -46,15 +59,54 @@ export default function OrdersPage() {
   const [error, setError] = useState<string | null>(null);
   const showSuccess = searchParams.get("success") === "1";
 
+  const fetchOrders = useCallback(async () => {
+    try {
+      setOrders(await requestOrders());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load orders");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
+    let isActive = true;
+
     if (!isPending && !userId) {
       router.push("/signin?redirect=/orders");
-      return;
+      return () => {
+        isActive = false;
+      };
     }
 
     if (userId) {
-      fetchOrders();
+      const loadInitialOrders = async () => {
+        try {
+          const nextOrders = await requestOrders();
+          if (isActive) {
+            setOrders(nextOrders);
+          }
+        } catch (loadError) {
+          if (isActive) {
+            setError(
+              loadError instanceof Error
+                ? loadError.message
+                : "Failed to load orders"
+            );
+          }
+        } finally {
+          if (isActive) {
+            setLoading(false);
+          }
+        }
+      };
+
+      void loadInitialOrders();
     }
+
+    return () => {
+      isActive = false;
+    };
   }, [userId, isPending, router]);
 
   useEffect(() => {
@@ -74,25 +126,7 @@ export default function OrdersPage() {
     };
 
     void reconcile();
-  }, [userId, showSuccess]);
-
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch("/api/orders");
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch orders");
-      }
-
-      const data = await response.json();
-      setOrders(data.orders || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load orders");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [userId, showSuccess, fetchOrders]);
 
   const continuePayment = async (orderId: number) => {
     try {
@@ -112,7 +146,7 @@ export default function OrdersPage() {
         throw new Error("Checkout URL not found");
       }
 
-      window.location.href = data.url;
+      window.location.assign(data.url);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to continue payment"
@@ -199,7 +233,7 @@ export default function OrdersPage() {
                   Payment Successful!
                 </h3>
                 <p className="text-green-700">
-                  Your order has been placed successfully. You'll receive a confirmation email shortly.
+                  Your order has been placed successfully. You&apos;ll receive a confirmation email shortly.
                 </p>
                 {isReconciling && (
                   <p className="text-green-700 text-sm mt-1">
@@ -235,7 +269,7 @@ export default function OrdersPage() {
             </p>
             <Link href="/shop">
               <Button className="bg-[#0F8DAB] hover:bg-[#0d7a94]">
-                Browse Recipes
+                Browse Shop
               </Button>
             </Link>
           </Card>
@@ -297,7 +331,20 @@ export default function OrdersPage() {
                               Quantity: {item.quantity} × $
                               {item.price.toFixed(2)}
                             </p>
-                            {order.status === "completed" && (
+                            {item.eventDate && (
+                              <p className="mt-1 text-sm font-medium text-[#388082]">
+                                Class date: {item.eventDate}
+                              </p>
+                            )}
+                            {order.status === "completed" && item.kind === "cooking_class" && (
+                              <Link
+                                href={`/shop/${item.slug || toSlug(item.name)}`}
+                                className="inline-flex mt-2 text-sm font-medium text-[#0F8DAB] hover:underline"
+                              >
+                                View class details
+                              </Link>
+                            )}
+                            {order.status === "completed" && item.kind !== "cooking_class" && (
                               <Link
                                 href={`/recipes/detail/${item.slug || toSlug(item.name)}/full`}
                                 className="inline-flex mt-2 text-sm font-medium text-[#0F8DAB] hover:underline"

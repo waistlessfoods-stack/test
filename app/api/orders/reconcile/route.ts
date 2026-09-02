@@ -1,10 +1,14 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
-import { syncCurrentClerkUser } from "@/lib/clerk-user-sync";
+import {
+  getClerkUserIdentityIds,
+  syncCurrentClerkUser,
+} from "@/lib/clerk-user-sync";
+import { sendOrderConfirmationOnce } from "@/lib/email/send-order-confirmation";
 
 const stripeSecretKey =
   process.env.sandbox_secret_key_stripe || process.env.STRIPE_SECRET_KEY;
@@ -30,15 +34,19 @@ export async function POST() {
       );
     }
 
-    await syncCurrentClerkUser();
+    const syncResult = await syncCurrentClerkUser();
+    const ownerIds = getClerkUserIdentityIds(userId, syncResult);
 
     const pendingOrders = await db
       .select()
       .from(orders)
-      .where(and(eq(orders.userId, userId), eq(orders.status, "pending")))
+      .where(
+        and(inArray(orders.userId, ownerIds), eq(orders.status, "pending"))
+      )
       .orderBy(desc(orders.createdAt));
 
     let updatedCount = 0;
+    let confirmationFailures = 0;
 
     for (const order of pendingOrders) {
       try {
@@ -71,6 +79,22 @@ export async function POST() {
             .where(eq(orders.id, order.id));
 
           updatedCount += 1;
+
+          try {
+            await sendOrderConfirmationOnce({
+              orderId: order.id,
+              customerName: session.customer_details?.name,
+            });
+          } catch (emailError) {
+            confirmationFailures += 1;
+            console.warn("[Orders Reconcile] Confirmation email failed", {
+              orderId: order.id,
+              message:
+                emailError instanceof Error
+                  ? emailError.message
+                  : String(emailError),
+            });
+          }
         }
       } catch (error) {
         console.warn("[Orders Reconcile] Could not verify Stripe session", {
@@ -81,15 +105,37 @@ export async function POST() {
       }
     }
 
+    const retryableConfirmations = await db
+      .select({ id: orders.id })
+      .from(orders)
+      .where(
+        and(
+          inArray(orders.userId, ownerIds),
+          eq(orders.status, "completed"),
+          sql`${orders.metadata}->>'orderConfirmationError' is not null`
+        )
+      )
+      .orderBy(desc(orders.createdAt));
+
+    for (const order of retryableConfirmations) {
+      try {
+        await sendOrderConfirmationOnce({ orderId: order.id });
+      } catch {
+        confirmationFailures += 1;
+      }
+    }
+
     console.log("[Orders Reconcile] Completed", {
       userId: userId.slice(0, 8),
       pendingChecked: pendingOrders.length,
       updatedCount,
+      confirmationFailures,
     });
 
     return NextResponse.json({
       checked: pendingOrders.length,
       updated: updatedCount,
+      confirmationFailures,
     });
   } catch (error) {
     const message =

@@ -20,6 +20,7 @@ type Booking = {
 };
 
 type FilterTab = "all" | "pending" | "confirmed" | "cancelled";
+type RequestTypeFilter = "all" | "consultation" | "service";
 
 const STATUS_CONFIG: Record<
   string,
@@ -66,6 +67,8 @@ export default function AdminBookingsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState<FilterTab>("all");
+  const [requestTypeFilter, setRequestTypeFilter] =
+    useState<RequestTypeFilter>("all");
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [fadingOut, setFadingOut] = useState<Set<number>>(new Set());
@@ -168,7 +171,11 @@ export default function AdminBookingsPage() {
   function toggleExpand(id: number) {
     setExpanded((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   }
@@ -180,8 +187,17 @@ export default function AdminBookingsPage() {
     cancelled: bookings.filter((b) => b.status === "cancelled").length,
   };
 
-  const filtered =
-    filter === "all" ? bookings : bookings.filter((b) => b.status === filter);
+  const filtered = bookings.filter((booking) => {
+    const matchesStatus = filter === "all" || booking.status === filter;
+    const isConsultation =
+      booking.serviceSlug === "complimentary-consultation";
+    const matchesRequestType =
+      requestTypeFilter === "all" ||
+      (requestTypeFilter === "consultation" && isConsultation) ||
+      (requestTypeFilter === "service" && !isConsultation);
+
+    return matchesStatus && matchesRequestType;
+  });
 
   if (loading && bookings.length === 0) {
     return (
@@ -300,6 +316,32 @@ export default function AdminBookingsPage() {
           )}
         </div>
 
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-white p-2 shadow-sm">
+          <span className="px-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Request type
+          </span>
+          {(
+            [
+              ["all", "All requests"],
+              ["consultation", "Consultations"],
+              ["service", "Service enquiries"],
+            ] as Array<[RequestTypeFilter, string]>
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setRequestTypeFilter(value)}
+              className={`rounded-xl px-3 py-2 text-xs font-medium transition ${
+                requestTypeFilter === value
+                  ? "bg-[#388082] text-white"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         {/* Booking list */}
         {filtered.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 py-16 text-center">
@@ -319,7 +361,7 @@ export default function AdminBookingsPage() {
               </svg>
             </div>
             <p className="text-sm font-medium text-gray-500">
-              No {filter === "all" ? "" : filter} bookings yet
+              No matching requests yet
             </p>
           </div>
         ) : (

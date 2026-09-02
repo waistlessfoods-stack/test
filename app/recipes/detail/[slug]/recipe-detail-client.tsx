@@ -8,20 +8,31 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
 import { useSession } from "@/lib/auth-client";
-import type { Recipe } from "@/lib/contentful-management";
+import {
+  isCookingClassProduct,
+  type Recipe,
+} from "@/lib/contentful-management";
 
 type RecipeDetailClientProps = {
   recipe: Recipe;
+  source?: "recipes" | "shop";
 };
 
-export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) {
+export default function RecipeDetailClient({
+  recipe,
+  source = "recipes",
+}: RecipeDetailClientProps) {
   const router = useRouter();
   const { addItem } = useCart();
   const { data: session, isPending } = useSession();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const isCookingClass = isCookingClassProduct(recipe);
+  const detailHref = isCookingClass
+    ? `/shop/${recipe.slug}`
+    : `/recipes/detail/${recipe.slug}`;
 
   useEffect(() => {
-    if (isPending || !session?.user?.id) {
+    if (isCookingClass || isPending || !session?.user?.id) {
       return;
     }
 
@@ -66,7 +77,15 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
     return () => {
       isActive = false;
     };
-  }, [session?.user?.id, isPending, recipe.id, recipe.slug, recipe.title, router]);
+  }, [
+    session?.user?.id,
+    isPending,
+    isCookingClass,
+    recipe.id,
+    recipe.slug,
+    recipe.title,
+    router,
+  ]);
 
   const handleAddToCart = () => {
     try {
@@ -82,6 +101,8 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
         price: isNaN(priceValue) ? 0 : priceValue,
         quantity: 1,
         imagePath: recipe.imagePath,
+        kind: recipe.productKind,
+        maxQuantity: isCookingClass ? recipe.capacity ?? 10 : 20,
       });
 
       setTimeout(() => {
@@ -96,7 +117,11 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
   const handleOrderNow = () => {
     if (!session?.user) {
       router.push(
-        `/signin?redirect=/recipes/detail/${recipe.slug}&message=Please sign in to purchase this recipe`
+        `/signin?redirect=${encodeURIComponent(detailHref)}&message=${encodeURIComponent(
+          isCookingClass
+            ? "Please sign in to reserve your cooking class seat"
+            : "Please sign in to purchase this recipe"
+        )}`
       );
       return;
     }
@@ -113,6 +138,8 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
         price: isNaN(priceValue) ? 0 : priceValue,
         quantity: 1,
         imagePath: recipe.imagePath,
+        kind: recipe.productKind,
+        maxQuantity: isCookingClass ? recipe.capacity ?? 10 : 20,
       });
 
       router.push("/shop");
@@ -125,14 +152,14 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
     <div className="w-full bg-white overflow-x-hidden font-metropolis">
       <section className="w-full py-12 2xl:py-10">
         <Container>
-          <Link href="/recipes" className="mb-8 inline-block">
+          <Link href={source === "shop" ? "/shop" : "/recipes"} className="mb-8 inline-block">
             <div className="flex items-center gap-4 hover:opacity-70 transition-opacity">
               <span className="text-lg 2xl:text-base font-medium text-[#0F8DAB]">
-                Recipes
+                {source === "shop" ? "Shop" : "Recipes"}
               </span>
               <span className="text-lg 2xl:text-base text-black">/</span>
               <span className="text-lg 2xl:text-base font-medium text-black">
-                Detail recipes
+                {isCookingClass ? "Class details" : "Recipe details"}
               </span>
             </div>
           </Link>
@@ -166,9 +193,17 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
                 </p>
               </div>
 
-              {(recipe.cookTime || recipe.servingSize) && (
+              {(recipe.eventDate || recipe.duration || recipe.cookTime || recipe.servingSize) && (
                 <div className="flex flex-wrap gap-3">
-                  {recipe.cookTime && (
+                  {recipe.eventDate && (
+                    <div className="inline-flex items-center gap-3 rounded-full border border-black bg-white px-5 py-2.5">
+                      <span className="text-sm font-bold uppercase tracking-wide text-black">
+                        Date
+                      </span>
+                      <span className="text-base font-bold text-black">{recipe.eventDate}</span>
+                    </div>
+                  )}
+                  {(recipe.duration || recipe.cookTime) && (
                     <div className="inline-flex items-center gap-3 rounded-full border border-black bg-white px-5 py-2.5">
                       <svg
                         className="h-5 w-5 text-black"
@@ -181,12 +216,14 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
                         <polyline points="12 7 12 12 15 14" />
                       </svg>
                       <span className="text-sm font-bold uppercase tracking-wide text-black">
-                        Cook
+                        {isCookingClass ? "Duration" : "Cook"}
                       </span>
-                      <span className="text-base font-bold text-black">{recipe.cookTime}</span>
+                      <span className="text-base font-bold text-black">
+                        {recipe.duration || recipe.cookTime}
+                      </span>
                     </div>
                   )}
-                  {recipe.servingSize && (
+                  {(recipe.servingSize || (isCookingClass && recipe.capacity)) && (
                     <div className="inline-flex items-center gap-3 rounded-full border border-black bg-white px-5 py-2.5">
                       <svg
                         className="h-5 w-5 text-black"
@@ -199,9 +236,13 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
                         <circle cx="10" cy="7" r="4" />
                       </svg>
                       <span className="text-sm font-bold uppercase tracking-wide text-black">
-                        Serves
+                        {isCookingClass ? "Class size" : "Serves"}
                       </span>
-                      <span className="text-base font-bold text-black">{recipe.servingSize}</span>
+                      <span className="text-base font-bold text-black">
+                        {isCookingClass
+                          ? `${recipe.capacity ?? recipe.servingSize} seats`
+                          : recipe.servingSize}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -224,13 +265,17 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
                       disabled={isAddingToCart}
                       className="flex-1 h-10 bg-[#FB7118] hover:bg-[#E86510] text-white font-semibold text-sm rounded-md transition-colors disabled:opacity-50"
                     >
-                      {isAddingToCart ? "Adding..." : "Add to cart"}
+                      {isAddingToCart
+                        ? "Adding..."
+                        : isCookingClass
+                          ? "Add seat to cart"
+                          : "Add to cart"}
                     </Button>
                     <Button
                       onClick={handleOrderNow}
                       className="flex-1 h-10 bg-[#388082] hover:bg-[#2F6A6B] text-white font-semibold text-sm rounded-md transition-colors"
                     >
-                      Order now
+                      {isCookingClass ? "Reserve now" : "Order now"}
                     </Button>
                   </div>
                 </div>

@@ -1,4 +1,5 @@
 import { currentUser } from "@clerk/nextjs/server";
+import { or, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
 
@@ -18,6 +19,16 @@ type ClerkUserRecord = {
   created_at?: number | null;
   updated_at?: number | null;
 };
+
+export type ClerkUserSyncResult =
+  | {
+      skipped: true;
+      reason:
+        | "missing-email"
+        | "missing-user"
+        | "unverified-email-conflict";
+    }
+  | { skipped: false; userId: string };
 
 function getPrimaryEmailRecord(data: ClerkUserRecord): ClerkEmailAddress | null {
   const emails = data.email_addresses ?? [];
@@ -46,39 +57,86 @@ function toDate(value: number | null | undefined, fallback: Date): Date {
   return typeof value === "number" ? new Date(value) : fallback;
 }
 
-export async function upsertClerkUser(data: ClerkUserRecord) {
+export async function upsertClerkUser(
+  data: ClerkUserRecord
+): Promise<ClerkUserSyncResult> {
   const primaryEmail = getPrimaryEmailRecord(data);
-  const email = primaryEmail?.email_address?.trim();
+  const email = primaryEmail?.email_address?.trim().toLowerCase();
 
   if (!email) {
     return { skipped: true as const, reason: "missing-email" as const };
   }
 
   const now = new Date();
+  const emailVerified = primaryEmail?.verification?.status === "verified";
+  const profile = {
+    name: buildName(data),
+    email,
+    emailVerified,
+    image: data.image_url ?? null,
+    updatedAt: toDate(data.updated_at, now),
+  };
 
-  await db
+  const existingUsers = await db
+    .select({ id: user.id, email: user.email })
+    .from(user)
+    .where(or(eq(user.id, data.id), eq(user.email, email)));
+  const existingByEmail = existingUsers.find(
+    (existingUser) => existingUser.email.toLowerCase() === email
+  );
+  const existingByClerkId = existingUsers.find(
+    (existingUser) => existingUser.id === data.id
+  );
+
+  // Accounts created before the Clerk migration already own a row with this
+  // email. Keep that stable internal ID instead of violating user_email_unique.
+  // Only a verified Clerk email is allowed to claim the legacy identity.
+  if (existingByEmail && existingByEmail.id !== data.id && !emailVerified) {
+    return {
+      skipped: true as const,
+      reason: "unverified-email-conflict" as const,
+    };
+  }
+
+  const existingUser = existingByEmail ?? existingByClerkId;
+
+  if (existingUser) {
+    await db.update(user).set(profile).where(eq(user.id, existingUser.id));
+
+    return {
+      skipped: false as const,
+      userId: existingUser.id,
+    };
+  }
+
+  const [createdUser] = await db
     .insert(user)
     .values({
       id: data.id,
-      name: buildName(data),
-      email,
-      emailVerified: primaryEmail?.verification?.status === "verified",
-      image: data.image_url ?? null,
+      ...profile,
       createdAt: toDate(data.created_at, now),
-      updatedAt: toDate(data.updated_at, now),
     })
     .onConflictDoUpdate({
-      target: user.id,
-      set: {
-        name: buildName(data),
-        email,
-        emailVerified: primaryEmail?.verification?.status === "verified",
-        image: data.image_url ?? null,
-        updatedAt: toDate(data.updated_at, now),
-      },
-    });
+      target: user.email,
+      set: profile,
+    })
+    .returning({ userId: user.id });
 
-  return { skipped: false as const };
+  return {
+    skipped: false as const,
+    userId: createdUser.userId,
+  };
+}
+
+export function getClerkUserIdentityIds(
+  clerkUserId: string,
+  syncResult: ClerkUserSyncResult
+): string[] {
+  if (syncResult.skipped) {
+    return [clerkUserId];
+  }
+
+  return [...new Set([clerkUserId, syncResult.userId])];
 }
 
 export async function syncCurrentClerkUser() {

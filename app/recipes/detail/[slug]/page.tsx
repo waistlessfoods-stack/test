@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   findRecipeBySlug,
   fetchRecipesPageFromContentful,
+  isCookingClassProduct,
 } from "@/lib/contentful-management";
 import { redirect } from "next/navigation";
 import { buildMetadata, toAbsoluteUrl } from "@/lib/seo";
@@ -94,6 +95,10 @@ export default async function RecipeDetailPage({
         </section>
       </div>
     );
+  }
+
+  if (isCookingClassProduct(recipe)) {
+    redirect(`/shop/${recipe.slug}`);
   }
 
   if (recipe.slug !== slug) {

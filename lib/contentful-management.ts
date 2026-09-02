@@ -284,6 +284,11 @@ export type Recipe = {
   sortOrder: number;
   categoryIds?: string[];
   categoryId?: string;
+  categoryNames?: string[];
+  productKind?: "recipe" | "cooking_class";
+  capacity?: number;
+  eventDate?: string;
+  duration?: string;
   featured?: boolean;
   detailDescription?: string;
   ingredients?: string[];
@@ -335,6 +340,16 @@ export function doesRecipeMatchSlug(recipe: Recipe, slug: string): boolean {
 
 export function findRecipeBySlug(recipes: Recipe[], slug: string): Recipe | undefined {
   return recipes.find((recipe) => doesRecipeMatchSlug(recipe, slug));
+}
+
+export function isCookingClassProduct(product: Recipe): boolean {
+  return (
+    product.productKind === "cooking_class" ||
+    product.title.toLowerCase().includes("cooking class") ||
+    (product.categoryNames ?? []).some((name) =>
+      name.toLowerCase().includes("cooking class")
+    )
+  );
 }
 
 function toStringArray(value: unknown): string[] {
@@ -547,6 +562,9 @@ function mapRecipesOrShopPage(entry: any): RecipesPageData {
       sortOrder: Number(e.fields?.sortOrder ?? 0),
     }))
     .sort((a, b) => a.sortOrder - b.sortOrder);
+  const categoryNamesById = new Map(
+    categories.map((category) => [category.id, category.name])
+  );
 
   const recipes: Recipe[] = ((f.recipes as any[]) || [])
     .map((e: any) => {
@@ -570,14 +588,44 @@ function mapRecipesOrShopPage(entry: any): RecipesPageData {
           : typeof singleCategoryId === "string" && singleCategoryId.length > 0
             ? [singleCategoryId]
             : [];
+      const categoryNames = categoryIds
+        .map((categoryId) => categoryNamesById.get(categoryId))
+        .filter((name): name is string => Boolean(name));
+      const productKind: Recipe["productKind"] =
+        title.toLowerCase().includes("cooking class") ||
+        categoryNames.some((name) =>
+          name.toLowerCase().includes("cooking class")
+        )
+        ? "cooking_class"
+        : "recipe";
+      const rawCapacity = Number(e.fields?.capacity);
+      const servingSizeCapacity = Number.parseInt(
+        String(e.fields?.servingSize ?? "").replace(/[^0-9]/g, ""),
+        10
+      );
+      const capacity =
+        productKind === "cooking_class"
+          ? Number.isInteger(rawCapacity) && rawCapacity > 0
+            ? rawCapacity
+            : Number.isInteger(servingSizeCapacity) && servingSizeCapacity > 0
+              ? servingSizeCapacity
+              : 10
+          : undefined;
+      const canonicalSlug =
+        productKind === "cooking_class" ? generatedTitleSlug : resolvedSlug;
+      const legacyTitleSlug =
+        productKind === "cooking_class"
+          ? contentfulSlug && contentfulSlug !== canonicalSlug
+            ? contentfulSlug
+            : undefined
+          : contentfulSlug && contentfulSlug !== generatedTitleSlug
+            ? generatedTitleSlug
+            : undefined;
 
       return {
         id: e.sys.id,
-        slug: resolvedSlug,
-        legacyTitleSlug:
-          contentfulSlug && contentfulSlug !== generatedTitleSlug
-            ? generatedTitleSlug
-            : undefined,
+        slug: canonicalSlug,
+        legacyTitleSlug,
         title,
         price: String(e.fields?.price ?? ""),
         description: String(e.fields?.description ?? ""),
@@ -585,6 +633,17 @@ function mapRecipesOrShopPage(entry: any): RecipesPageData {
         sortOrder: Number(e.fields?.sortOrder ?? 0),
         categoryIds,
         categoryId: categoryIds[0],
+        categoryNames,
+        productKind,
+        capacity,
+        eventDate: e.fields?.eventDate
+          ? String(e.fields.eventDate)
+          : undefined,
+        duration: e.fields?.duration
+          ? String(e.fields.duration)
+          : e.fields?.cookTime
+            ? String(e.fields.cookTime)
+            : undefined,
         featured: Boolean(e.fields?.featured ?? false),
         detailDescription: String(
           e.fields?.detailDescription ?? e.fields?.description ?? ""

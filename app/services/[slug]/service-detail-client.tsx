@@ -73,7 +73,7 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
   const [visibleCount, setVisibleCount] = useState(2);
   const [mainImage, setMainImage] = useState(service.images.main);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
-  const [bookingNoticeOpen, setBookingNoticeOpen] = useState(false);
+  const [publicClassesNoticeOpen, setPublicClassesNoticeOpen] = useState(false);
   const reviewsHeadingRef = useRef<HTMLHeadingElement>(null);
   const detailSections = service.detailSections?.sections ?? [];
   const hasDetailSections = detailSections.length > 0;
@@ -273,22 +273,28 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
           </div>
 
           {service.slug === "cooking-classes" ? (
-            <button
-              type="button"
-              onClick={() => setBookingNoticeOpen(true)}
-              className="w-[132px] h-12 flex items-center justify-center bg-[#388082] rounded-[14px] hover:opacity-90 transition-all active:scale-95"
-            >
-              <span className="font-['Helvetica_Neue'] font-medium text-base md:text-lg leading-[110%] tracking-tight text-white">
-                Book now
-              </span>
-            </button>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                href={`/services/${service.slug}/book`}
+                className="flex min-h-12 items-center justify-center rounded-[14px] bg-[#388082] px-5 text-center font-['Helvetica_Neue'] text-base font-medium leading-[110%] tracking-tight text-white transition-all hover:opacity-90 active:scale-95 md:text-lg"
+              >
+                Request a Private Class
+              </Link>
+              <button
+                type="button"
+                onClick={() => setPublicClassesNoticeOpen(true)}
+                className="flex min-h-12 items-center justify-center rounded-[14px] border border-[#388082] bg-white px-5 text-center font-['Helvetica_Neue'] text-base font-medium leading-[110%] tracking-tight text-[#388082] transition-all hover:bg-[#f1f7f7] active:scale-95 md:text-lg"
+              >
+                Explore Public Classes
+              </button>
+            </div>
           ) : (
             <Link
               href={`/services/${service.slug}/book`}
-              className="w-[132px] h-12 flex items-center justify-center bg-[#388082] rounded-[14px] hover:opacity-90 transition-all active:scale-95"
+              className="flex min-h-12 w-fit items-center justify-center rounded-[14px] bg-[#388082] px-5 hover:opacity-90 transition-all active:scale-95"
             >
               <span className="font-['Helvetica_Neue'] font-medium text-base md:text-lg leading-[110%] tracking-tight text-white">
-                Book now
+                Request to Book
               </span>
             </Link>
           )}
@@ -327,11 +333,14 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
         serviceSlug={service.slug}
         serviceTitle={service.title}
       />
-      <Dialog open={bookingNoticeOpen} onOpenChange={setBookingNoticeOpen}>
+      <Dialog
+        open={publicClassesNoticeOpen}
+        onOpenChange={setPublicClassesNoticeOpen}
+      >
         <DialogContent className="border-[#d7e3e2] bg-white sm:max-w-[480px]">
           <DialogHeader>
             <DialogTitle className="text-xl text-[#0e2f31]">
-              Cooking Classes
+              Public Cooking Classes
             </DialogTitle>
             <DialogDescription className="pt-2 text-base leading-7 text-[#5b6b69]">
               No public classes are currently available. In-home cooking classes
@@ -348,10 +357,10 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
               </button>
             </DialogClose>
             <Link
-              href={`/services/${service.slug}/book`}
+              href="/shop?category=cooking-classes"
               className="rounded-lg bg-[#388082] px-4 py-2 text-center text-sm font-medium text-white hover:opacity-90"
             >
-              Book an in-home class
+              Continue to Shop
             </Link>
           </DialogFooter>
         </DialogContent>

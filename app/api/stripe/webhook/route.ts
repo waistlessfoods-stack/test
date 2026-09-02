@@ -2,7 +2,8 @@ import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
+import { sendOrderConfirmationOnce } from "@/lib/email/send-order-confirmation";
 
 const stripeSecretKey =
   process.env.sandbox_secret_key_stripe || process.env.STRIPE_SECRET_KEY;
@@ -59,14 +60,17 @@ export async function POST(request: Request) {
         .update(orders)
         .set({
           status: "completed",
-          stripePaymentIntentId: session.payment_intent as string,
+          stripePaymentIntentId:
+            typeof session.payment_intent === "string"
+              ? session.payment_intent
+              : null,
           updatedAt: new Date(),
-          metadata: {
+          metadata: sql`coalesce(${orders.metadata}, '{}'::jsonb) || ${JSON.stringify({
             paymentStatus: session.payment_status,
             amountTotal: session.amount_total,
             customerDetails: session.customer_details,
             checkoutSessionId: session.id,
-          },
+          })}::jsonb`,
         })
         .where(eq(orders.stripeSessionId, session.id))
         .returning({ id: orders.id });
@@ -78,14 +82,17 @@ export async function POST(request: Request) {
           .set({
             status: "completed",
             stripeSessionId: session.id,
-            stripePaymentIntentId: session.payment_intent as string,
+            stripePaymentIntentId:
+              typeof session.payment_intent === "string"
+                ? session.payment_intent
+                : null,
             updatedAt: new Date(),
-            metadata: {
+            metadata: sql`coalesce(${orders.metadata}, '{}'::jsonb) || ${JSON.stringify({
               paymentStatus: session.payment_status,
               amountTotal: session.amount_total,
               customerDetails: session.customer_details,
               checkoutSessionId: session.id,
-            },
+            })}::jsonb`,
           })
           .where(eq(orders.id, metadataOrderId))
           .returning({ id: orders.id });
@@ -97,6 +104,13 @@ export async function POST(request: Request) {
           metadataOrderId: session.metadata?.orderId,
         });
       } else {
+        for (const order of updated) {
+          await sendOrderConfirmationOnce({
+            orderId: order.id,
+            customerName: session.customer_details?.name,
+          });
+        }
+
         console.log("[Stripe Webhook] Order marked completed", {
           orderIds: updated.map((row) => row.id),
           sessionId: session.id,
