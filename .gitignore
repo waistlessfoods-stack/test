@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/.runtime/contentful-backups/
 
 # next.js
 /.next/

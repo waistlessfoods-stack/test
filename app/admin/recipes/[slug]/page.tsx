@@ -25,7 +25,7 @@ export default async function AdminRecipePreviewPage({
 
   return (
     <main className="min-h-screen bg-[#f0f5f5]">
-      <div className="bg-[#0e2f31] px-4 py-4 text-white md:px-12">
+      <div className="recipe-print-controls bg-[#0e2f31] px-4 py-4 text-white md:px-12">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-semibold">Admin-only preview</p>

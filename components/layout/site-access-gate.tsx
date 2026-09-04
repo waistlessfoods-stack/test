@@ -19,7 +19,12 @@ type SiteAccessGateProps = {
 };
 
 function isPublicPath(pathname: string): boolean {
-  return pathname === "/" || pathname === "/unsubscribe";
+  return (
+    pathname === "/" ||
+    pathname === "/unsubscribe" ||
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/")
+  );
 }
 
 function getServerUnlockSnapshot(): boolean {

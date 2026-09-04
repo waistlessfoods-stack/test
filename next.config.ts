@@ -33,6 +33,26 @@ const nextConfig: NextConfig = {
         destination: "/services/cooking-classes/:path*",
         permanent: true,
       },
+      {
+        source: "/recipes/detail/apple-peanut-donut-bites/:path*",
+        destination: "/recipes/detail/triple-berry-french-toast/:path*",
+        permanent: true,
+      },
+      {
+        source: "/shop/apple-peanut-donut-bites",
+        destination: "/shop/triple-berry-french-toast",
+        permanent: true,
+      },
+      {
+        source: "/recipes/detail/almond-fudge-brownie/:path*",
+        destination: "/recipes/detail/harvest-stuffed-mushrooms/:path*",
+        permanent: true,
+      },
+      {
+        source: "/shop/almond-fudge-brownie",
+        destination: "/shop/harvest-stuffed-mushrooms",
+        permanent: true,
+      },
     ];
   },
   allowedDevOrigins: allowedDevOrigins?.length

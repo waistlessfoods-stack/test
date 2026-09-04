@@ -26,9 +26,8 @@ For your additional questions:
 
 - You can preview a complete paid recipe from **Admin Portal → Paid Recipe
   Previews** without placing a test order. This preview remains admin-only.
-- Visitors can currently view a paid recipe online after purchasing it, but there
-  is not yet a recipe-download button. We can add a protected PDF or print/save
-  option once we decide how downloadable copies should be branded and protected.
+- Visitors can view a paid recipe online after purchasing it and use the protected
+  **Print / Save PDF** action to create a branded personal copy.
 - For an e-book, I recommend starting with a branded PDF. It will preserve your
   recipe layouts and photography and is the simplest format to distribute or
   sell. EPUB can be added later if you want dedicated e-reader support.
@@ -38,11 +37,9 @@ For your additional questions:
   unsubscribes, but the campaign editor/sending workflow still needs the provider
   and separate scope confirmed.
 
-One launch cleanup remains: the Pasta Making test item is currently published in
-Contentful even though public classes should remain unavailable. It should be
-unpublished for now, or completed and re-published later when public enrollment
-is ready. The website is currently keeping that test class hidden and unavailable
-for checkout.
+The mismatched Contentful recipe records have now been corrected, and the Pasta
+Making test item has been removed from Recipes and Shop and unpublished. Public
+classes remain hidden and unavailable for checkout until enrollment is ready.
 
 Thanks,  
 Zul

@@ -99,7 +99,7 @@ export function ContentfulRichText({ document, className }: ContentfulRichTextPr
         const altValue = fields?.title || fields?.description;
         const alt = typeof altValue === "string" ? altValue : "";
         return (
-          <div className="relative w-full aspect-[16/7] rounded-lg overflow-hidden bg-[#EFEFEF] my-5">
+          <div className="contentful-rich-text-asset relative w-full aspect-[16/7] rounded-lg overflow-hidden bg-[#EFEFEF] my-5">
             <Image
               src={url}
               alt={alt}

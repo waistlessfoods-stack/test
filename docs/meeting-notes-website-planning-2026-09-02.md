@@ -2,8 +2,8 @@
 
 Meeting date: September 2, 2026  
 Final source: Chef Amber's written recap sent after the meeting  
-Status: Website changes implemented in the working tree; external setup and
-content cleanup remain
+Status: Website changes and Contentful recipe cleanup completed; external setup
+and end-to-end verification remain
 
 Amber's written recap is the final authority where it differs from the automatic
 meeting transcript.
@@ -55,11 +55,9 @@ admin session and does not unlock the recipe for ordinary visitors.
 
 ### Recipe downloads
 
-The current customer experience unlocks paid recipes for online viewing after a
-completed purchase; it does not yet generate a downloadable file. A protected
-**Download PDF** or **Print / Save PDF** option can be added as a separately
-confirmed enhancement. A downloadable file is easier to keep, print, and share,
-so the preferred access rules and branding or watermarking should be agreed first.
+The customer experience unlocks paid recipes for online viewing after a completed
+purchase and now includes a protected **Print / Save PDF** action. The branded
+Letter-size print layout is available only from an authorized full-recipe page.
 
 ### E-book format
 
@@ -83,6 +81,7 @@ newsletter workflow and require a provider and scope decision.
 - Consultation requests distinguished from service requests in admin.
 - Exact service and cooking-class button/form copy from the written recap.
 - Protected paid-recipe preview area in admin.
+- Protected branded recipe printing and Save as PDF support.
 - Shop generalized to support recipes and future public cooking classes.
 - Public cooking classes hidden and blocked by default until their launch flag is
   explicitly enabled.
@@ -95,27 +94,25 @@ newsletter workflow and require a provider and scope decision.
 - Google Calendar owner: add the three required booking-form custom questions.
 - Supply the public Google Appointment Schedule URL for
   `NEXT_PUBLIC_GOOGLE_BOOKING_URL`, redeploy, and complete an end-to-end test.
-- Unpublish or correct the current Pasta Making test entry before launch. It is
-  published in Contentful even though the final instruction says that no public
-  classes are currently available.
-- Decide whether customer recipe downloads should be added and, if so, whether
-  the output is print-only, PDF, or watermarked PDF.
 - Select the newsletter provider and approve the owner-managed campaign workflow.
 
-## Published Contentful Test-Class Cleanup
+## Contentful Recipe Cleanup — Completed September 4, 2026
 
-The Pasta Making entry is currently published and still contains reused recipe
-content:
+After the replacement CMA token was authorized for the WaistLess Foods
+organization:
 
-- category **Vegan**, not **Cooking Classes**;
-- stored slug `sweet-potato-chickpea`;
-- `3 servings`, currently interpreted as a three-seat class capacity;
-- `40 mins`, presented as the duration; and
-- the older potato image.
+- Triple Berry French Toast, Harvest-Stuffed Mushrooms, and Thai Red Vegetable
+  Curry were corrected and republished with matching slugs, descriptions,
+  detailed content, ingredients, tools, categories, timings, and instructions.
+- The existing images were retained because they match the corrected recipe
+  identities.
+- The Pasta Making test reference was removed from both Recipes and Shop, and the
+  test entry was unpublished.
+- The production Contentful cache was revalidated and all affected live routes
+  were verified.
+- Permanent redirects were added for the two replaced recipe slugs so existing
+  recipe, full-recipe, and Shop links continue working after deployment.
 
-Because Amber's written recap says no public classes are currently available, the
-safest launch action is to unpublish this test entry. The Contentful Management
-API credential available during implementation was rejected, so production
-content was not changed automatically. The website also keeps public classes
-hidden and unavailable for checkout unless
-`PUBLIC_COOKING_CLASSES_ENABLED=true` is set in the deployment environment.
+Public classes remain hidden and unavailable for checkout unless
+`PUBLIC_COOKING_CLASSES_ENABLED=true` is explicitly set in the deployment
+environment.

@@ -143,3 +143,276 @@ body {
     top: calc(var(--site-header-height, 197px) + 1rem);
   }
 }
+
+.recipe-print-only {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: Letter;
+    margin: 0.45in 0.5in;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  body:has(.recipe-print-page) header,
+  body:has(.recipe-print-page) > header,
+  body:has(.recipe-print-page) footer:not(.recipe-print-footer),
+  body:has(.recipe-print-page) [data-radix-portal],
+  .recipe-print-controls {
+    display: none !important;
+  }
+
+  .recipe-print-page {
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+  }
+
+  .recipe-print-section {
+    padding: 0 !important;
+  }
+
+  .recipe-print-container {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 0.25in !important;
+  }
+
+  .recipe-print-sheet {
+    max-width: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    color: #183637 !important;
+    font-size: 9.5pt !important;
+  }
+
+  .recipe-print-only {
+    display: block !important;
+  }
+
+  .recipe-print-secondary-media,
+  .recipe-print-page .contentful-rich-text-asset {
+    display: none !important;
+  }
+
+  .recipe-print-brand {
+    color: #00676e;
+    font-size: 17pt;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .recipe-print-tagline {
+    margin-top: 4pt;
+    color: #4f6665;
+    font-size: 7.5pt;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .recipe-print-heading {
+    display: flex !important;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 0.16in;
+    border-bottom: 3px solid #00676e;
+    padding-bottom: 0.1in;
+  }
+
+  .recipe-print-collection {
+    color: #d8722f;
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .recipe-print-hero {
+    height: 2.25in !important;
+    max-height: none !important;
+    margin-bottom: 0.2in !important;
+    border-radius: 10pt !important;
+    break-after: avoid-page;
+  }
+
+  .recipe-print-sheet > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.14in !important;
+  }
+
+  .recipe-print-sheet > :not([hidden]):not(:last-child) {
+    margin-bottom: 0 !important;
+  }
+
+  .recipe-print-title-row {
+    align-items: flex-end !important;
+    border-bottom: 1px solid #bdd1cf;
+    padding-bottom: 0.12in;
+  }
+
+  .recipe-print-title {
+    max-width: 100% !important;
+    color: #173c3e !important;
+    font-size: 25pt !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.035em !important;
+    line-height: 1.05 !important;
+  }
+
+  .recipe-print-meta {
+    gap: 7pt !important;
+  }
+
+  .recipe-print-meta > div {
+    gap: 6pt !important;
+    border-color: #9dbfbd !important;
+    padding: 5pt 9pt !important;
+  }
+
+  .recipe-print-meta svg {
+    width: 12pt !important;
+    height: 12pt !important;
+    color: #00676e !important;
+  }
+
+  .recipe-print-meta span {
+    font-size: 7.5pt !important;
+  }
+
+  .recipe-print-description {
+    border-left: 4px solid #e58a4c;
+    border-radius: 0 6pt 6pt 0;
+    background: #f3f8f7;
+    padding: 9pt 12pt;
+  }
+
+  .recipe-print-description h2 {
+    display: none !important;
+  }
+
+  .recipe-print-description p {
+    margin: 0 !important;
+    color: #3e5858 !important;
+    font-size: 9.5pt !important;
+    line-height: 1.45 !important;
+  }
+
+  .recipe-print-details-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 0.32in;
+  }
+
+  .recipe-print-details-grid > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0 !important;
+  }
+
+  .recipe-print-details-grid > :not([hidden]):not(:last-child),
+  .recipe-print-panel > :not([hidden]):not(:last-child),
+  .recipe-print-instructions > :not([hidden]):not(:last-child) {
+    margin-bottom: 0 !important;
+  }
+
+  .recipe-print-panel {
+    border-top: 2px solid #e58a4c;
+    padding-top: 8pt;
+  }
+
+  .recipe-print-panel > :not([hidden]) ~ :not([hidden]),
+  .recipe-print-panel > div > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 6pt !important;
+  }
+
+  .recipe-print-page h2 {
+    margin: 0 0 7pt !important;
+    color: #00676e !important;
+    font-size: 11pt !important;
+    font-weight: 750 !important;
+    letter-spacing: 0.09em !important;
+    line-height: 1.2 !important;
+    text-transform: uppercase;
+  }
+
+  .recipe-print-page h3 {
+    margin: 9pt 0 2pt !important;
+    color: #173c3e !important;
+    font-size: 10pt !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+  }
+
+  .recipe-print-page p,
+  .recipe-print-page li {
+    font-size: 9pt !important;
+    line-height: 1.42 !important;
+  }
+
+  .recipe-print-page ul {
+    list-style: disc;
+    margin: 0 !important;
+    padding-left: 15pt !important;
+  }
+
+  .recipe-print-page ol {
+    margin: 0 !important;
+    padding-left: 17pt !important;
+  }
+
+  .recipe-print-page li + li {
+    margin-top: 3pt !important;
+  }
+
+  .recipe-print-instructions {
+    border-top: 2px solid #00676e;
+    padding-top: 10pt;
+  }
+
+  .recipe-print-instructions article {
+    border-left: 2px solid #bdd1cf;
+    padding-left: 10pt;
+  }
+
+  .recipe-print-page article,
+  .recipe-print-page li,
+  .recipe-print-panel,
+  .recipe-print-description {
+    break-inside: avoid-page;
+  }
+
+  .recipe-print-page h1,
+  .recipe-print-page h2,
+  .recipe-print-page h3 {
+    break-after: avoid-page;
+  }
+
+  .recipe-print-footer {
+    display: flex !important;
+    justify-content: space-between;
+    margin-top: 0.24in !important;
+    border-top: 1px solid #bdd1cf;
+    padding-top: 7pt;
+    color: #4f6665;
+    font-size: 7.5pt;
+    line-height: 1.3;
+  }
+
+  .recipe-print-footer p {
+    margin: 0 !important;
+    color: #4f6665 !important;
+    font-size: 7.5pt !important;
+  }
+}
