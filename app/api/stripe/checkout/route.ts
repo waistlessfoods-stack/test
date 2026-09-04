@@ -17,10 +17,11 @@ import {
   isCookingClassProduct,
 } from "@/lib/contentful-management";
 import { arePublicCookingClassesEnabled } from "@/lib/public-cooking-classes";
+import { getStripeSecretKey } from "@/lib/stripe-config";
+import { getCookingClassAvailabilityError } from "@/lib/cooking-class-capacity";
 import { eq } from "drizzle-orm";
 
-const stripeSecretKey =
-    process.env.sandbox_secret_key_stripe || process.env.STRIPE_SECRET_KEY;
+const stripeSecretKey = getStripeSecretKey();
 
 const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" })
@@ -177,19 +178,17 @@ async function resolveCheckoutItems(rawItems: unknown): Promise<CheckoutItem[]> 
     const capacity =
       recipe.productKind === "cooking_class" ? recipe.capacity ?? 10 : 20;
     const soldQuantity = soldQuantityByProductId.get(recipe.id) ?? 0;
-    const availableQuantity = Math.max(capacity - soldQuantity, 0);
+    if (recipe.productKind === "cooking_class") {
+      const availabilityError = getCookingClassAvailabilityError({
+        title: recipe.title,
+        capacity,
+        soldQuantity,
+        requestedQuantity: nextQuantity,
+      });
 
-    if (
-      recipe.productKind === "cooking_class" &&
-      nextQuantity > availableQuantity
-    ) {
-      if (availableQuantity === 0) {
-        throw new Error(`${recipe.title} is sold out.`);
+      if (availabilityError) {
+        throw new Error(availabilityError);
       }
-
-      throw new Error(
-        `Only ${availableQuantity} seat${availableQuantity === 1 ? " is" : "s are"} still available for ${recipe.title}.`
-      );
     }
 
     if (nextQuantity > capacity) {

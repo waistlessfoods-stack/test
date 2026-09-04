@@ -27,7 +27,7 @@ export default function ReviewCarousel({
   const currentReview = reviews[currentIndex];
 
   return (
-    <div className="w-full bg-white py-12">
+    <div className="w-full bg-white py-12" aria-label={title}>
       <div className="relative w-full max-w-[1440px] mx-auto px-4">
         {/* Background Image Backdrop */}
         <div className="absolute inset-0 -z-10 opacity-20" />

@@ -6,7 +6,7 @@ export function getIconPath(iconName: string): string {
     Instagram: "/IG.svg",
     Facebook: "/FB.svg",
     Star: "/STAR.svg",
-    Yelp: "/STAR.svg",
+    Yelp: "/YELP.svg",
     Music: "/TT.svg",
     TikTok: "/TT.svg",
     MapPin: "/globe.svg", // Google Business - using globe icon

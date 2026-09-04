@@ -1,0 +1,2939 @@
+10:30 uh
+it's 10:10 third 10:30 10:30
+I know I hear it echo myself
+can you hear me echoing um
+it's fine it's not that bad
+going back for me though
+uh how
+I'm gonna jump off and then jump back on and see if that helps uh
+how about now are you still echoing
+no
+yeah I think I
+I think it's what it was me
+I'm using speaker
+OK
+well no
+I'm gonna be worse but now
+I'm eating breakfast which is
+okay so I took the time to review over the scope that we initially had
+do you have access to that matrix
+uh
+I think I have because I'm the one that made it
+yeah uh
+I I think it's this one right
+yeah I
+so
+I just kind of scrub the entire thing really quickly
+to just kind of pinpoint out key words and phrases
+and I guess the bullets etcetera
+we just kind of walk through those to make sure
+I have a good understanding
+or we just align on some of these terms so
+on page 1 like um
+the package summary can you see it
+uh
+yep
+yeah okay
+so just at the bottom of that
+what says newsletter sign up and events calendar
+so I think that from initially from the beginning
+I think both of our brains went to like an events calendar
+versus like an events page
+I'm thinking
+um that's how that reads just as like initial
+but if you created this at first I thought John created it
+if you created this what was your thoughts behind events calendar
+uh so when
+when I think about the events calendar is that I again
+this is very
+this is usually different um
+because we can I mean
+I mean we can say that uh
+it is it is like that
+but it can be meaning very broad
+the meaning can be very broad because um
+it has
+uh we can interpret it as simple as it is in advance
+or more robust system uh
+and when I'm thinking when I put it there
+I think that I I was thinking about like Google Calendar
+like I just uh
+make it an iframe or basically just embed the Google form there
+that's what I'm thinking at least
+yeah
+cause I think what since we hadn't got gotten started at this point
+it was kind of it was some great areas
+it was kind of hard to pinpoint specifically what we would need
+and just um
+generating the addition of yes
+uh
+yes but basically
+uh that's also that that is why I
+I'm I'm usually I'm I'm
+I'm also explaining that to John basically at the start because again
+this this uh
+this whole thing it usually doesn't go that smooth because uh
+it doesn't really reflect of what the business is need um
+and usually it grows because a website
+it's not like a house a house sometimes uh
+uh it's the industry itself is not that very long
+uh and it is not uh
+made by like a technical or uh
+I don't know how to explain it but uh
+I think uh like
+like in the in the architectural because my
+my dad is actually um
+like a technique I don't
+I don't know the name civil civil technique
+engineer I guess uh
+which which can kind of count the numbers of stuff before the uh
+house yeah
+developing a a architecture and a framework that's more concrete
+so when you start the project
+it's not too much different from the initial project yeah
+yeah you feel that
+but basically yeah
+yeah but basically yeah
+you used to win it better than me uh which is
+which is yeah
+it's because what you said
+I was able to say what I said yeah
+uh yeah
+basically something like that um
+yeah and then because it uh
+website is more like a tools for business
+I guess uh
+which will grow or it's supposed to grow because if it doesn't grow
+then the business doesn't grow sometimes yeah
+it really connects with the business itself so there's also the
+okay so got it
+so your your initial password even counters was using Google
+yup yup uh
+because there are many grey area in the
+in the s 0 a basically or the proposal because
+and when we I don't have the recording
+but when we talk about me and John talk about it
+um yeah
+basically we kind of brush off the details because we don't even know
+we have it's supposed to be a surprise so that we
+yeah we just have been laid out
+and you need me involved in it to kind of like finalize some things
+and laid out yes
+so that being said what you saying in this calendar
+have you used an events calendar with any other clients that you can
+like kind of show me what that looks like
+like I know I said today let's spend time like walking through it
+we did use Google calendars
+what that can look like for me so um so basically
+basically uh
+it is fairly simple I
+again I'm using
+I'm even
+I'm even using AI to kind of help me thinking through it
+uh but but basically
+we can actually use contentful to kind of just show uh
+each event which is basically just we don't have that right now
+but it's basically just like a content pool
+and then we kind of show it each even
+or we uh
+or if we just use Google Calendar uh
+we can make it like uh
+it goes to the Google the
+I think we have show it before
+uh wait let me
+basically something like this
+uh that's I think I guess
+and then and then basically we got the link
+and then we made this link to be like a
+a button on the website and then it goes to something like this
+um
+that's that's what we're facing that's what um
+someone signing up for a class would see uh
+yep this is what they would see yeah
+but basically what I'm what I'm thinking is that when
+when I'm making that that proposal because I
+I don't even know uh
+what we don't really think we don't really talk about the details
+but yeah
+it can mean something like this because this is actually a calendar
+which people can click on
+uh which I don't know again
+the the I I understand that the branding is not ideal
+because it shows Google Calendar
+um we cannot really change the the the style the layout the styles uh
+and everything but if you want something simple
+this is usually the way or
+or we use currently again
+currently is something I
+I think I have show you before but I'm just going to yeah
+show you again yeah
+let's pull it up again just so I can see yup
+look like yep uh
+but basically before the Google Calendar
+that's what they're gonna see when they select um
+yep secondary consultation
+they can submit their information like a message and it emails me
+but with the
+with it using Google Calendar
+we do have a way to have them book a calendar appointment
+what about me have I reach out to them and chase them down
+uh yes uh
+because Google Calendar have like a mail when we when we do the
+it will it will automatically send an email to them
+uh using Google system so you don't have to
+once you click on complimenting consultation
+they ask for the name
+the phone number and the message and then it says submit
+at that point it seems like it should say the name
+the phone number a message and then request time on the calendar
+find the time and then look it
+and then it sends me a overall message with the the um
+perspective times is that how that works
+like where does the calendar piece come in at
+um for them booking time on my calendar
+uh I'm sorry I don't follow you uh
+like for the for the consultation
+like if you go to the main home
+and I know we're trying to get off just a little bit
+but I want to stay on a Google uh
+Google calendar piece
+but when you go to complimentary consultation on the site
+for their name
+their phone number and a message and then it sends me an email
+how do we um at what point do they access Google Calendar
+Google Calendar uh
+we can make it after they sign uh
+sign up all of the details or we can make
+I'll actually make it after they click the
+I mean clicking on the details of the
+what is this all about and then clicking on the
+button and then goes straight to the Google Calendar
+because they have to uh
+put down the details again in the Google Calendar
+because we cannot share the details of their user
+I don't I don't think that that is a good way to do it
+because they have to kind of make it twice
+if that makes sense
+for example when I click this it will ask my first name
+last name and email address which is
+yeah uh which we cannot
+yes
+basically yeah basically two type so after for example
+this one catering this is not a good example
+but after they click after they
+they read all everything they like it and then they can click book now
+and then we can actually just goes to the Google calendar directly
+that's also the way but it won't um book now yeah
+so you hit book now
+and then you scroll down and they provide suggested dates
+yes uh
+my my thinking is that we either make this really simple
+or we kinda just keep it because it
+it force them to kinda input it twice
+which is not really user friendly in my thinking in my thinking
+it's not that I know this is not question for you
+I feel like we're getting off
+we're going getting up a little off topic but yep
+would that no you can go back to the website so I can see it okay
+so because I cannot see you see you when I share my skin
+I just sorry it's
+it's OK
+don't look at me I look crazy
+question OK
+so let's simply let's go back right quick so I don't get confused okay
+click on that at the top yep
+right there so I have a bullet on here
+um to share with you
+so here is a name email phone and message
+yes at this point
+is there a section they can click
+that connects them directly with Google Calendar
+can we put a button here uh
+directly to my calendar and book time
+uh the uh again
+the again the we cannot
+we cannot have to talk about the flow
+uh do you want it to just if this button goes to the calendar
+directly or do you want it to have put down the email
+I all of this the inform and then the only the only thing
+you know me and you kind of talked about it too
+filtering out clients a little bit
+and it was like do we quit pricing
+do we not quit pricing do they need to see a starting point to
+so it filters out
+the ones that only can afford
+an event that cost $200 versus my starting price is $1,000
+like it's kind of those initial questions kind of help me
+it kind of weeds out the ones that aren't serious
+and it kind of helps me know what I'm getting into before I get on
+the phone with these people right
+so it's kind of like
+it's good to know their name and information and message
+kind of what they're looking for
+and I was thinking about adding a button there
+me and John talked about that
+we'll have a budget range
+just so is your budget between 500 and 1,000 or 1,000 again
+I budget range again uh
+when when we
+we talk about that again uh
+that's usually
+uh really connected with your marketing
+so for example
+for for example
+if you have a marketing budget to do ads
+I think that will be powerful to have a like a filter
+but if you if you don't do ads right now
+I don't think that's really a good idea because we don't want to
+because filtering usually happen when we have a lot of
+we have too much data or we have too much uh demand
+uh but right now
+because I I
+I don't think you have enough date we
+we want more data we usually want more data instead of not um
+not less data but uh
+that's usually change when we have when we want to put ads
+for example because when we wanna do ads uh
+we have to kinda make because of if we do ads
+the data will be too much
+too much and then we want the ads is actually performing
+so that it has to be like uh
+we have to have a indicator to kind of um
+uh make the system goes with our way or at least make the data really
+really uh
+clear like
+like we want this type of range
+we don't want people that doesn't really have this budget
+for example and I hope that makes sense
+I hope my explanation so what you're saying I'm either I was on board
+but then I got confused
+so you're saying that we don't want to filter our people
+because we want the data to see what traffic is coming to the site yes
+basically be basic yeah
+be be again
+the question is that the first question is that uh
+how will you tackle the marketing side
+uh again
+this is off track uh
+of the website but uh
+that's usually the question
+it's usually if I'm if I'm in a company
+this will be goes to the other department
+which is higher up or marketing side
+which will talk about more macro thing of the business
+which is the marketing budget
+if you have the marketing budget to do ads
+the the website should uh
+kinda follow that because we want to provide data to the ads
+uh basically that's the simplest things that I can say uh
+but if you if you don't add do ads
+if you basically that's the question
+if you will you do ads or will you do
+will you not do ads
+I will do ads so for clarification for me
+we you're saying let's not filter these people out
+cause we want the data
+we want the traffic to the website so it can help us with ads right
+so no but uh
+but uh
+you it's actually the other way around
+if we if we don't do ads
+we usually we don't we only do
+for example organic
+organic marketing or organic content
+we want more data because uh
+we we want the filter to uh
+we don't have we don't want to filter before it happens like
+uh because usually organic content is mostly many trial and error
+but the ads usually when we do ads
+it's actually the other way around
+when we do ads we actually want the data to be um
+like many layer many um
+option to to differentiate um
+each each traffic that goes through the website
+so you're saying okay
+so I get it so you're saying like
+obviously people will come to the website
+the traffic will go in different directions here
+some can immediately go to the recipe
+some will go to immediately shop
+some might go to services etcetera yep
+that involves strictly the complimentary consultation
+you think
+putting a budget range within that section will deter additional
+like
+will deter them from exploring additional pages within the website um
+again again again
+uh when uh
+when we do ads we usually
+we usually goes them to the landing page
+so usually it's only one offer
+for example if we
+I again
+I don't know we
+we haven't talked really about this because uh
+it's not that much time
+but basically what I'm saying is that if you will
+you do ads for the book a complimentary consultation or not uh
+but uh
+when when you talk about uh
+something like this
+that that is a pop up or something simple like this
+uh usually this is not for ads because usually it goes through a
+a page instead of a pop up
+um
+so that I think it's better if you don't really put down um
+yeah uh
+basically put down the budget range
+uh yes uh
+because uh
+you you
+I
+oh so you
+no I'm thinking out loud here
+I I think we can
+we can actually put down the uh
+I think we kind of defeat the question uh
+I think the the budget rate is actually uh
+it's okay to be put down there
+even though it's on uh
+organic or ads but the question is that uh
+do we do we send the
+the them the
+to Google Calendar after they input the form
+or do we immediately send them to the Google Calendar
+I think that's the original question
+sorry I'm
+I'm I'm not yeah
+I get it
+so if you send them directly to Google Calendar
+which is streamline the process we want
+what information will we capture
+the only information we can get is just
+the information from scheduling appointment
+like their name their email etcetera
+I think it's yeah I think it's name on email only ma'am
+hmm yeah
+we can't give any details regarding the type of event yes
+yes
+that's that's uh again
+there's many things that I'm also doesn't like it
+but that's the way it is uh
+because we cannot
+I think we can actually make it so that after they put uh
+after they put down the booking
+they will goes to another form
+maybe that we can fill out the data again uh yeah
+but but yeah
+again there's there's more process to the user
+which is not very video and then even
+even if they had it on the front end
+to where it's like you enter in the name
+phone number email address and then it clicks uh
+book and it then takes you to a Google calendar
+how does that initial information get to me
+is it email to me
+but then another email to me once they actually book in Google
+would it be if they have to take two steps
+it seems like I'm going to receive information in two steps
+uh yeah
+uh basically
+uh after they book
+they will get uh an email something like this
+which is being sent by Google
+um
+by book
+what happens to that information
+uh what happens to the information
+I'm sorry what
+what happened to the information or yeah
+where is it where is it go like that initial one
+it clicks complimentary consultation and they do their name
+their phone number their email in a description
+if we're leaving that yeah
+like where's that information go
+if we also include Google like you know what I'm saying
+yeah yeah
+uh I think yeah
+I it will goes to the Google um
+the information will goes to the Google
+so as
+wait let me try to edit it
+which is which is saying which I mean
+you're saying that if you click on complimentary consultation
+you can have it to where it goes straight to Google Calendar
+after they click and um
+select the event
+I mean after they pick a date and time then is send a confirmation
+then they can lead to another form
+that captures additional information about their event
+yes I think we can do that
+um
+what let me where is that
+so this is what people will see um
+wait let me do a Google search what is the data of
+booking pages
+it's not that very intuitive I guess
+so so we can embed the we can embed it like like a button
+we can even in line it
+so this so
+um
+yep so basically after they do this and then they book uh
+yes that's that's the problem
+I I don't think that's
+so what happened is that
+we can actually make it so that it is still on the website
+so after I we we make the calendar to be on in
+line or on the website but after they book uh
+after they have
+they have it something like this
+something like this is the booking confirm uh
+and then it will lead to the other form which is still on the website
+but which is they cannot being sent directly to the
+this link they have to be in line
+that's my thinking which is here something like this
+I think that's good
+you're saying that the form would direct them back to the website
+from Google Calendar
+the the
+the the booking or the Google calendar
+it will be embedded and wait let me try to do a
+if there's a way like once you say confirm
+and it sends an email with the date and the time
+if there's a way to capture just an event description there
+or maybe a budget range there
+just something that they can type in information
+then like if there's a
+a description box and then we can have grade in there
+type in your details and budget range
+and then they can type that in and all of that can be sent
+like it's kind of like how you sent me a um
+in a meeting agenda within our
+our our link
+like is there a way to like put notes within
+our appointment um
+again the I
+I I think the only thing that I can do is that uh
+figuring out uh
+after they send the Google calendar
+uh booking Google after they book uh
+we will find a way to make it
+to redirect it to the site
+uh which is
+I to be honest I
+uh I don't really know right now if we can
+we can do that because basically this whole thing is like a
+like something
+something that we it's theoretically it can happen but uh
+sometimes uh
+there are limitation of what I can do uh
+because this that's usually why uh
+when I'm talking I'm talking to the client
+I usually just uh
+point it out to just use the whole system to be coded from the scratch
+which is
+yep because that will give me a lot of freedom
+uh to make it
+I hope I hope that makes sense
+uh because like
+so for example just cause
+you know I'm slow with technology
+yeah
+so Google I'm looking at the
+the invitation that the confirmation that was emailed to me
+this is Google Meet so when they signed up in Google Calendar
+is that the same thing as Google meet
+um
+I think this is the only thing that will be shown
+so it is actually different
+the one that I sent you is that I make a
+I make a Google calendar and then I make something like this
+for example
+um I
+I create and then I make an event
+so the we have the
+the way here like mega Google meet we have a location
+and yeah
+the the only thing here I don't see a way to kind of edit the
+the settings
+settings here
+yeah it's very
+it's fairly limited I think we have I I think we can actually
+oh we
+we can add a phone number
+I guess or we can add
+add a description here I guess maybe description
+something like that
+it it of course it has a um
+it of course it has a limitation but
+and then we can actually add a description to explain
+the details here
+um and then I think here are share your event details
+I think we can also add a Google meet here
+and then
+they will get a reminder
+which is will look something
+like this
+this will be the details description
+for example we can add that
+after you
+sorry
+that's telling them
+that's just giving a description like it's telling them um
+are is that them writing the description
+uh they can add a description here
+uh
+okay that's for them
+yeah that's for them
+but for this uh this is for us
+got it so what it says description right there for them
+how do they know
+do oh
+you wrote did you write description or was it already there
+uh I
+you can change description to event share event details
+I just put the event details
+can you change that to which one
+this one where is it description no
+no no
+on the back end did you
+write description
+or was that already there when you did like the custom item
+uh I write it
+I write it so you want description
+oh good
+so we can change that to event details
+yes we can add
+we basically add an item and then we can
+uh add something event details
+first of all
+event details and then we
+then we do we put in like parentheses
+um I
+I think it's only free form
+free form meaning like a
+it is it's it's just an input
+we cannot we cannot add like uh
+like a drop down or a search
+so they kind of know what details to put in
+oh
+details and then we will put like this
+yeah like date
+oh
+like something like that because if we're taking away the initial um
+pop up that says event details and all that
+and there's no dates or nothing to provide initially right there
+cause right there we're asking for the same thing
+there's no specific dates that they're sending over
+so maybe I thought the
+I thought the dates will be on the appointment
+that's the date for a meeting
+that's not the date that they were interested in having an event
+hmm so
+okay so
+for way to capture as much information as possible in advance
+to prepare for the meeting
+so then selecting a date for the meeting is right here
+but in the description box or event details box
+we can put in parentheses
+uh please list your um proposed date
+budget range or whatever the case may be
+so they can give me some information up front
+so I don't get on the phone with them and not have any information
+yes um
+the the
+I think the uh
+which I need to explain is that uh
+it's again the
+the form is really limited in a way
+so you can add something like a budget uh
+range for example
+but it only be looking like
+it will be only looking like the same with the description
+so they they can put something like
+like this uh
+because everything about budget range usually have to kind of make it
+for example have
+it has to be a number it has to be
+for example
+start at the minimum number is something like this
+we can kinda
+um custom that on the
+if I called it but on here
+oh no
+I just want them to type something in
+we didn't have to do a drop down or anything
+oh okay
+so yeah basically we can
+they have a range no
+they just want to type it in
+okay so yeah
+I think yeah
+this is I hope that explain what you need
+yeah um
+cause initially too like where you have event details
+I was just gonna do in parentheses
+event date budget range
+whatever else close parentheses
+but you're breaking it up into different sections
+which I don't mind that either
+but will it display different sections
+like if you say will it display it
+uh
+yes uh
+I think they will just have to scroll down
+no no
+I mean like I like close that and hit cancel
+like right now you have budget range
+is that displayed doing at the meeting details like cancel that cancel
+yeah um
+like where it says explain the details
+uh oh this one
+yeah that one's to explain the details where
+where is
+will it up in that section also say event details and budget range
+where will that information be at
+uh it will be email
+uh they
+they they need to import it in the website and on the Google calendar
+so when somebody books
+and they type in all this information right here
+and then they hit book it will then appear where
+the top right there it will appear on the email
+I think
+wait let me see
+I think it yeah
+we have it here something like this
+OK cause I was looking at so
+okay so it'll
+so all the information I type in will appear in the email
+that will be emailed to me
+uh wait
+let me check I don't see the email
+so I don't see I think it's because that's the thing I
+I book I book the
+I book the event for myself
+so which is weird
+let me try to
+change my to my other email
+so that we can see it
+hope that works
+no it doesn't work
+I need I think I need to try it on
+do I still share if
+yeah uh
+can you still see my Chrome
+yeah okay
+because sometimes it only
+oh yeah so it
+it it is it is working
+so at the end I'm just going to try it out again
+I uh
+this is not something I usually do because
+um
+for me I think it's just easier to
+to kind of
+uh
+I'll make it from scratch
+but yeah I will try to show you so
+so basically yes
+it will be uh
+sent to yourself and then to their
+so this is for you and for
+for you and for
+uh the
+this is
+this is I think this is you uh
+this is the one that makes the book
+uh and then this one is yup
+it's basically it's the same email
+this is the details for you
+uh and then this is the
+the details for the one who book
+the one who book
+yeah
+I hope that makes sense
+basically
+the the depreciator is they have a cancel appointment and for you
+it doesn't have that button
+so in your opinion I know you say you normally don't take this route
+but in your opinion if they click on appointment consultation
+and it takes them straight to the Google Calendar
+and they're able to put in all that information
+including the event description and a
+budget range etcetera
+and they type that in and then press book
+and then it sends me an email with all of that information
+they just input in that that seems like a smooth flow
+uh
+yes I
+I yes
+that that is better than is uh
+than having it twice to ask for the form to input
+I think that's not a good
+uh flow
+in my thinking
+but going straight to Google is easy
+uh
+at least for the user I'm thinking for the user for you
+it's better if if
+if we do it still on the website before going to the Google
+the problem is that um
+there there is a possibility that after they input everything here
+and then they don't input it again on the calendar
+which is weird but it can happen
+um
+I hope that makes sense
+my you mean like them putting it here and then uh
+having to then go to Google Calendar and then having to take
+type in the same information again
+it could deter them from wanting to do it
+yeah yes
+uh there is a possibility of that happening
+so it I
+I think it's better if we just made it twice at
+at least we make people irritated
+I guess because it's the same
+information yeah
+a form
+so when as far as collecting data
+if they go and fill out this information through the site
+it collects their data but if it goes directly
+to Google Meet it won't collect their data yes
+it it uh we have to kind of manually uh import it by uh
+at least from what I'm seeing right now uh
+we have to kind of input everything again from the email
+yeah we can use AI to 50
+that's like if we get 50 inquiries in one month
+and it goes directly to Google Meet instead of to the website
+we're gonna have to manually input fifty uh
+contact information into our system
+yes ma'am that's uh that's not really ideal again
+um because it is uh yeah
+I'm I'm even trying to kind of understand it which is uh
+the synchronization is one of the problem we
+I think we had we talked about it in the email I we
+it is not that easy to kind of synchronize Google with our site
+in in that terms in in that data data synchronization
+so despite them being irritated
+if they click on complimentary consultation
+and they fill out their name
+email
+phone and a message then after that instead of saying send inquiry
+it can then go straight to book an appointment
+and then it goes straight to
+I think I think we
+we can still make the send inquiry the the button there
+so it it still send the inquiry
+but after that they will be redirected to the Google Calendar
+and then they'll have to type in all that information again
+I don't think you have to type it again if you if
+if we have the form here and then so if we don't have
+we won't do redirect it uh
+before the form so they have to put the form first
+they have to fill in the form first
+and then they get the Google calendar
+I don't think you
+you have to uh type it again because it's supposed to be the same uh
+will we uh
+unless people are doing it not the same information which is weird
+but again that's I think they probably are
+I don't think that they would change it
+then for the Google appointment okay
+so yeah but at at at least uh
+at least we have already have that data on the system
+um yeah
+I
+the problem is that it will make some people irritated by that
+so I don't care I mean I care but I don't care
+I I I think that if you're that interested in booking a whole event
+and your soul is like okay
+let me put in my name email
+phone message okay
+send inquiry oh good
+it popped me up to a Google Calendar
+oh man I have to type in my name and email again
+oh well let me proceed with booking the Google Calendar appointment
+I don't think it's gonna irritate them
+if they're that easily irritated through that process
+then they probably are gonna be difficult to work with okay
+I would rather us
+capture information here and redirect them to Google meet
+and then they just have to counter
+and then they just have to fill it out again okay
+this was gonna be what the process can be
+but here on this initial send inquiry
+we can put instead of message
+we can just put um
+we can just put event details
+tell us more about your event
+and then right underneath that
+we can just say budget and then in grey
+we can say please provide your budget range
+then we say send inquiry then it sends them to Google
+cause I still would like to know if they have a range
+they should know that if they're interested in booking
+they should have a range yes ma'am
+I think that's pretty clear on
+I think that's pretty clear on what I need to update on that
+yeah I will
+I will I will put event details
+please share your event or yeah
+event description or something to that extent
+you you get it yeah
+I I get it
+budget please provide your budget range and then that's it
+and then it will help me at least capture the event type
+and then um
+you want to
+can we put like dates somewhere too
+so I just kind of have a idea what date they're even thinking about
+yes I think we can we can add something
+I think we have we can add something like that if you want to
+well it wouldn't be there
+cause that's if they actually decide to book
+we're just talking about the inquiry
+yeah in on here
+yeah yeah
+if I we can add something like this
+if you want to
+oh you mean like to provide a date okay yeah
+yeah what
+but what if they have multiple dates in mind
+do we um
+let them type in their own dates
+so that's that's why in my thinking is that we can make it
+for example
+the range to be for example
+this is the the first range and then this is the second range
+or we made it so that they can
+they can like put something in the
+oh
+that's why on here I put preferred 2 dates so they
+they can at least uh
+choose 2 dates if they if they want to do that on here too
+uh huh
+I have a question for you
+cause we're really going left right now
+but just out of curiosity
+like I had a guy reach out to me on TikTok
+and he wants me to do a dinner for him one night
+and then a breakfast the next day
+if they want to do multiple days
+same for the 3 day experience
+doing dinner for 3 nights or whatever the case may be
+arcade for 3 nights
+what do they select just like booking a flight
+do they select the range or do we just give them date 1 and date
+2 and then they tell me the details um
+I think to make it clean to right
+right now we don't have that features
+so I think that the most clean way to do that
+to do that is that is to just uh
+told him to kind of make it twice
+um so we
+they need to in
+in Google Calendar at least I don't think we can have a
+have a range on the dates
+um
+yeah
+so they need to choose the dates or the dates and then the the hours
+sorry that's taking too long
+but hours hours here
+so they have I think they have to do it twice basically
+so now that you brought it back to Google Calendar
+cause my brain wasn't there
+so are you saying when they actually go to book an event
+and they pick the date those dates appear on my Google Calendar
+because it's a confirmed event
+uh yes
+it will look something like this
+this one for example
+because I booked it
+I
+basically on your Google calendar
+you have like if people book for example
+in 11 Friday September 4
+you get something like this
+and then the data is here too booked by this is on my other email
+I make it with this email and then I booked it with this email
+this right here is the end
+and then you can actually see the description
+the form that we the budget range
+now I'm getting mixed up
+are we talking about the consultation form
+or are we talking about the book me page
+uh right
+we talk about in general but we
+we talk about complimentary consultation
+yes I'm saying on the book me page
+once it uh
+click off of that once you go down and you put the event date
+on here in the calendar yes
+once you select the date and I go down to book me
+where does that date go does that also go to the Google calendar
+oh on here on the website yeah
+what is that thing bro is that just emailed to me
+uh on the
+on the website you will get it on the admin site
+so it's
+so it's not being sent to
+uh I I
+yes
+yeah yes
+got it got it got it
+so
+OK good I did
+so we know next steps for the complimentary consultation
+to add the events the date
+the budget and then we'll integrate that with um
+the Google Calendar and they'll be redirected to that
+and then they can immediately schedule appointment
+which would then be emailed to me
+uh which one
+which one
+uh yes
+they'll fill all that information out
+and then they'll put send inquiry
+that will then be captured in the system
+that then the email will also be generated to me with the inquiry
+and then they can be redirected to Google
+meet to schedule an appointment
+so after they input all of the thing here
+they will goes to the Google Calendar
+and then the Google Calendar will email you and you and the book book
+book book people the
+the one who book and then all the information here will be in the uh
+in in in the admin uh
+the one in the Google will be on the Google uh
+the one that is being inputted in the Google uh
+will the data on will be on Google Calendar on here um
+but the one that is in being inputed in our site will be on the admin
+so how do I know that the inquiry came through
+cause I thought it was gonna be email uh
+yes it there will be an email to you
+from good uh if they
+right now
+I don't think I have an email for the complimentary consultation
+so if you want it also being sent from our side to you
+if there is a consultation from the side
+I can make that I think that's pretty simple to make uh
+the problem is that if they book also in the Google
+because after this
+they will goes to the Google calendar and then after that
+after they fill out on the Google calendar too
+you will also get an email from the Google Calendar
+so it's actually twice
+which I don't I don't know if you want that or not
+that's I just want to know where the information right
+here was going like
+I know I'll get an email from Google with all the calendar details
+but this part right here name email
+phone message budget
+where and then you click send inquiry
+where is that information going
+this one on the website yes
+it will goes to the it will goes to the website
+the admin so booking room
+so that also goes under
+so complimentary consultation and booking services all fall underneath
+booking request
+yes
+so is it color coordinated or something so it doesn't get mixed up
+like if you click and book and request I can see what's open
+so can we tell from this which one is a request for a consultation
+versus which one is a actual booking request
+right now I don't
+I don't have that distinction
+but I I think I can make the adjustment on the side
+I just need to know like even if it was a drop down
+I need like where it says catering
+we know that's catering yeah
+services yeah
+uh
+consultation yes
+uh right now the data is there
+but the UI it's uh
+because you want if you want to filter it out
+I don't think I have that right now
+but I think I can make that
+uh it's here
+ma'am
+right now okay
+but it'll so it will say complimentary consultation
+yes
+got it okay
+uh but I think I can make the adjustment to at least make you
+make it better
+this is not
+I just want to make sure I can read through it yep
+it's not a OK
+I just don't know like
+what if it if
+if 100 come in next year what if we get the ball gets rolling
+then we'll probably need to filter it so I can see OK
+these at the top are consultation
+these at the bottom are confirmed bookings
+OK
+and then after they click with me and it goes to this here
+where we sit in the back in
+where's the payment part coming in at
+uh right now we don't
+we don't payment card or no uh
+right now the payment is not on the
+uh
+on the self service I
+can you go to I
+can you go to private learning more
+and then after you go down and it's 1:50
+a person said there's two people
+it's $300 or whatever book me
+you put in the information
+confirm booking where's the payment then coming at
+do they add um
+like where's that coming at
+um right now we don't have that uh
+flow because we haven't really talked about uh
+the flow after the form
+uh for the same services
+if you remember I only don't do the recipes
+and yeah I think the shop
+we haven't really touch on what happened after they book
+on the services
+even the
+even the
+what happens after they fill in the information and it says booked
+it sends them a confirmation like your event is booked
+yes
+basically you will get the details on the email ma'am
+oh I can show you
+stand
+simple this one this one
+cause it cause it seems like they're able to book
+we have to talk to it
+they're able to book and request Caesar request received
+thank you
+like we received your booking request and sent confirmation to blah
+blah blah
+we'll be in touch shortly okay
+so that's more so a request
+that's not you confirming your booking
+that's me that knowing that you want that date
+but then I'm going to reach out to you
+cause you need to be able to execute a contract
+etcetera before your date is locked in
+you can't just pick a date and then take the date and it's concrete
+it's for you you have to sign a contract first yes
+I'll do once they go in and officially book on the website
+yes that's payment
+I wonder what that looks like
+um
+they will get something like this
+yeah the payment
+we don't
+we just uh
+I think on my on the website side
+we haven't really touched on
+uh the system again on the self services
+we haven't really touched on that
+we only touch on recipes which is recipes again
+it's pretty simple because it's products that has a
+uh predetermined price
+which is easy to adjust uh
+but after for example
+if on the book service
+uh service page
+uh after
+this for example
+um we
+I I don't really
+I I don't really understand if we can kinda get
+make them go back to the site because it's just booking booking it
+unless we
+we make them sign in when they
+when they book I guess that makes sense
+but the problem is that is the service isn't
+it isn't the service is not that predetermined
+yes not like okay
+it's only 150 check out that's it
+like that's not the final cost
+that's the starting point starting at
+so I'm just thinking through like
+if
+cause I need to provide a quote and it's not even like book me right
+I mean it's called book me
+but it's not really booking me because you're giving me
+this is your initial giving me all of your information
+this is the date that you want
+this is the first step in booking right
+then after that I need to talk to you
+generate a quote say
+if they don't even go through complimentary consultation and they say
+oh I want chef services
+and they go strictly to the chef services
+strictly the catering to filling out
+this is more of an interest form
+it's not a book me yes
+fill out this interest form
+they fill it out somebody be in contact with you to discuss your event
+and to provide you a quote and to execute the contract etcetera
+that's things that can be done on the back end right
+and then when it's time to make the payment
+that's when it's like okay
+it's time to make the payment lock
+that's the part that we don't get
+yes
+so they can log back in into like
+their membership portal to make the payment
+to like add the
+whatever I give them whatever quote I give them
+add that to a card and check out
+uh yeah
+I I
+again the service is
+I'm not really sure if people do service that has a card
+it's usually a cart is more like a product base
+so I'm I'm really not like for the
+like for the cooking class
+that's almost falls into a product that's a cart because it's like
+oh it's a cooking class
+it's a flat fee with taxes
+and that's it that's like a product
+okay
+and catering is not an easy direct concrete number so
+um I'm still wondering if I
+I get if
+if if you make
+right yeah
+I'm just thinking out loud
+put it in the shop section
+and then it will say private chef or catering
+and then they can click on it
+they click on it just like a recipe
+they click on it it has the details
+but how do we connect the pricing
+do they input their own pricing
+or is that something that can't be done um
+if you if you
+for example if it's a really the
+if it's just this one for example
+if this is the logic 125 per person
+I think we can make it um
+like for example
+how many people here and then it will just kinda make them
+yeah adjust the total or the
+the the price based on how many people
+is that how you will do the cooking class
+yeah that makes sense
+yeah cause you're able to then book
+OK
+multiple people but like
+do I have access you know
+how I have back in access and I can create a recipe
+once the membership the member logs into their membership portal
+once they sign in right
+do I have access to their specific
+remember signing that port
+that portal
+I guess is what I call it to where I wanted to create a quote unquote
+not recipe but quote unquote um
+private chef service like the page
+but it'll say private chef service
+it'll be under shop
+no no no
+I'm trying to make something up in my head
+it will be sign in they sign in
+welcome to your membership page
+your member page right
+on your member page then I can go and put oh
+you have a pending uh
+event or pending uh
+private chef service they can click on it
+it already have the price
+just like I have the price for the recipes
+they already have the price for um
+their event and then they can add it to a cart and pay for it
+yes
+everybody doesn't have visibility like regular
+people don't have visibility once you sign in
+so I'm thinking once they sign in
+and they have like a member page where they can access um
+old old recipes that they purchase
+newsletters that they can download in their section
+that we can add in there that I can add in there for the um
+for them to check out uh
+I think after people sign in uh
+we should just uh
+make them go straight to the
+for example account settings
+uh so that at least they can see uh
+details like that I think it should be on my orders
+yeah
+go into the banking in my orders and add their service and price
+I don't understand how will that be look like but uh
+I I think in your side
+I think you're just
+uh seeing the admin side
+so which is you can see what people already paid
+for example
+or isn't a inquiry
+people ask for private set earlier
+is there a way I'm sorry
+I'm cutting you off is there a way it would be as a
+is there a way to where if I generate them like on the back end
+I say okay
+this is your quote this is your invoice
+I send them the invoice I email them the invoice
+there's an invoice number
+is there a way that they can type in an invoice number
+once they're signed in and then their
+their price is generated some type of
+way
+uh right now there is not
+not there is not uh
+nothing like that right now uh
+we can you can build something where they can be invoiced
+yes I
+I can do that
+so it will use the stripe uh
+the stripe uh system
+but yeah we can
+we can do that
+I mean there has to be a way to
+for them to
+for me to collect payment to where I'm not telling them to Zell me
+like they have to be able to pay some type of way
+I just don't know what what that process looks like
+yes
+yes I
+we can make people to generate that
+um
+that that invoice on there if you want to
+is that something that once they sign in they'll see
+wait let me try to rethink it
+why do people
+I'm just saying we don't have to figure it out right
+right now if it needs some thought
+and we need to just think through what the process looks like
+we don't have to brains like think of it right
+right now if you need some time
+cause I don't
+I really don't know because you would have to build something out
+I really don't know what that payment process looks like
+um
+yeah I
+I think we can talk to how the process will look like
+but my thinking is that uh
+how why
+why is that why do you need to send out invoice for people
+for people to make invoice to you
+what point in my process uh
+why do you need the the future to make people send the invoice
+I don't understand I just need
+I just well
+I send them like after I go through the process of generating a quote
+and they look at it everything is good
+then I generate the contract and within the contract
+there's an invoice with the payment
+and this is all just done like through PDF
+so I don't mind sending in a PDS invoice as well
+I'm just trying to figure out why not
+where the uh
+if if you're going to do that
+I don't understand the hassle for me
+I mean it's not a hassle for me because no uh
+why for the invoice for them yeah
+why do we need to make a an invoice generator
+which you can just send them a PDF that
+that all because I'm trying to think about connecting it to the
+how do they collect the payment
+oh okay
+so you want to basically make a
+make an invoice for a user
+and then that user will
+maybe get a email that will goes through their uh
+profile and then in their profile they will get like a
+you have a unpaid invoice for example
+it's not how you will
+yeah yeah
+you wanna take your money
+how do we take these people's money
+like yeah that
+my my again the thing my thinking is that uh
+because there is something that is simple to to talk out loud
+but when we are maybe it will it is hard to me
+I hope that makes sense
+but I'm not saying that I cannot make it but it is
+it is actually not that simple because you have to kind of um
+talk to the uh make for first of all
+we need to make the invoice generator
+and then you have to kind of make it basically at admin side
+that I need to make
+to and then connect it with their data that they already invoice
+and then they email them and then uh
+how do we for example how do we know if people um
+that's that's more like a an app thing
+which is I'm I'm explaining something that an app usually do
+I hope that makes sense
+maybe I'll go because I have some other websites because
+because if you other people are or how they go about doing it
+yup maybe I
+it seems like it's easier to
+we built the system for people to be able to pay for stuff online
+and add stuff to carts but it's like dang
+we can't use it for our chef and catering
+I would like to use it for that
+but like I don't know with these bigger companies
+I don't know what they what they do
+I don't know what their process looks like
+I don't know if they just send an invoice through Pedia and say hey
+pay this through cash um
+money order whatever sale like
+like not using sale but like what the process is
+I'm sure bigger companies
+they generate some type of invoice and send it through Quickbooks
+or Intuit or Paypal or whatever
+like
+I don't use them cause I'm super expensive and we already use stripe
+so what's the point of using multiple payment system
+payment systems like that
+I don't wanna do that yep
+if I'm using stripe can I send them an invoice through stripe
+it wouldn't go through the website
+but can I generate something through stripe on my own
+I think you can I think you can um
+wait let me
+let me check it again but it should be
+it should be possible
+yeah that would make more sense yup
+so just online is just filling out this interest form
+but like when it comes to payment I
+I generate the invoice through stripe
+and they pay through whatever link stripe sends
+right um yep
+uh and basically uh
+again this is
+this is where it gets uh
+really confusing for me because if
+if you just say that uh
+for example if this is uh
+uh again
+this is this is something that I don't really know how to talk about
+but uh
+if this is for example
+a retainer uh
+if if
+if this is a retainer things
+I will just kind of build you something that for you to see
+because I'm not really good at explaining things
+I just know how to build stuff
+but basically uh
+this is something again
+I don't really know how
+the flow that you think is the same with my thinking
+I just know that I have something in mind
+which I can show you after I build it
+which is
+uh yeah
+so that kind of like goes back to the
+to the scope of what we what we're supposed to build out
+but you're saying what's in the scope
+figuring out like it says like to connect things with like strike
+strike integration for digital product sales plus bookings
+that's in the the um
+scope so with that being said
+like the plus bookings falls into the category
+supposedly for everything
+but for the cooking classes
+way more similar because cooking classes almost count as sales
+but for bookings strike integration for bookings
+that's where it gets tricky
+I feel like stripe has
+there's no way stripe doesn't have what we need to be able to
+uh but uh again
+there is a possibility that stripe doesn't have one because
+stripe is more like a like a build your thing it
+it is more like a platform for developers to kind of use
+their system to make stuff
+make your own stuff so there
+there is actually a possibility that they don't have that features uh
+because again in the sauce market uh
+people usually niche things
+they different products
+different purposes and different features so yeah there is
+there is that I hope that makes sense
+one 1 business traffic account
+I should be able to select payment through different avenues
+and it still come compile under my one stripe account
+so for example if they're purchasing a cooking class or a recipe
+and they do that through the website
+it goes to my stripe account and they show the
+they could track the payments there
+if I auto generate them a invoice through email using stripe
+and they pay
+they click on the link through their email
+and they pay the invoice through stripe
+it should all funnel back through the same stripe account right
+so we can still track what's been paid
+I track the money period just track everything and if I go to hey
+if I have a QR code for stripe and I go to an event and say hey
+scan this QR code and pay me through stripe
+it still should be able to capture all of this
+these different avenues of payment should still funnel through stripe
+and be able to collect all of the information through stripe
+regardless of they
+making payment through website or through an event using their phone
+or through an invoice that I've emailed them
+yes yes
+yes that should be the way to think about it
+I mean I
+I feel like I don't want to overcomplicate it
+if I don't know about checking out
+I don't know what that looks like being able to uh
+actually basically
+basically you you are able to uh
+have a
+uh I
+I don't know about the other things but at least I'm stripe
+there's actually uh
+like customer choose what to pay for example
+so they can just put down
+they have this page where people can just
+um
+like just data payment link okay
+yeah that's me creating a payment link
+yes
+they access the link and they come right here and make the payment
+yes
+so and they can choose uh
+they can choose how many just put down
+yeah and then I'll be able
+I'll be able to cross reference and make sure they've made their full
+that's where accounting comes in
+make sure they pay their entire invoice their balance yeah uh
+but I don't think it uh
+it's just it's
+it's not a payment
+it's it's not invoice to be exact
+but yeah basically
+yeah this is payment link but uh
+for example
+uh products or subscription
+for example uh
+yeah you can make
+for example
+this one uh and then you put down
+the the the dollars
+and that's the payment link so they'll know what their balance is uh
+yes but I didn't see
+oh this is this is the
+you you need to make a product there but basically
+it has the you can
+you can you need to make the product on
+that's the thing because this is on stripe
+you have to make remake remake the product again on the
+this is not for each person
+this is
+that's the thing I
+I don't think um
+uh stripe has a invoice
+uh
+more like traditional invoice like Paypal
+I'm usually seeing it on Paypal
+I don't think stripe has that
+but it has a it has a way for you to kind of make a simple
+simple page that for for your products
+so is it creating like so you're creating a payment link
+so it's not a payment link per client to go and make their payment
+it's a payment link per product
+yes per product yes
+this is the link this falls in the category of this product
+this is how much you need to pay and then they go and pay
+yep
+and it just follows through that product
+that column I yep I think
+yes
+yes uh
+I think the one that you describe like making an invoice for each uh
+service or like a custom invoice for service for a specific service
+specific details of service and for specific person
+uh
+that's something that I don't think people already has as a features
+so you if you want that I
+I think I need to make one for you
+that's a custom features
+which is I'm trying to explain
+I hope I hope that explain things yeah
+no but even yeah
+but even before we take that step
+I wanna explore what strike has to offer
+because you're saying that you create categories
+not individual invoices and strike
+so with that being said
+what if I have 10 pending clients and I'm sending them these links
+so I'm able to customize the payment link to change the pricing right
+yes uh
+10 payment links with 10 different prices
+but it's just falling under different categories yes
+uh basically you just make a
+make a product you
+I think you can cheat chase it in a way because you can uh
+you
+you can make it creatively that the product has the name of the person
+so there's there's also that
+so I think you can actually make an invoice in a types of way
+by creating payment
+no yeah
+if I have 10 people and I have 10 different uh
+prices and it's like I don't remember who was supposed to pay who
+I need to at least be able to attach your name to it
+so I can quickly look and say oh
+such and such paid this yes
+I think you can actually make the products
+uh so basically stripe using products
+but I think there is no limit how many products you that you can make
+at least what I'm saying right now
+so I can click new payment link
+catering Bob Billy Bob yep yep
+yep then next one I can do the exact same thing catering yep Susan yep
+yep
+I mean yeah
+that's what we'll do then I'll just collect the shopping now we'll all
+we'll have just access on the back end
+and we'll just know that this payment came from the payment
+this payment came from the website yes
+and if we want if I was doing a pop up and I said okay
+this is one payment link um
+for cause I'm selling
+I don't know
+10 dollar cookbooks and I'm at an event and they scan a QR code
+which leads to that one specific payment link
+and it's like pay your $10
+they pay it I'll check their confirmation
+then they walk off
+and then the same person is using that same link repeatedly
+cause now it's a QR code to keep making a payment
+yes
+got it
+yep that's the right
+we'll take that's fine that makes it easy for us
+so I just need to go back through
+I think I overlooked it when I go through the like chef services
+the gray part on the side
+like the book me process we just need to go through it
+I need to kind of I need to go through and like update that process
+yes um yeah
+and I think the I think
+and also when I'm when I go through the sides again
+I think that the
+the connection to stripe
+it's not working because there is a database connection time out
+which I need to check again um
+that no worries there just wanna let you know maybe
+maybe it's on the back end or on the sides on the on the stream
+but it has an error right now
+yep I just wanna let you know
+so there's nothing that's some
+that's some stripes in or something we have to do uh
+something that I need to I need to do yeah
+yep
+okay got it
+what we resolve both of those
+that wasn't even on the list to talk about today
+I just I just saw it all oh
+there's there's a problem which you should be working before
+um I need to check that that
+but no worries I think I'm going to fix that
+OK no
+I I have full faith in you so I can come
+so we just need to go and change the virtual
+it's not book me technically
+it's like
+fill out this interest form and I'll get back with you type of thing
+yes
+that's the flow right now on the sites
+okay
+got it
+so you want to move cooking class to shop
+no I'm gonna leave it there
+but if they'll be able to check out
+they can check out and add it to cart too
+right right now or not uh
+it yeah it it is an interest form for the I
+I need to make the changes because I made a
+made it all the same thing
+can it still look the same
+let me go to it right quick
+drop down cooking class 1:50 per person can instead of saying book now
+it has a pop up
+yeah I think a
+a way to make it simple for me is that for cooking class
+because we made it uh
+to goes to the pop up uh
+we can actually make it uh
+to just uh
+book now as a as a add add to cart or shop now which add to the cart
+again
+you remember this is what we're supposed to be working through today
+as far as we're gonna have multiple cooking classes
+they need to be able to filter through pick a class
+add it to cart and check out
+that's the thing though uh
+the for example if people if we just use big add to cart flow
+uh the the thing is uh for the next
+uh because it it will goes to your email and then to them
+I think that they will just have to communicate through emails
+going forward after that
+if that makes sense so after they for example
+they they have paid
+because right now add to cart doesn't have a dates on there
+that's the thing that that's that's the thing
+I'm just I'm just thinking through the easiest solution for right now
+we want to change a year from now just be like okay
+now we have a full blown event space
+okay cool
+so with the interest form now can't um
+for cooking class can't we
+I'm sorry I didn't pull it up can't we do
+when you go to book now
+sorry it's closed
+it's sorry maybe you can pull up when you go to book now
+I'm not signed in and it takes you to the interest form
+can we add drop downs
+instead of having a whole calendar thing in a separate events page
+can we just do a dropdown on the type of class
+and once they select the type of class that they want
+it will then generate another dropdown box with dates
+the dates uh
+right right now cooking classes for making pasta and they go oh
+let me do a drop down cooking classes
+oh I see
+let me select the pasta class
+and then after that it will generate another drop down for all the
+dates that's available that the boys
+that's having to go through the calendar and um
+but
+but how do we how do we uh
+I I again
+I need to confirm that that feature doesn't exist yet on the website
+but how do we know uh your schedule
+I would have to go and put it
+can we put it I would have to go and give you the date
+so I put it in contempt for whatever it looks like okay
+so
+so I would have to yeah
+I did I
+there's something I need to make on the contentful
+and then make the dates uh
+like like on here
+OK go
+go back up a little bit so if you go down a little bit
+so under event details
+this is for cooking class right
+yes so yeah
+so under event details the first thing it would say was
+uh
+select a class or whatever
+and it's a drop down after they pick a class
+then it generates another drop down with the dates
+which I can share with you after they select a date
+then
+do they need a description in your opinion can't they just
+yeah like
+do they need to know like what they're making
+say this is a class about healthy cuisine
+do they need to like know
+the details
+or what if I was promoting promoting it through social and um
+they knew from social but I guess for people that's just coming
+straight here that's just come from social
+I wonder if they need like a description
+do we have it to where we do select the type of class is a drop down
+we select is a pasta class
+then that generates a description
+is that a way to do that generate description on what it is
+and then I can update that
+and then they could do a drop down on a date
+um the the problem is that uh
+uh the the reason we we we again
+the reason we use Google Calendar as a
+for the dates because contentful doesn't have a two way
+uh communication with the sites
+that's the limitation
+unless we unless I make it in the website and then I make it
+I make the dates uh
+not using content pool so we make it for example in admin
+and then I mean you have to kinda uh
+because for example
+if you are already for example for this type of cooking class uh
+the available dates it's
+it's kinda hard to code out because you have to
+you have to determine the
+the
+you have to determine your availability first
+first of all and what happen if you you have to also uh
+update that availability after people already book that time or date
+so the
+the if
+uh on the if we're if we're using contentful not not the blown out uh
+databases or a VPS something like that
+um it will just kinda make it people uh
+for example you
+it it just kinda
+uh I'm available from for example Friday to Friday uh
+maybe only only days for example uh
+Mondays to Fridays
+and then all of them will be available for this tabla classes
+or for the the
+the from what o'clock to from the time
+from the time what o'clock to what
+what what time does
+yeah the timing window yeah that's
+finding that word
+I don't know I get it just to walk me through the process like it's uh
+we kind of talked about in email
+if we're doing this process and we are using Google Calendar
+what does that look like
+so they put in an email and phone number of guests preferred dates
+well that's not gonna work
+because I'm gonna already have the date confirmed
+they need to that automatically generate essentially
+and that's what that is that the part to where they then like
+at what point do they select the class type
+or do they have to be redirected to the calendar
+to know the class type
+yes uh
+they can actually uh
+do the class type here and then we made uh
+that's the thing I don't know the yes
+I think you can make for example
+cooking class type a
+example I'm just for example
+you have a different booking pages and different availability for each
+solution
+kind of hello
+wait wait wait
+I'm sorry my brain was thinking yes
+it's okay
+I'm going back to what you told me initially
+so the that cooking class under Cooking Services
+that strictly we can change that to strictly in
+in house
+like that's a service like I'm coming like the catering service
+private chef that cooking class is strictly to book
+for me to come to your home with your number of people
+it's like another inquiry form yes
+so cooking classes themselves
+that's public will then go under the shop
+OK shop page
+OK right yeah
+we can put then cooking class
+and then put a picture of the cooking class and whatever things
+so shopping sizes recipes
+there will be merch ebooks
+whatever under the shop page
+then we can put the cooking class
+we can put the description
+we can put the cost they can check out
+add it to the cart yes
+yeah and then the date
+cause I'm not doing a million cooking class at one time
+the date for the cooking class will be in the description
+uh or you can just uh
+make a for example
+you can
+uh
+yup
+making classes for Saturday and Sunday
+I want to put pasta making Saturday in the title
+pasta making Sunday in the title
+they'll have the date already by just looking at it
+and then they'll have the description
+and we'll have the price in the corner
+and then they can add it to the cart
+uh yep
+uh for the dates
+I think it uh
+if you don't want it to be
+uh kind of crowded like this
+uh you can just make an event and then just add them to the guest
+if that makes sense
+because I uh
+for example after they uh
+they have this on the card and then fade
+you can
+uh I think you can just see it on
+on here their data and then
+hmm
+this is not the last part I didn't think through
+so after they act like on the
+on their end they can see the date that they selected
+they can add it to the cart
+but it still has to connect to Google right
+yes uh
+for us to be able to track it has to connect to Google for why
+like I know why
+but I don't know why
+it has to connect for them to be added to their calendar yes
+uh basically uh
+yes basically we
+we can what I'm thinking before is that we make a booking page
+and then on the Google calendar
+and then you kind of figure out your appeal ability
+or does it repeat or does it not repeat
+or you just pick a date somewhere
+um your appeal ability
+uh the scheduling windows is it
+uh how many days
+how many hours
+um and after all of that done uh
+you you add that link
+um so after people already paid
+they will get a on their orders
+they will get like a like the link for the booking because I
+it you have made you have made the booking appointment in the
+beforehand and your availability uh
+so after people uh order
+order it they can you just put it uh
+on the content full of the link of the Google calendar
+so after they they
+they have paid it only
+then they have access to the booking page of the Google
+and then you just
+at least you already get paid before you do the cooking class
+I hope that makes sense and they click on that link to then do what
+book book book the Google book the book the your appointment
+so you book book uh
+so it's like booking a calendar appointment
+so they'll go in and they'll say the cooking class starts at 10:00
+and I already have that window designated for the cooking class
+so then they'll go and select
+and then that's how the system connects their name to that date
+yes and then I can see on that date
+who's all attending on your Google Calendar
+but obviously this doesn't look good
+if we were eventually like once we get the ball rolling
+if we were to use calmly
+this would look much different and look much better
+um
+right and use calmly
+like still put cooking classes in shop and use calmly
+and you look better uh
+it uh currently is will look currently
+uh uh
+it will look something it's almost the same thing
+but it just look different
+uh
+it will look something like this uh
+it's loading it will look something like this
+so
+it is not really that different
+I guess
+yeah what's the what's the experience not using calendar or so
+so for right now
+county or Google meet or whatever would be the solution
+on the grand scheme of things
+the right would be to create an events page
+like you did for Task Force
+you create an events page
+have all of the events listed out and then they can book
+I feel like that's the same thing as going to the shop page
+like what's the smoother process for them
+like they can check out that's an easy process
+but for me to capture that information on a calendar
+or that they've registered
+um I
+that can't be in a admin section for me like a back office of yup
+I I don't know how to explain uh
+the technical things but basically what I
+what have what I have done in the wasteless foods is that uh
+because I we we uh
+I I
+me and John talked about this at the start
+which is there is a lot of capabilities I spoke that uh
+if we are using PVS or using Versal
+it basically kind of limits the things that I can do to the side
+if that makes sense so yeah
+uh and then uh
+because that's basically already limits the scope or the scope of the
+the features uh
+and for something like really custom
+there is some limitation on what I can do
+and basically I'm task for because it already has
+because it just happened
+I think a year ago which we move from Perth so to using uh
+basically a back end that's all running 24 hour
+but there's more money to the to the the it's not even for me
+it is for the server
+I hope that makes sense I'm not really sure I can explain it better
+like I'm just trying to think too
+so what if we put it in the shop page
+let them select the class
+all the information will be there
+they'll add it to the cart
+they'll pay I'll collect their information on the back end
+because any sales that run through the site
+I can see it within the admin
+yes see their name
+I'll see their email
+I'll see their so I see their name and their email right
+I take their email address
+cause now I have constant contact
+whatever email marketing I'm using to send out the newsletter
+so anytime anybody registers for a class then I generate them a
+payment link
+yeah on on you
+you can make um payment link on stripe right
+no they've already paid cause they've added
+oh yeah oh yeah
+I I
+I forgot at the cooking class
+yeah OK
+the only next step is thank you for booking
+your cooking class is confirmed
+that's something that I can have like a
+I think you already
+I think I think
+I think for that I think we can make a like an email
+at least for the start
+and then on that email maybe we can make it
+for example after they paid for the cooking class
+they will get an email like
+thank you for your anticipation for this
+and then please uh
+email back on this email to have your dates
+do you want that
+no I feel like
+so you're talking about the email that we can send them
+the same thing as like auto generating the welcome email right
+yes but after the
+after they book a class
+we can have email templates already built out
+so we know that they built a class for this day
+it sends this thank you email
+thank you for booking popsicle class
+blah blah blah
+and then if it's a healthy cuisine
+we'll have a template for healthy cuisine
+so every time somebody books
+we can have a template for that class
+yes
+rates them a thank you email
+which is great any follow up emails like hey
+your class is next week
+your class things to do to be prepared for class
+here's a class reminder etcetera
+that's another template that will be built
+and all the templates will essentially be the same
+it'll just change
+the type of class will change and the date will change
+but it can be like some templates that's already built in the system
+to where it sends it out
+now any
+the welcome email is automatically sent out because they signed up
+can we automatically have more emails going out
+uh
+I I was thinking that signing up or without them triggering the email
+can we have like a week before the fitting class
+we just send the email out
+now I know it the
+the problem that we were having right
+is that it's gonna look basic
+and it's not gonna look like email marketing
+unless you use like a Constant Contact or a Mailchimp right um uh
+and uh uh
+wait wait
+uh so basically the issue is that uh
+right now I don't build it
+I I don't have the news
+News Letter news campaign or email campaign on the sites
+that's one thing so I
+I was just thinking that uh
+after they after we send out the automatic email
+you just you just kind of have to uh
+take it like regular email
+yeah yeah
+or if I sign up for constant Contact yeah
+and I have the email address
+it just comes from website and I send them directly yeah
+uh the
+the thing is for the automatic email
+for example uh
+one day for before the event uh
+or one hour for the event
+something like that that is automatic
+we have to make that on the system
+so they have to be registered on the system
+so basically
+if we want that I need to make the Google calendar system on our side
+which they need to also input
+unless you want
+but using Constant Contact you can schedule emails to go out
+you can build out the email
+build out the list and then schedule when it will go out
+that's something that would then kind of fall on me
+like after we generate a thank you for booking email
+the rest of the email marketing
+cause it's probably gonna be one or two classes in there
+that kind of falls on me to use a program
+like a constant contact to say hey
+your event's in a week hey it's in two days hey
+your event is today type of thing
+unless you're saying that
+it's either that solution or you could do that for me
+but then you'll have to build out all of this stuff
+which I don't think that's all necessary yes um
+I think for for it to happen to have the automatic email
+even even if I'm not building it up
+I think for example Google can do that
+I think uh but they have to fill out the booking email
+booking that you have to make an appointment or booking
+booking form
+that they need to confirm one by one the time window what time
+what day what what
+I don't think that looks that doesn't streamline the process for him
+I think that looks like why would I pay for a class editor card
+and now I have to go and Google Calendar for
+to book the meeting like that doesn't make sense to me
+I think that once they added to the cart and pay yep they're expecting
+a confirmation yes
+so that confirmation just like the email when they sign in
+and you generate them a welcome email
+are you saying that as a one off
+you can generate the welcome email and you can generate a thank you
+cause that doesn't have to look pretty
+yep a thank you for registering our booking in the class
+and then I take over from there with the newsletters
+and any promo Mark they needed leading up to the cooking class
+uh yep
+uh but how will you handle the
+the dates uh
+what what booking appointment that they want on the email
+do they do they just reply that I want this on the email
+I'm I'm confused there
+no I'm saying that
+that we'll know the dates because when they add to cart
+I don't have it in the title
+it'll be cooking class pasta making September 7th um
+so so I
+I need to add that to the site on the form
+I don't think so um
+like let me go to the site now let me go to
+so under shop
+where's that one I was messing with it under shop
+give me a second cause I'm right here
+because right now if people add to cart for example
+they it doesn't have the pop up to add it just basic
+OK let me see if this works one second
+or or each shop or each class already has the dates or the appointment
+I already have
+oh let me oh
+hold on wait
+let me change this 150
+okay and publish this
+let me see if it publishes quickly
+it doesn't look good um
+okay so go to the site now and look under shop and you can see cooking
+it doesn't look good I had to figure out a way to make it look better
+but it says cooking class pasta making and then the date cooking class
+okay okay
+so so the dates is on the title or on the description
+okay that
+that makes sense
+that makes sense
+yeah we'll clean it up
+but it'll have to say cooking class 9
+7 and then description
+let me see what's in the bottom so we can go back
+okay that I
+I understand it now uh
+yeah that that is really simple
+yeah and then after we capture the date
+we'll know based in the in the admin part
+we'll be able to see who paid for what
+because you gotta think about a cooking class
+I don't want where did you go
+I don't want too many people because it gets overwhelming
+and they really can't learn
+so cooking class might not be no more than 10 people yeah
+we we
+I think we can make uh for uh like a limit uh uh quantity quantity
+okay yeah
+uh yeah
+we we can limit the quantity of people that can join the cooking class
+or each product
+but I'm going to just make all of the products like more 4,000
+for example
+but for the cooking class we can make it like 15 or 20 or you
+you just decided
+yeah but so I think that's the solution
+we'll just put in shop cooking class 9 September 7th
+and that will be the the
+the title
+and then in the description it can say pasta making blah blah blah
+blah blah blah
+and you can just look at the date
+cause you kind of you
+you either gonna have to read through the description
+or it's gonna say pasta making cooking class
+I'll have to figure it out
+I I think I I think it will be better if we add uh
+like for example we have like cook serves
+which is doesn't make sense for the cooking class
+so maybe we will add something there so it's the dates instead
+if you see the in the description
+or on the detail page
+it has it has cooks cook serve okay
+serve yup
+so we kind of remove that or maybe we can add like a um
+we just agree that cook cook for cooking class is a type for example
+and then we add the type here time is three or four hours
+yep
+and then total class our class size 10 people or something like that
+yeah and then we add
+add something here again maybe for example the dates on here
+if that makes sense
+if you don't want it to on the title because it's too long
+no yeah
+but also with the title cause I wanted to look uniform with the rest
+I don't want it to cause if you make the word smaller
+then you'll be able to see more
+you'll be able to see the date
+the type of class and cooking class in the title right
+but you have to make the font smaller yes
+we can uh yeah
+do you want it to be smaller
+hmm yeah
+I don't know and no
+cause I want to look like
+I want to look like how the rest of it
+the rest of the site looks
+so I mean we can always figure okay
+I got a solution do we in the picture
+I think the picture
+do we put cooking class on the actual picture itself
+and then the description will say the type of class and the date
+um I don't think it will look that good
+like you like how it says feature
+would we say cooking class
+uh
+oh yeah
+oh oh
+you want you want the
+you want to feature here to be like cooking class
+yeah I mean
+if it's featured that's a featured recipe right
+so that's fine but if it's a cooking class
+so people can easily see that's a cooking class
+maybe we put cooking class on there
+oh
+maybe I don't know I'm just trying to think through it
+and then with the filter
+it says search premium recipes because that's all we have
+but after a while it's gonna change from search premium recipes
+so we'll have cooking classes right
+so then would you just type in cooking class I to search
+and I think it's it I think it's makes
+it makes more sense if we add the category cooking class
+and then
+uh
+at the cooking class here for example beef uh
+you're right because the titles are gonna change
+because right now all we have is recipes
+so it has the Kira so recipes
+but then it will change to recipes merch cooking class blah blah blah
+yes yes it that it yeah
+uh and then we can uh so we don't have to get really add the name here
+yeah that makes sense yeah
+um okay we are working through it okay that makes sense okay
+okay okay no
+I don't know it's a minor adjustment
+but you see the hundred and fifty for the cooking class
+yes the triangle of the one fifty
+clip
+it is being clipped
+OK and then I was gonna tell you
+on the chef services to drop down to the cooking uh page
+you know it says book now
+that's how they'll be able to do it like the interest form
+like the other services
+but can we create a link to it will say book now for a private event
+or
+uh how do we lead them to the shop page for cooking classes
+for public events uh
+do we just tell them at the bottom shop uh go shopping tab for uh
+we we can make it so that uh
+if they kinda click click it here book now uh
+and then it will goes to shop and but it will be filtered
+yeah
+so in this book this is also the interest form for private as well
+so you can have book now for private book now for public
+if they click private
+it submits this uh
+it goes to the interest form if it's book now for public
+it sends them to the shop page
+it is for cat uh catering on what service
+you oh that's on you said what
+I'm sorry
+that's at the um on the services page go down to the bottom
+yeah cooking class
+so if you scroll down and go to book now
+it's gonna send them to the interest form if I had an event right
+that's that's what we'll do it
+that's how we have to change it up
+so if it says book now at the bottom
+it will say book now for in home class or something like that
+and next to it it could be a button that says book for private
+I mean for public oh
+and it's gonna link them to the shop's page oh
+so cooking class they're gonna come to cooking class
+and they're not gonna understand that it's two different
+private public
+they need to be able to say to understand that
+so it has two buttons
+yes OK
+OK that
+that book now for in home book now for public
+and then the public one will take them to shop
+yes uh
+yeah that makes sense
+okay
+we'll update that card yes
+and then the automatic emails
+that's one thing that you can set up to send once they book
+yes yes
+and and I can manage all the rest of the communications after that yes
+that that is simple to do
+because the news
+whatever I use for the newsletter is gonna be the same thing I use for
+the reminders for the classes
+yes do you
+do you need do you need me to uh
+connect it uh
+I don't know what what uh
+newsletter do you use
+but just let me know if you want me to connect it with the sites
+um because
+uh for example
+mail shame it has like a
+like a FBI or to connect the
+the stuff together we can actually
+like an API to connect the
+the stuff
+mm hmm yep
+I think that was the last thing that we kind of needed to talk through
+yep
+and then we'll be able to
+so that at least at least you can track
+uh that the automatic email
+for example the automatic email right now we are using Google
+uh but if you are using a newsletter
+something like this
+uh we should just use their uh
+their
+I I just need to kind of reconfigure it so that at least you
+you can see the mail from their perspective
+but you're saying we can't use Google
+after they paid what
+what do they after they pay for a recipe or whatever what
+what what gets sent to them
+what do they see
+they will see
+they just see it within once they're signed in
+they don't get an email or anything
+right now there is no email for the card
+yeah but because they have to
+but I I can make one if you want to that's
+yeah that's
+that's quite simple to make
+to send like automatic email that you have a order
+or you have a cooking class that
+thank you for your cooking class payment
+and then
+I I need to make the email to make the
+it's not from stripe but the
+the payment is through stripe
+but the the send out that you have paid like automatic
+like for like something like this
+like the booking request received
+for example uh
+but for classes
+yeah we
+we can make one
+this is simple enough to make unless we are using
+that's the thing I need to change everything after we
+uh record everything if we are using uh
+not using Google or using uh
+Mailchim if you want to
+yeah uh that's basically
+uh redo the whole thing
+that's that's the thing
+but that's that's okay because right now
+what do you mean by that oh
+I basically right now we are using Google to send email and we make uh
+but if you are using for example
+Mailchimpa later on
+uh all of that we'll need to move to Melbourne
+which is not
+which is not that simple because you have to make the mail
+because right now I'm I'm coding the mail to be sent
+but I if you
+I think if you from my understanding
+all of the newsletter they have to goes
+you have to go to the
+uh mail
+you have you have to
+you have to make the mail in their system that need to be sent
+if that makes sense so yeah basically
+it is redoing all of the thing uh
+we have to redo the
+uh the email system
+but you sent me for like the newsletter
+did you send me an example of what it look like using Google
+I feel like we talked about it
+yes it just doesn't look as pretty
+but it can still be sent through Google
+uh yes it is looking like this
+the the I
+I again the problem will
+will the pro uh
+I would I hope I
+don't give you a lot of headache
+but the problem with with if
+if we are moving from Google to Mail Chimp for example
+we have to remake the uh remake the the what what is being sent
+we have to configure again on the on the mail team system
+but if we don't if we don't use any newsletter
+we are using Google for example right now
+uh
+then you don't have to really redo it
+but the problem with because it's very basic right now uh
+it is we don't have that
+the capability to kind of track who is opening the email
+who is replied it and then taking it from there
+it doesn't have right now it doesn't have a news I should
+but Google could still work
+it just doesn't have the tracking that we want
+so we can't track engagement through Google yeah
+yeah basically you have uh uh
+if you don't make the system it doesn't have one so uh basically uh
+we are just using Google to send the email the uh
+everything like what is what is on the email
+or what is the system is basically outside of Google
+but if you are using like for example
+Metal Team you cannot use uh
+you you cannot use it at the same time
+I hope that that is not confusing like it's basically it has uh
+its own system that you cannot choose
+what you don't want on that or what you
+you cannot configure anything
+you just have to accept that that is the whole thing
+and you have to connect you have to connect it
+OK can you have an example of what
+sending it through Google would look like
+uh this is how it will look like uh
+so
+oh
+like the News Letter cause you can't do that
+that's not good yeah
+um
+basically like the welcome email that you
+the automatic welcome email
+like what will that look like when they receive it
+that's being sent through Google right yes
+the view itself I
+I can basically change everything
+the
+the the few I
+I hope that makes sense the few itself
+we can change it like home
+whatever you want it to be like
+you want it to be there there is no limit on the view itself
+I'm I'm just take talking about the system
+so the view itself it doesn't
+um that's not the problem
+is that what you have to build out though
+yes but yeah
+I need to make make uh
+no the
+the uh
+I don't have the the synthesizer
+I don't have to
+uh only if you have
+if you want like advanced features
+but right now uh
+what you are looking right now in this uh
+this is being called by me
+I know that this is pretty simple
+I think what we got looks like that
+you're saying you can use Google for this screen
+which will act as a confirmation
+yes
+and I was thinking about you know
+how you get an email confirmation in your email
+um in your inbox
+so I think that's why initially I was like
+what do you mean using Google
+but just saying you can use Google right here
+after they check out is within their membership portal
+it shows this is your orders
+this is your confirmation
+which is all they need and with them getting this
+there will be no external email sent to their inbox yes
+only be here yes
+yeah yeah
+basically that that is the problem with using
+uh something like this
+uh because we have to build it out after that
+uh but if you are using Mailchim
+I think it has more features that already being built on the system
+on their system so yeah
+I hope I hope
+I hope that explain things
+yeah so we can use to sum it up
+we can use Google right here to say hey
+you place an order here's your confirmation
+um here's your confirmation
+yes
+the automatic welcome email that sent after they sign up
+it's just essentially the same as this
+they'll say they'll get a automatically welcome email with
+that gets sent to their inbox
+but that's also sent through Google
+yes
+OK Google just uh basically uh
+help us send the email
+it doesn't do with like the tracking and then the
+the view the how it will be seen
+so why can't why
+why can't it be set up for Google to send a welcome email
+automatically
+but it can't be set up for it to send a confirmation email
+are you saying it can and it just takes work
+or is it easier to just do it right here within the site
+uh it
+yeah it
+it can be almost everything can be done ma'am so that's the thing
+but yeah but it
+so welcome what this right here using
+going through the site all you gotta do is type up some verbiage
+it's right here thank you
+going through the welcome email
+that's much more that needs to be put together
+uh yes
+uh yeah
+yes basically I'm that yeah
+basically
+maybe that's the only thing
+I'm always speaking Malayalam because that's what I know
+but basically Malayalam has a lot of features
+a a lot of functionality that
+that is not on the site right now
+but we uh the
+but you have you
+if you are using Mailchim
+you have you just
+uh for more features
+you still have to pay that
+and that's basically just the same thing
+which is the the
+the only difference for me is that I build it uh
+when the when
+when it is needed I think that's the only difference so
+uh yeah
+but basically if you are asking what
+what what is being done right now
+there are many things that
+that is not being done right now
+uh
+yeah so uh
+okay
+I'll be like a monthly or annual fee with you
+I'll just
+we'll have to pay you every time an email is a newsletter sent out
+so if I send out twice a month
+then that's what that will be versus paying no chips
+I haven't even gotten that far
+but I mean that's
+that's good to know that your payment will be per send up versus
+on a monthly
+uh
+the only thing I'm thinking about using mail ship
+cause it kind of allows me to have more flexibility
+cause if I'm working late or if I'm doing if I wanna create
+5 different emails to be sent out over the course of two months
+I can sit there and crank all of it out
+versus
+now I need to send you all the information for you to build it up um
+it's almost the same thing
+I guess because I
+uh you still have the capabilities to kinda make it yourself because
+uh I'm just
+I'm just building out features
+uh what again
+what I'm offering is that um
+it is more
+uh
+like tools I'm building tools
+uh that
+that you can access
+uh so that tools
+if you don't want it if you don't want to access it
+and you want me to access it to do it for you
+that's basically
+uh
+but but uh
+I primarily just uh
+me as a developer is building out the tools
+so for example
+if you if you need that features
+I'm building out the tools for that
+and then if you want me to also do the sending out the newsletter
+uh that's me as not
+not as a developer because I'm just a
+maybe a personal assistant in types of way
+but yeah
+but I don't really agree if you say that you cannot do it by yourself
+because I'm building out the tools on the sides
+the only difference that is that you access it on your side
+not in the mail chain uh
+and then it will takes times it
+it would be in that like the admin back office
+yes uh
+yes basically like a admin back office that okay
+so you have to put together a proposal for me to let me know
+how much is it to like
+I guess send out two
+to build it out and then to send out two newsletters monthly
+so once you build it out it's like you built a template
+it's kind of the same which is change out images and the verbiage
+yes uh
+basically uh
+after we are doing like the first
+for example if it's really the same thing
+I don't think you have to told me to build it again
+um the
+for example it's just one template and one that you just
+yeah changing maybe
+yeah it's
+if it's the same email type of way
+uh I think
+I think I don't think you
+need me to update the tools basically
+uh
+yeah so there's also that uh
+which again I
+I don't really know uh
+that's the thing with software
+I don't really know right now
+if you ask me what will be it look like
+how it will
+how it is difficulty of that
+because that's really the thing
+uh sometimes we don't really
+we haven't really think about it like
+oh there's a problem that is not
+uh turns out there is a problem like this
+that there is this is not presenting itself before we actually do it
+so yeah that's why haha that's
+that's actually what happened in the
+in tasfrol 2 um
+at first time I'm just building out features
+and then after I build out the features
+I just build build the
+the stuff that I have built
+and then after that it's just um
+I it's just simpler to
+to just pay me each month because it's basically asking for
+uh features almost every month
+uh and then I even do the social media
+so it's not even about the website anymore
+so I I really yeah
+yeah so yeah
+what would you do for social
+uh so basically I do the
+I also do the
+their social media almost all of it
+um like Instagram
+like for example it has all of these threads
+Blue Sky TikTok YouTube LinkedIn
+Instagram Facebook X
+and then we just use AI to make the
+the content of it uh
+we we use uh
+like uh
+we also do the posters flyers
+and then for the videos we use AI to generate the videos uh
+sometimes we get views sometimes we don't
+uh
+right now we are do sometimes doing ads
+also ads is different because we
+ads is more
+a little bit technical because it needs to connect with the sites
+with the website
+like I don't think from a social media standpoint
+I can handle like the posting and the reels and all of that stuff
+I prefer to do that stuff
+but like from the ad perspective
+like what does that look like
+yeah that's
+that's basically really
+really not that simple because uh
+you have to kind of uh
+connect with the tracking
+that's why in the sites there is a campaign that we can uh
+track of how many people that comes from the email
+how many comes from uh
+which for example if we do ask in
+in meta on or in LinkedIn
+uh how many it converts the tracking and everything Google ads
+you just have to many
+that's why at least you need to make the landing pages
+you have to connect the the pixel Facebook
+Facebook pixel you have to uh
+every ads has different pixel
+uh which is
+technical a little bit technical
+but
+yeah
+yeah that's the thing with the email
+you have to also track who open
+who doesn't open who click it
+who doesn't click it
+and you use all this campaign performance for the ads
+yes and then we just kind of
+because I also do because I also have the teams to do the
+the
+the content too we
+it also it helps me because uh
+I can control what what message that I need to convey
+uh that because
+because we have to kind of synchronize it with the landing pages
+of the of the offer
+for example this one
+this is the event
+it needs to be connected with the ads
+um because even though it
+it it
+the copyrighting should be connected with the ads
+so I I hope that makes sense
+yeah it does
+like
+yeah uh
+I get it uh
+yeah and then basically for your website
+uh it's really confusing for me because uh
+we
+on the on the other part
+I sometimes just kind of say that yeah
+basically I can just build it and then uh
+after after seeing it
+like I just it doesn't have
+it doesn't have the the end of it
+maybe per se that's why I just I'm really confused
+I'm not really
+again I'm not really that good in
+in types of this
+I'm just
+I hope that makes sense
+OK so what you can do for me
+can you just get me some pricing and send those
+some pricing what that would look like
+um
+have you managed the newsletter piece
+um I
+I guess maybe the question is that um
+uh I don't know how
+how uh
+I I don't know how the
+the problem is that
+uh
+what what what uh
+what I am always thinking is that uh
+what happen if the size is
+uh really going like uh
+for because uh
+what I'm what I'm seeing from you at least is that uh
+you prepare for something that doesn't happen yet
+if that makes sense
+yeah yeah
+just trying to get all the
+all the infrastructure everything in place
+yeah yes
+that's something that's gonna happen quickly
+if I have people start signing up within next month or so
+that's something that needs to be in place yes um
+uh I
+I again the
+uh
+that's the thing uh
+because I'm I'm really is comfortable with
+with just building it out after it happens or because we
+we really can see the what happens after
+um
+port on port fail
+even though that's not what we want but uh
+after at least after it happens
+we at least know exactly what needs to be fixed
+because we don't really want it to be um
+like overthinking too much on what needs to be done
+at least
+are you saying like
+have the template built out already and have the traffic
+I mean have the template built out already right yes
+yes uh
+that's my thinking because uh
+because uh
+uh
+I'm not really
+even though you uh
+even though we don't agree on the prices for example
+uh I
+I don't think I will uh
+reject to kind of fix it after
+after it uh
+it is being published or launched in a way
+mm hmm yeah
+because yeah
+uh usually
+uh that's the only thing I can maybe offer that uh
+is that at least we see that people are already registered
+and then turns out we do have a problem with the people
+uh because my thing is right now is that we make it simple
+for example the cooking class
+uh
+if they're interested
+you you can just take it from the email and then email it uh
+using regular email like
+like just uh
+like using email
+Google email um
+which is simple uh
+the the problem will rise after it
+it it is too much for you to handle
+I think that's that's uh
+that will make
+makes more sense to build out the features of a bus robust features
+I hope that makes sense
+yeah I'm following you
+yep um
+because
+um
+yeah unless
+unless again the
+I'm just thinking out loud here
+unless you you are thinking something else uh
+well let me
+let me talk to John about this one piece
+and tell him what all you can do
+and then I can send shoot you over email and kind of
+time to let you know where we're landing
+what we're thinking yep
+um because I'm not really doing I
+I don't think I have I'm doing a
+really good job at explaining
+uh
+because if you ask me I'm just going to
+I'm always answering that yeah
+I just I can make that yeah
+it's late too I can
+it's like super late over there
+so yup
+uh
+it's fine uh
+but I I don't really know the
+that that
+that's the thing I don't really know the limit of the scope
+I just if you
+uh but that's also bringing up the problem for me because
+if I just building it out all always that's
+which is a problem too because
+I'm I'm
+uh I
+I don't know how to say it but uh
+it's uh
+so if you ask me that uh
+like for example if we add the dates
+add the Google system like calendar on the sites yes
+I think all of the answer is that yes
+I can build it out maybe I will need
+for example VVS
+maybe I will need something like this
+and that's
+that's the answer I guess because uh
+it it has happened for me before where uh
+a client like uh
+where I don't I don't really know the limits like
+like I don't
+I don't I don't
+I know that it already beyond the scope
+that's why I'm kind of trying to limit like
+what is the capabilities and what can be done when
+what cannot be done because you're picking parcel
+for example and I need PVS
+for example for that uh
+it's kinda hard for me to explain that
+uh am I
+should I explain that I I actually can do that
+but you cannot
+it's already beyond the scope
+it's it's
+it's too it's too advanced for the size right now
+and yeah that's I'm
+I'm really confused again
+I don't know
+maybe because
+do you get my 1 point my point
+like I kind of get it
+but that's a little above my pay grade
+as far as the technical piece of it yes
+yes that that's
+that's also why because sometimes I'm really technical
+which is I suppose not to do that to the client
+ha ha
+yeah
+you're kind of losing me a little bit yeah
+okay okay
+yes ma'am
+let me let me let
+let us go this way let us figure that piece out
+let me I'll send you an email recap with the updates that still needed
+and now we have a solution
+yeah cooking class to be a
+yeah we have all our solutions
+except the new fighter piece is the last little thing
+we can still kind of talk to yes
+share with John with you
+just share with me and then we'll
+we can be um
+later even if we meet later this week on Friday or something
+we can like reconvene on that part yes
+uh yeah
+uh and I'll loop him in since he's more tech savvy than me
+he'll understand all the tech talk about this piece
+so we can finalize it
+OK done
+yes
+so yeah OK
+I'll send you an email recap and then we'll just go from there
+and then we'll find some time to meet later on this week
+yes ma'am
+okay alright
+you have a good night haha
+have a good day man alright
+so can you also send John the invoice please
+uh like for the the the final invoice
+the final invoice yes
+oh OK
+I thought I thought that it
+it's supposed to happen after done
+it's it's OK
+you said what uh
+I I thought it
+it was supposed to happen after it is done
+so it's okay if I send it right now
+yeah okay
+I just wanna confirm that
+yeah just send it right now
+okay yes ma'am
+have a good day ma'am

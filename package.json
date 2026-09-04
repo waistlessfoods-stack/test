@@ -34,6 +34,7 @@
     "contentful:migrate-recipe-categories": "node scripts/contentful/migrate-recipe-categories-to-multi.mjs",
     "contentful:migrate-recipe-rich-text": "node scripts/contentful/migrate-recipe-rich-text.mjs",
     "contentful:migrate-blog-article": "node scripts/contentful/migrate-blog-article-content.mjs",
+    "contentful:repair-amber-recipes": "node scripts/contentful/repair-amber-recipe-data.mjs",
     "contentful:update-links-hidden": "node scripts/contentful/update-links-hidden.mjs",
     "contentful:migrate-service-reviews": "node scripts/migrate-contentful-service-reviews.mjs",
     "db:import-client-service-reviews": "node scripts/import-client-service-reviews.mjs",

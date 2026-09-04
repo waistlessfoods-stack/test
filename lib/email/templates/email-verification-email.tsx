@@ -53,7 +53,7 @@ export default function EmailVerificationEmail({
             <Hr style={hr} />
 
             <Text style={footer}>
-              This verification link will expire in 24 hours. If you didn't create this account,
+              This verification link will expire in 24 hours. If you didn&apos;t create this account,
               you can safely ignore this email.
             </Text>
 

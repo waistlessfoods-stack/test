@@ -14,9 +14,9 @@ import {
   resolveOrderCheckoutSnapshot,
 } from "@/lib/order-checkout-snapshot";
 import { arePublicCookingClassesEnabled } from "@/lib/public-cooking-classes";
+import { getStripeSecretKey } from "@/lib/stripe-config";
 
-const stripeSecretKey =
-  process.env.sandbox_secret_key_stripe || process.env.STRIPE_SECRET_KEY;
+const stripeSecretKey = getStripeSecretKey();
 
 const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" })

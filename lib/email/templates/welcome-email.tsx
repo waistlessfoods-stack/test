@@ -6,11 +6,9 @@ import {
   Heading,
   Hr,
   Html,
-  Img,
   Link,
   Font,
   Preview,
-  Row,
   Section,
   Text,
 } from "@react-email/components";
@@ -42,12 +40,12 @@ export default function WelcomeEmail({ name }: WelcomeEmailProps) {
           <Section style={content}>
             <Text style={paragraph}>Hi {name},</Text>
             <Text style={paragraph}>
-              We're thrilled to have you join our food community! Your account has been
+              We&apos;re thrilled to have you join our food community! Your account has been
               successfully created.
             </Text>
 
             <Heading as="h2" style={sectionTitle}>
-              What's Next?
+              What&apos;s Next?
             </Heading>
             <ul style={listStyle}>
               <li style={listItem}>🥘 Explore our recipe gallery</li>

@@ -4,11 +4,13 @@ import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { sendOrderConfirmationOnce } from "@/lib/email/send-order-confirmation";
+import {
+  getStripeSecretKey,
+  getStripeWebhookSecret,
+} from "@/lib/stripe-config";
 
-const stripeSecretKey =
-  process.env.sandbox_secret_key_stripe || process.env.STRIPE_SECRET_KEY;
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const stripeSecretKey = getStripeSecretKey();
+const webhookSecret = getStripeWebhookSecret();
 
 const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" })

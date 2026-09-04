@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import {
   fetchRecipesPageFromContentful,
   fetchServicesFromContentful,
+  isCookingClassProduct,
 } from "@/lib/contentful-management";
 import { fetchBlogPageFromContentful } from "@/lib/contentful-blog";
 
@@ -95,7 +96,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const recipesPage = await fetchRecipesPageFromContentful();
     entries.push(
       ...recipesPage.recipes
-        .filter((recipe) => recipe.slug)
+        .filter((recipe) => recipe.slug && !isCookingClassProduct(recipe))
         .map((recipe) => ({
           url: toAbsoluteUrl(
             baseUrl,

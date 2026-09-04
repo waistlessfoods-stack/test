@@ -488,7 +488,7 @@ export default function HomepageClient({ data }: HomepageClientProps) {
                         className="group flex items-center justify-center gap-3 bg-[#388082] hover:bg-[#2d6b6d] active:scale-95 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 w-full sm:w-auto min-w-[200px] shadow-sm"
                       >
                         <Image
-                          src="https://cdn.simpleicons.org/yelp/ffffff"
+                          src="/YELP.svg"
                           alt="Yelp"
                           width={24}
                           height={24}

@@ -1,5 +1,6 @@
 import {
   fetchRecipesPageFromContentful,
+  getRecipeOnlyPageData,
 } from "@/lib/contentful-management";
 import { buildMetadata } from "@/lib/seo";
 import RecipesPageClient from "./recipes-page-client";
@@ -13,7 +14,7 @@ export async function generateMetadata({
     category?: string;
   }>;
 }) {
-  const data = await fetchRecipesPageFromContentful();
+  const data = getRecipeOnlyPageData(await fetchRecipesPageFromContentful());
   const { category } = await searchParams;
 
   return buildMetadata({
@@ -32,7 +33,7 @@ type RecipesPageProps = {
 };
 
 export default async function Recipes({ searchParams }: RecipesPageProps) {
-  const data = await fetchRecipesPageFromContentful();
+  const data = getRecipeOnlyPageData(await fetchRecipesPageFromContentful());
   const { category } = await searchParams;
 
   return <RecipesPageClient data={data} initialCategorySlug={category} />;

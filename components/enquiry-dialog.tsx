@@ -106,7 +106,7 @@ export default function EnquiryDialog({
               ✓ Thank you!
             </p>
             <p className="text-sm text-[#5b6b69]">
-              We've received your enquiry and will be in touch soon.
+              We&apos;ve received your enquiry and will be in touch soon.
             </p>
           </div>
         ) : submitStatus === "error" ? (

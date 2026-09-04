@@ -64,12 +64,12 @@ export default function PasswordResetEmail({
             <Section style={warningBox}>
               <Text style={warningText}>
                 <strong>⚠️ Security Note:</strong> This link expires in 24 hours. If you
-                didn't request this, please ignore this email or contact support.
+                didn&apos;t request this, please ignore this email or contact support.
               </Text>
             </Section>
 
             <Text style={paragraph}>
-              For security reasons, we'll never ask for your password via email.
+              For security reasons, we&apos;ll never ask for your password via email.
             </Text>
           </Section>
 

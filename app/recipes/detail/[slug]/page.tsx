@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   findRecipeBySlug,
   fetchRecipesPageFromContentful,
+  getRecipeOnlyPageData,
   isCookingClassProduct,
 } from "@/lib/contentful-management";
 import { redirect } from "next/navigation";
@@ -20,7 +21,7 @@ type RecipeDetailPageProps = {
 };
 
 export async function generateStaticParams() {
-  const data = await fetchRecipesPageFromContentful();
+  const data = getRecipeOnlyPageData(await fetchRecipesPageFromContentful());
 
   return data.recipes.flatMap((recipe) =>
     [recipe.slug, recipe.legacyTitleSlug]

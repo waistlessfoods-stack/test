@@ -9,9 +9,9 @@ import {
   syncCurrentClerkUser,
 } from "@/lib/clerk-user-sync";
 import { sendOrderConfirmationOnce } from "@/lib/email/send-order-confirmation";
+import { getStripeSecretKey } from "@/lib/stripe-config";
 
-const stripeSecretKey =
-  process.env.sandbox_secret_key_stripe || process.env.STRIPE_SECRET_KEY;
+const stripeSecretKey = getStripeSecretKey();
 
 const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" })

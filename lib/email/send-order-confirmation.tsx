@@ -33,7 +33,7 @@ export async function sendOrderConfirmationOnce({
       metadata: sql`(
         coalesce(${orders.metadata}, '{}'::jsonb)
         - 'orderConfirmationError'
-      ) || jsonb_build_object('orderConfirmationClaimedAt', ${claimedAt})`,
+      ) || jsonb_build_object('orderConfirmationClaimedAt', ${claimedAt}::text)`,
     })
     .where(
       and(
@@ -41,7 +41,7 @@ export async function sendOrderConfirmationOnce({
         sql`${orders.metadata}->>'orderConfirmationSentAt' is null`,
         sql`(
           ${orders.metadata}->>'orderConfirmationClaimedAt' is null
-          or ${orders.metadata}->>'orderConfirmationClaimedAt' < ${staleBefore}
+          or ${orders.metadata}->>'orderConfirmationClaimedAt' < ${staleBefore}::text
         )`
       )
     )
@@ -115,7 +115,7 @@ export async function sendOrderConfirmationOnce({
           - 'orderConfirmationClaimedAt'
         ) || jsonb_build_object(
           'orderConfirmationError',
-          ${result.error.message}
+          ${result.error.message}::text
         )`,
       })
       .where(eq(orders.id, orderId));
@@ -136,7 +136,7 @@ export async function sendOrderConfirmationOnce({
         coalesce(${orders.metadata}, '{}'::jsonb)
         - 'orderConfirmationClaimedAt'
         - 'orderConfirmationError'
-      ) || jsonb_build_object('orderConfirmationSentAt', ${sentAt})`,
+      ) || jsonb_build_object('orderConfirmationSentAt', ${sentAt}::text)`,
     })
     .where(eq(orders.id, orderId));
 

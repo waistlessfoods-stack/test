@@ -1,4 +1,5 @@
 import { createClient } from "contentful";
+import type { Document } from "@contentful/rich-text-types";
 import { unstable_cache } from "next/cache";
 
 // --- Config ---
@@ -54,8 +55,29 @@ function getTextOrFallback(value: unknown, fallback: string): string {
 
 // --- Asset URL helper ---
 
-function getAssetUrl(asset: any): string | null {
-  const url = asset?.fields?.file?.url;
+function toRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+function getEntryParts(value: unknown): {
+  id: string;
+  fields: Record<string, unknown>;
+} {
+  const entry = toRecord(value);
+  const sys = toRecord(entry.sys);
+
+  return {
+    id: String(sys.id ?? ""),
+    fields: toRecord(entry.fields),
+  };
+}
+
+function getAssetUrl(asset: unknown): string | null {
+  const fields = toRecord(toRecord(asset).fields);
+  const file = toRecord(fields.file);
+  const url = file.url;
   if (!url || typeof url !== "string") return null;
   return url.startsWith("//") ? `https:${url}` : url;
 }
@@ -304,9 +326,9 @@ export type Recipe = {
   cookTime?: string;
   servingSize?: string;
   // Rich Text fields (new, editor-friendly)
-  ingredientsRichText?: any;
-  toolsRichText?: any;
-  instructionsRichText?: any;
+  ingredientsRichText?: Document | null;
+  toolsRichText?: Document | null;
+  instructionsRichText?: Document | null;
 };
 
 export type RecipesPageData = {
@@ -350,6 +372,25 @@ export function isCookingClassProduct(product: Recipe): boolean {
       name.toLowerCase().includes("cooking class")
     )
   );
+}
+
+export function getRecipeOnlyPageData(
+  data: RecipesPageData
+): RecipesPageData {
+  const recipes = data.recipes.filter(
+    (recipe) => !isCookingClassProduct(recipe)
+  );
+  const categoryIds = new Set(
+    recipes.flatMap((recipe) => recipe.categoryIds ?? [])
+  );
+
+  return {
+    ...data,
+    recipes,
+    categories: data.categories.filter((category) =>
+      categoryIds.has(category.id)
+    ),
+  };
 }
 
 function toStringArray(value: unknown): string[] {
@@ -482,7 +523,7 @@ function parseInstructionSteps(
       const imagePath =
         typeof raw.imagePath === "string"
           ? raw.imagePath
-          : getAssetUrl(raw.image as any);
+          : getAssetUrl(raw.image);
 
       if (!title && !description) {
         return acc;
@@ -498,8 +539,8 @@ function parseInstructionSteps(
     }, []);
 }
 
-function mapServiceFields(entry: any) {
-  const f = entry.fields;
+function mapServiceFields(entry: unknown) {
+  const { id, fields: f } = getEntryParts(entry);
   const legacyImagePath =
     typeof f.imagePath === "string" && f.imagePath.length > 0
       ? String(f.imagePath)
@@ -521,7 +562,7 @@ function mapServiceFields(entry: any) {
     legacyMainImagePath;
 
   return {
-    id: entry.sys.id,
+    id,
     slug: String(f.slug ?? ""),
     title: String(f.title ?? ""),
     description: String(f.description ?? ""),
@@ -551,37 +592,43 @@ function mapServiceFields(entry: any) {
   };
 }
 
-function mapRecipesOrShopPage(entry: any): RecipesPageData {
-  const f = entry.fields as any;
+function mapRecipesOrShopPage(entry: unknown): RecipesPageData {
+  const { fields: f } = getEntryParts(entry);
 
-  const categories: RecipeCategory[] = ((f.categories as any[]) || [])
-    .map((e: any) => ({
-      id: e.sys.id,
-      name: String(e.fields?.name ?? ""),
-      imagePath: getAssetUrl(e.fields?.image),
-      sortOrder: Number(e.fields?.sortOrder ?? 0),
-    }))
+  const categoryEntries = Array.isArray(f.categories) ? f.categories : [];
+  const categories: RecipeCategory[] = categoryEntries
+    .map((entryValue) => {
+      const { id, fields } = getEntryParts(entryValue);
+      return {
+        id,
+        name: String(fields.name ?? ""),
+        imagePath: getAssetUrl(fields.image),
+        sortOrder: Number(fields.sortOrder ?? 0),
+      };
+    })
     .sort((a, b) => a.sortOrder - b.sortOrder);
   const categoryNamesById = new Map(
     categories.map((category) => [category.id, category.name])
   );
 
-  const recipes: Recipe[] = ((f.recipes as any[]) || [])
-    .map((e: any) => {
-      const title = String(e.fields?.title ?? "");
+  const recipeEntries = Array.isArray(f.recipes) ? f.recipes : [];
+  const recipes: Recipe[] = recipeEntries
+    .map((entryValue) => {
+      const { id, fields } = getEntryParts(entryValue);
+      const title = String(fields.title ?? "");
       const generatedTitleSlug = generateSlug(title);
       const contentfulSlug =
-        typeof e.fields?.slug === "string" && e.fields.slug.trim().length > 0
-          ? e.fields.slug.trim()
+        typeof fields.slug === "string" && fields.slug.trim().length > 0
+          ? fields.slug.trim()
           : "";
       const resolvedSlug = contentfulSlug || generatedTitleSlug;
-      const imagePath = getAssetUrl(e.fields?.image);
-      const multiCategoryIds = Array.isArray(e.fields?.categories)
-        ? (e.fields.categories as any[])
-            .map((categoryRef: any) => categoryRef?.sys?.id)
-            .filter((id: unknown): id is string => typeof id === "string" && id.length > 0)
+      const imagePath = getAssetUrl(fields.image);
+      const multiCategoryIds = Array.isArray(fields.categories)
+        ? fields.categories
+            .map((categoryRef) => getEntryParts(categoryRef).id)
+            .filter((categoryId) => categoryId.length > 0)
         : [];
-      const singleCategoryId = (e.fields?.category as any)?.sys?.id;
+      const singleCategoryId = getEntryParts(fields.category).id;
       const categoryIds =
         multiCategoryIds.length > 0
           ? multiCategoryIds
@@ -598,9 +645,9 @@ function mapRecipesOrShopPage(entry: any): RecipesPageData {
         )
         ? "cooking_class"
         : "recipe";
-      const rawCapacity = Number(e.fields?.capacity);
+      const rawCapacity = Number(fields.capacity);
       const servingSizeCapacity = Number.parseInt(
-        String(e.fields?.servingSize ?? "").replace(/[^0-9]/g, ""),
+        String(fields.servingSize ?? "").replace(/[^0-9]/g, ""),
         10
       );
       const capacity =
@@ -623,45 +670,47 @@ function mapRecipesOrShopPage(entry: any): RecipesPageData {
             : undefined;
 
       return {
-        id: e.sys.id,
+        id,
         slug: canonicalSlug,
         legacyTitleSlug,
         title,
-        price: String(e.fields?.price ?? ""),
-        description: String(e.fields?.description ?? ""),
+        price: String(fields.price ?? ""),
+        description: String(fields.description ?? ""),
         imagePath,
-        sortOrder: Number(e.fields?.sortOrder ?? 0),
+        sortOrder: Number(fields.sortOrder ?? 0),
         categoryIds,
         categoryId: categoryIds[0],
         categoryNames,
         productKind,
         capacity,
-        eventDate: e.fields?.eventDate
-          ? String(e.fields.eventDate)
+        eventDate: fields.eventDate
+          ? String(fields.eventDate)
           : undefined,
-        duration: e.fields?.duration
-          ? String(e.fields.duration)
-          : e.fields?.cookTime
-            ? String(e.fields.cookTime)
+        duration: fields.duration
+          ? String(fields.duration)
+          : fields.cookTime
+            ? String(fields.cookTime)
             : undefined,
-        featured: Boolean(e.fields?.featured ?? false),
+        featured: Boolean(fields.featured ?? false),
         detailDescription: String(
-          e.fields?.detailDescription ?? e.fields?.description ?? ""
+          fields.detailDescription ?? fields.description ?? ""
         ),
-        ingredients: toStringArray(e.fields?.ingredients),
-        tools: toStringArray(e.fields?.tools),
-        heroImagePath: getAssetUrl(e.fields?.heroImage) || imagePath,
+        ingredients: toStringArray(fields.ingredients),
+        tools: toStringArray(fields.tools),
+        heroImagePath: getAssetUrl(fields.heroImage) || imagePath,
         ingredientsImagePath:
-          getAssetUrl(e.fields?.ingredientsImage) || imagePath,
-        toolsImagePath: getAssetUrl(e.fields?.toolsImage) || imagePath,
+          getAssetUrl(fields.ingredientsImage) || imagePath,
+        toolsImagePath: getAssetUrl(fields.toolsImage) || imagePath,
         instructionSteps: parseInstructionSteps(
-          e.fields?.instructionSteps ?? e.fields?.instructions
+          fields.instructionSteps ?? fields.instructions
         ),
-        cookTime: e.fields?.cookTime ? String(e.fields.cookTime) : undefined,
-        servingSize: e.fields?.servingSize ? String(e.fields.servingSize) : undefined,
-        ingredientsRichText: e.fields?.ingredientsRichText ?? null,
-        toolsRichText: e.fields?.toolsRichText ?? null,
-        instructionsRichText: e.fields?.instructionsRichText ?? null,
+        cookTime: fields.cookTime ? String(fields.cookTime) : undefined,
+        servingSize: fields.servingSize ? String(fields.servingSize) : undefined,
+        ingredientsRichText:
+          (fields.ingredientsRichText as Document | undefined) ?? null,
+        toolsRichText: (fields.toolsRichText as Document | undefined) ?? null,
+        instructionsRichText:
+          (fields.instructionsRichText as Document | undefined) ?? null,
       };
     })
     .sort((a, b) => a.sortOrder - b.sortOrder);
@@ -688,7 +737,7 @@ async function fetchServicesFromContentfulRaw(): Promise<ServiceEntry[]> {
     const entries = await client.getEntries({
       content_type: "service",
       order: ["fields.sortOrder"],
-    } as any);
+    } as never);
     console.log(`[Contentful] fetchServices: got ${entries.items.length} entries`);
     const result = entries.items
       .map((e) => mapServiceFields(e))
@@ -718,7 +767,7 @@ async function fetchServiceDetailFromContentfulRaw(
       content_type: "service",
       "fields.slug": slug,
       limit: 1,
-    } as any);
+    } as never);
     const entry = entries.items[0];
     if (!entry) {
       console.log(`[Contentful] fetchServiceDetail: no entry found for slug=${slug}`);
@@ -744,45 +793,65 @@ async function fetchHomepageFromContentfulRaw(): Promise<HomepageData> {
       content_type: "homepage",
       include: 2,
       limit: 1,
-    } as any);
+    } as never);
     const entry = entries.items[0];
     if (!entry) {
       throw new Error("No homepage entry found in Contentful.");
     }
     console.log("[Contentful] fetchHomepage: entry found", entry.sys.id);
-    const f = entry.fields as any;
+    const f = toRecord(entry.fields);
 
-    const features: FeatureItem[] = ((f.features as any[]) || [])
-      .map((e: any) => ({
-        id: e.sys.id,
-        title: String(e.fields?.title ?? ""),
-        description: String(e.fields?.description ?? ""),
-        imagePath: getAssetUrl(e.fields?.image),
-        buttonLabel: e.fields?.buttonLabel ? String(e.fields.buttonLabel) : undefined,
-        buttonHref: e.fields?.buttonHref ? String(e.fields.buttonHref) : undefined,
-        sortOrder: Number(e.fields?.sortOrder ?? 0),
-      }))
+    const featureEntries = Array.isArray(f.features) ? f.features : [];
+    const features: FeatureItem[] = featureEntries
+      .map((entryValue) => {
+        const { id, fields } = getEntryParts(entryValue);
+        return {
+          id,
+          title: String(fields.title ?? ""),
+          description: String(fields.description ?? ""),
+          imagePath: getAssetUrl(fields.image),
+          buttonLabel: fields.buttonLabel
+            ? String(fields.buttonLabel)
+            : undefined,
+          buttonHref: fields.buttonHref
+            ? String(fields.buttonHref)
+            : undefined,
+          sortOrder: Number(fields.sortOrder ?? 0),
+        };
+      })
       .sort((a, b) => a.sortOrder - b.sortOrder);
 
-    const featuredRecipes: FeaturedRecipe[] = ((f.featuredRecipes as any[]) || [])
-      .map((e: any) => ({
-        id: e.sys.id,
-        title: String(e.fields?.title ?? ""),
-        slug: String(e.fields?.slug ?? ""),
-        description: String(e.fields?.description ?? ""),
-        imagePath: getAssetUrl(e.fields?.image),
-        sortOrder: Number(e.fields?.sortOrder ?? 0),
-      }))
+    const featuredRecipeEntries = Array.isArray(f.featuredRecipes)
+      ? f.featuredRecipes
+      : [];
+    const featuredRecipes: FeaturedRecipe[] = featuredRecipeEntries
+      .map((entryValue) => {
+        const { id, fields } = getEntryParts(entryValue);
+        return {
+          id,
+          title: String(fields.title ?? ""),
+          slug: String(fields.slug ?? ""),
+          description: String(fields.description ?? ""),
+          imagePath: getAssetUrl(fields.image),
+          sortOrder: Number(fields.sortOrder ?? 0),
+        };
+      })
       .sort((a, b) => a.sortOrder - b.sortOrder);
 
-    const testimonials: Testimonial[] = ((f.testimonials as any[]) || [])
-      .map((e: any) => ({
-        id: e.sys.id,
-        title: String(e.fields?.title ?? ""),
-        text: String(e.fields?.text ?? ""),
-        author: String(e.fields?.author ?? ""),
-        sortOrder: Number(e.fields?.sortOrder ?? 0),
-      }))
+    const testimonialEntries = Array.isArray(f.testimonials)
+      ? f.testimonials
+      : [];
+    const testimonials: Testimonial[] = testimonialEntries
+      .map((entryValue) => {
+        const { id, fields } = getEntryParts(entryValue);
+        return {
+          id,
+          title: String(fields.title ?? ""),
+          text: String(fields.text ?? ""),
+          author: String(fields.author ?? ""),
+          sortOrder: Number(fields.sortOrder ?? 0),
+        };
+      })
       .sort((a, b) => a.sortOrder - b.sortOrder);
 
     const legacyHeroImagePath =
@@ -851,13 +920,13 @@ async function fetchAboutPageFromContentfulRaw(): Promise<AboutPageData> {
       content_type: "aboutPage",
       include: 1,
       limit: 1,
-    } as any);
+    } as never);
     const entry = entries.items[0];
     if (!entry) {
       throw new Error("No about page entry found in Contentful.");
     }
     console.log("[Contentful] fetchAboutPage: entry found", entry.sys.id);
-    const f = entry.fields as any;
+    const f = toRecord(entry.fields);
 
     const aboutResult = {
       heroTitle: String(f.heroTitle ?? ""),
@@ -899,7 +968,7 @@ async function fetchRecipesPageFromContentfulRaw(): Promise<RecipesPageData> {
       content_type: "recipesPage",
       include: 10,
       limit: 1,
-    } as any);
+    } as never);
     const entry = entries.items[0];
     if (!entry) {
       throw new Error("No recipes page entry found in Contentful.");
@@ -924,7 +993,7 @@ async function fetchShopPageFromContentfulRaw(): Promise<ShopPageData> {
       content_type: "shopPage",
       include: 10,
       limit: 1,
-    } as any);
+    } as never);
     const entry = entries.items[0];
     if (!entry) {
       throw new Error("No shop page entry found in Contentful.");
@@ -948,14 +1017,14 @@ async function fetchHeaderSettingsFromContentfulRaw(): Promise<HeaderSettings | 
     const entries = await client.getEntries({
       content_type: "headerSettings",
       limit: 1,
-    } as any);
+    } as never);
     const entry = entries.items[0];
     if (!entry) {
       console.log("[Contentful] fetchHeaderSettings: no entry found");
       return null;
     }
     console.log("[Contentful] fetchHeaderSettings: entry found", entry.sys.id);
-    const f = entry.fields as any;
+    const f = toRecord(entry.fields);
 
     const headerResult = {
       promotionBannerEnabled: Boolean(f.promotionBannerEnabled ?? false),
@@ -1060,14 +1129,14 @@ async function fetchFooterSettingsFromContentfulRaw(): Promise<FooterSettings | 
     const entries = await client.getEntries({
       content_type: "footerSettings",
       limit: 1,
-    } as any);
+    } as never);
     const entry = entries.items[0];
     if (!entry) {
       console.log("[Contentful] fetchFooterSettings: no entry found");
       return null;
     }
     console.log("[Contentful] fetchFooterSettings: entry found", entry.sys.id);
-    const f = entry.fields as any;
+    const f = toRecord(entry.fields);
 
     const footerResult = {
       brandDescription: String(f.brandDescription ?? ""),

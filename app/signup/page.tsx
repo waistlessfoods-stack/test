@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useClerk, useSignUp } from "@clerk/nextjs";
 import { useAuthenticationSettings } from "@/components/auth/auth-image-provider";
@@ -100,14 +100,6 @@ export default function SignUpPage() {
         ? (signUp as unknown as BrowserSignUpResource)
         : null;
   const isAuthReady = Boolean(browserClerk?.loaded && signUpResource);
-
-  useEffect(() => {
-    if (isAuthReady) {
-      setErrorMessage((previous) =>
-        previous === "Sign-up is still loading. Please try again." ? "" : previous
-      );
-    }
-  }, [isAuthReady]);
 
   const handleGoogleSignUp = async () => {
     if (!signUpResource || !isAuthReady) {

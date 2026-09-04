@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useClerk, useSignIn } from "@clerk/nextjs";
 import { useAuthenticationSettings } from "@/components/auth/auth-image-provider";
@@ -92,14 +92,6 @@ export default function SignInPage() {
         ? (signIn as unknown as BrowserSignInResource)
         : null;
   const isAuthReady = Boolean(browserClerk?.loaded && signInResource);
-
-  useEffect(() => {
-    if (isAuthReady) {
-      setErrorMessage((previous) =>
-        previous === "Sign-in is still loading. Please try again." ? "" : previous
-      );
-    }
-  }, [isAuthReady]);
 
   const handleContinue = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

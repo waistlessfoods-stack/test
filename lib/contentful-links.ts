@@ -40,8 +40,16 @@ function createContentfulClient(config: ContentfulConfig) {
 
 // --- Asset URL helper ---
 
-function getAssetUrl(asset: any): string | null {
-  const url = asset?.fields?.file?.url;
+function toRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+function getAssetUrl(asset: unknown): string | null {
+  const fields = toRecord(toRecord(asset).fields);
+  const file = toRecord(fields.file);
+  const url = file.url;
   if (!url || typeof url !== "string") return null;
   return url.startsWith("//") ? `https:${url}` : url;
 }
@@ -126,26 +134,35 @@ async function fetchLinksPageFromContentfulRaw(): Promise<LinksPageData> {
       content_type: "linksPage",
       include: 2,
       limit: 1,
-    } as any);
+    } as never);
     const entry = entries.items[0];
     if (!entry) {
       throw new Error("No links page entry found in Contentful.");
     }
     console.log("[Contentful] fetchLinksPage: entry found", entry.sys.id);
 
-    const f = entry.fields as any;
+    const f = toRecord(entry.fields);
 
-    const primaryLinks: LinksPageLink[] = ((f.primaryLinksReferences as any[]) || [])
-      .map((e: any) => ({
-        id: e.sys.id,
-        title: String(e.fields?.title ?? ""),
-        description: String(e.fields?.description ?? ""),
-        href: String(e.fields?.href ?? ""),
-        highlight: Boolean(e.fields?.highlight ?? false),
-        icon: String(e.fields?.icon ?? ""),
-        sortOrder: Number(e.fields?.sortOrder ?? 0),
-        hidden: Boolean(e.fields?.hidden ?? false),
-      }))
+    const primaryLinkReferences = Array.isArray(f.primaryLinksReferences)
+      ? f.primaryLinksReferences
+      : [];
+    const primaryLinks: LinksPageLink[] = primaryLinkReferences
+      .map((entryValue) => {
+        const linkedEntry = toRecord(entryValue);
+        const sys = toRecord(linkedEntry.sys);
+        const fields = toRecord(linkedEntry.fields);
+
+        return {
+          id: String(sys.id ?? ""),
+          title: String(fields.title ?? ""),
+          description: String(fields.description ?? ""),
+          href: String(fields.href ?? ""),
+          highlight: Boolean(fields.highlight ?? false),
+          icon: String(fields.icon ?? ""),
+          sortOrder: Number(fields.sortOrder ?? 0),
+          hidden: Boolean(fields.hidden ?? false),
+        };
+      })
       .sort((a, b) => a.sortOrder - b.sortOrder);
 
     const linksResult = {
@@ -158,7 +175,9 @@ async function fetchLinksPageFromContentfulRaw(): Promise<LinksPageData> {
       conferenceHeading: String(f.conferenceHeading ?? ""),
       conferenceSubheading: String(f.conferenceSubheading ?? ""),
       primaryLinks,
-      socialLinks: (f.socialLinks as SocialLink[]) || [],
+      socialLinks: Array.isArray(f.socialLinks)
+        ? (f.socialLinks as SocialLink[])
+        : [],
       footerText: String(f.footerText ?? ""),
     };
     console.log("[Contentful] fetchLinksPage: result", linksResult);

@@ -96,7 +96,9 @@ export async function POST(req: Request) {
       }
 
       default:
-        console.log(`[Clerk Webhook] Unhandled event type: ${(event as any).type}`);
+        console.log(
+          `[Clerk Webhook] Unhandled event type: ${(event as { type: string }).type}`
+        );
     }
   } catch (err) {
     console.error(`[Clerk Webhook] DB error handling ${event.type}:`, err);
