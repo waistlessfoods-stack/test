@@ -1,5 +1,6 @@
 import {
   boolean,
+  check,
   index,
   integer,
   jsonb,
@@ -8,6 +9,7 @@ import {
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const enquiries = pgTable("enquiries", {
   id: serial("id").primaryKey(),
@@ -33,6 +35,28 @@ export const subscribers = pgTable("subscribers", {
 
 export type Subscriber = typeof subscribers.$inferSelect;
 export type NewSubscriber = typeof subscribers.$inferInsert;
+
+// Archive publication is deliberately separate from email delivery.
+export const newsletterIssues = pgTable("newsletter_issues", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  subject: text("subject").notNull(),
+  previewText: text("preview_text").notNull().default(""),
+  body: text("body").notNull().default(""),
+  ctaLabel: text("cta_label").notNull().default(""),
+  ctaUrl: text("cta_url").notNull().default(""),
+  status: text("status").notNull().default("draft"),
+  version: integer("version").notNull().default(1),
+  publishedAt: timestamp("published_at"),
+  lastTestAt: timestamp("last_test_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  index("newsletter_issues_archive_idx").on(table.status, table.publishedAt),
+  check("newsletter_issues_status_check", sql`${table.status} in ('draft', 'published')`),
+]);
+
+export type NewsletterIssue = typeof newsletterIssues.$inferSelect;
 
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),

@@ -2,57 +2,12 @@
 // temporary table, never the application's permanent orders or sequences.
 // Run: node --env-file=.env scripts/test-order-notifications.mjs --integration
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
-import { createRequire } from 'node:module';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import vm from 'node:vm';
 import test from 'node:test';
-import ts from 'typescript';
 import React from 'react';
 import { render } from '@react-email/render';
 import pg from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
-
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-
-// Compile the actual TS/TSX sources with only external side effects replaced.
-function sourceLoader(overrides = {}) {
-  const cache = new Map();
-  function load(relative) {
-    const filename = path.resolve(root, relative);
-    if (cache.has(filename)) return cache.get(filename).exports;
-    const compiledModule = { exports: {} };
-    cache.set(filename, compiledModule);
-    const nativeRequire = createRequire(filename);
-    const localRequire = (specifier) => {
-      if (Object.hasOwn(overrides, specifier)) return overrides[specifier];
-      if (specifier.startsWith('@/')) {
-        const base = specifier.slice(2);
-        const resolved = [base + '.ts', base + '.tsx', base + '/index.ts']
-          .find((candidate) => existsSync(path.join(root, candidate)));
-        if (!resolved) throw new Error(`Unresolved source: ${specifier}`);
-        return load(resolved);
-      }
-      return nativeRequire(specifier);
-    };
-    const { outputText } = ts.transpileModule(readFileSync(filename, 'utf8'), {
-      compilerOptions: {
-        module: ts.ModuleKind.CommonJS,
-        target: ts.ScriptTarget.ES2022,
-        jsx: ts.JsxEmit.ReactJSX,
-        esModuleInterop: true,
-      },
-      fileName: filename,
-    });
-    const execute = vm.runInThisContext(
-      `(function(require, module, exports) { ${outputText}\n})`, { filename },
-    );
-    execute(localRequire, compiledModule, compiledModule.exports);
-    return compiledModule.exports;
-  }
-  return load;
-}
+import { sourceLoader } from './lib/load-typescript.mjs';
 
 test('admin template renders escaped order details, totals and test warning', async () => {
   const Template = sourceLoader()('lib/email/templates/admin-order-notification-email.tsx').default;

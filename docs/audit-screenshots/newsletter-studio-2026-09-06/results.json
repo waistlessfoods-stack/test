@@ -1,0 +1,25 @@
+{
+  "checks": {
+    "anonymousApisProtected": true,
+    "adminPdfDownload": true,
+    "adminPublish": true,
+    "memberReadAndDownload": true,
+    "unpublishRevokesReadAndDownload": true,
+    "subscriberUnsubscribe": true
+  },
+  "screenshots": [
+    "01-editor-desktop.png",
+    "02-editor-mobile.png",
+    "03-email-preview.png",
+    "04-member-archive.png",
+    "05-member-issue.png",
+    "06-member-mobile.png",
+    "07-subscriber-controls.png",
+    "08-newsletter-studio.png"
+  ],
+  "cleanup": {
+    "qaIssueRemoved": true,
+    "qaSubscriberRemoved": true,
+    "qaMemberRemoved": true
+  }
+}

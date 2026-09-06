@@ -1,0 +1,30 @@
+{
+  "run": "1788662407617",
+  "source": "deployed commit 408c43a, run locally with sandbox keys",
+  "screenshots": [
+    "01-sandbox-checkout.png",
+    "02-completed-order.png",
+    "03-unlocked-recipe.png",
+    "04-admin-email-sent-copy.png",
+    "05-customer-email-received.png"
+  ],
+  "checks": {
+    "sandbox": true,
+    "paymentPaid": true,
+    "customerSendRecorded": true,
+    "adminSendRecorded": true,
+    "webhookReplayAccepted": true,
+    "webhookDelivery": "Actual sandbox event manually forwarded to local handler with test signing secret",
+    "fullRecipeAccessible": true,
+    "customerInboxCopies": 1,
+    "administratorSentCopies": 1,
+    "administratorInboxReceipt": "Not accessible; actual Sent folder copy verified instead"
+  },
+  "cleanup": {
+    "sandboxRefund": "succeeded",
+    "orderStatus": "refunded",
+    "qaUserDeleted": true
+  },
+  "orderId": 8,
+  "amountCents": 108
+}

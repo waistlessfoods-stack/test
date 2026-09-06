@@ -5,6 +5,12 @@ import { useAdminAuth } from '@/components/admin/admin-auth';
 
 const NAV_ITEMS = [
   {
+    href: '/admin/newsletters',
+    label: 'Newsletter Studio',
+    description: 'Prepare issues, publish the member archive, and manage subscribers',
+    icon: <span aria-hidden="true" className="text-xl">✉</span>,
+  },
+  {
     href: '/admin/dashboard',
     label: 'Dashboard',
     description: 'Statistics, recent orders, accounts, and enquiries',

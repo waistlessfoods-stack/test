@@ -1,0 +1,29 @@
+{
+  "run": "1788664432081",
+  "bookingConfirmed": false,
+  "checks": {
+    "requiredQuestions": [
+      true,
+      true,
+      true
+    ],
+    "bookButtonStillVisible": true,
+    "validationErrors": [],
+    "frames": [
+      "calendar.google.com",
+      "www.google.com",
+      "",
+      ""
+    ],
+    "networkFailures": [
+      {
+        "host": "www.google.com",
+        "resource": "fetch",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  "screenshotDirectory": "docs/audit-screenshots/google-booking-2026-09-06",
+  "selectedSlot": "Monday, September 7 · 10:00 – 10:30pm (GMT+08:00) Central Indonesia Time",
+  "afterSubmitText": "Amber Fitzgerald\nWaistLess Foods Complimentary Consultation\n30 min appointments\nGoogle Meet video conference info added after booking\nThank you for your interest in WaistLess Foods. Use this complimentary 30-minute Google Meet consultation to discuss your upcoming event with Chef Amber. We will review your event vision, preferred date or dates, expected guest count, dietary needs, service options, and estimated budget. Please complete the questions below, even if you already shared these details on the WaistLess Foods website, so the information is attached to your calendar appointment. This consultation is an initial conversation. Scheduling a consultation does not reserve an event date, confirm service availability, or create a service booking. You will receive a Google Calendar confirmation and Google Meet link after selecting a time.\nShow more\nSelect an appointment time\n(GMT+08:00) Central Indonesia Time\nSeptember 2026\nPrevious month\nNext month\nS\nSunday\nSunday\n\t\nM\nMonday\nMonday\n\t\nT\nTuesday\nTuesday\n\t\nW\nWednesday\nWednesday\n\t\nT\nThursday\nThursday\n\t\nF\nFriday\nFriday\n\t\nS\nSaturday\nSaturday\n\n\n30\n\t\n31\n\t\n1\n\t\n2\n\t\n3\n\t\n4\n\t\n5\n\n\n6\n\t\n7\n\t\n8\n\t\n9\n\t\n10\n\t\n11\n\t\n12\n\n\n13\n\t\n14\n\t\n15\n\t\n16\n\t\n17\n\t\n18\n\t\n19\n\n\n20\n\t\n21\n\t\n22\n\t\n23\n\t\n24\n\t\n25\n\t\n26\n\n\n27\n\t\n28\n\t\n29\n\t\n30\n\t\n1\n\t\n2\n\t\n3\n\n\n4\n\t\n5\n\t\n6\n\t\n7\n\t\n8\n\t\n9\n\t\n10\nchevron_left\nPrevious day\nS\n6\nMON\n7\n10:00pm\n10:30pm\n11:00pm\n11:30pm\nTUE\n8\n12:00am\n12:30am\n1:00am\n1:30am\n2:00am\n2:30am\n3:00am\n3:30am\n4:00am\n4:30am\n5:00am\n5:30am\n10:00pm\n10:30pm\n11:00pm\n11:30pm\nWED\n9\n12:00am\n12:30am\n1:00am\n1:30am\n2:00am\n2:30am\n3:00am\n3:30am\n4:00am\n4:30am\n5:00am\n5:30am\n10:00pm\n10:30pm\n11:00pm\n11:30pm\nTHU\n10\n12:00am\n12:30am\n1:00am\n1:30am\n2:00am\n2:30am\n3:00am\n3:30am\n4:00am\n4:30am\n5:00am\n5:30am\n10:00pm\n10:30pm\n11:00pm\n11:30pm\nFRI\n11\n12:00am\n12:30am\n1:00am\n1:30am\n2:00am\n2:30am\n3:00am\n3:30am\n4:00am\n4:30am\n5:00am\n5:30am\n10:00pm\n10:30pm\n11:00pm\n11:30pm\nSAT\n12\n12:00am\n12:30am\n1:00am\n1:30am\n2:00am\n2:30am\n3:00am\n3:30am\n4:00am\n4:30am\n5:00am\n5:30am\nchevron_right\nNext day\nCreate your own appointment page.\nLearn More\n\n\nPowered by Google Calendar appointment scheduling.\n\nUse is subject to the Google Privacy Policy and Terms of Service.\n\nSend feedback to Google\nWaistLess Foods Complimentary Consultation\nMonday, September 7 · 10:00 – 10:30pm\n(GMT+08:00) Central Indonesia Time\nGoogle Meet video conference info added after booking\nYour contact info\nFirst name\n\nLast name\n\nEmail address\n\nPhone number\n\nOptional\n\nOptional\nEvent Details\n\nEvent Date(s)\n\nBudget Range\n\nBook\nCancel\nRequest is being submitted\nFailed to book the slot."
+}

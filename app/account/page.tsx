@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { RedirectToSignIn, UserProfile } from '@clerk/nextjs';
 import { useSession } from '@/lib/auth-client';
 import { Container } from '@/components/ui/container';
@@ -38,6 +39,12 @@ export default function AccountPage() {
         <div className="rounded-lg bg-white p-8 shadow-lg">
           <h1 className="mb-2 text-3xl font-bold text-slate-900">Account Settings</h1>
           <p className="mb-8 text-slate-600">Manage your account details in your style</p>
+
+          <Link href="/account/newsletters" className="mb-7 block rounded-xl border border-[#cbdcd6] bg-[#f3f8f6] p-5 text-[#173d40] hover:border-[#086b70]">
+            <span className="block font-semibold">The WaistLess Table — Member Archive</span>
+            <span className="mt-2 block text-sm leading-6 text-slate-600">Read previous newsletters and download your personal PDF copies.</span>
+            <span className="mt-3 block text-sm font-medium text-[#086b70]">Open your collection →</span>
+          </Link>
 
           <div className="space-y-6">
             <div className="rounded-lg border border-slate-200 p-5">

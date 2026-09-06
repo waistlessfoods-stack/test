@@ -39,6 +39,7 @@
     "contentful:migrate-service-reviews": "node scripts/migrate-contentful-service-reviews.mjs",
     "db:import-client-service-reviews": "node scripts/import-client-service-reviews.mjs",
     "db:migrate-newsletter-subscribers": "node scripts/migrate-newsletter-subscribers.mjs",
+    "db:migrate-newsletter-issues": "node scripts/migrate-newsletter-issues.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
@@ -68,6 +69,7 @@
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
     "nodemailer": "^8.0.3",
+    "pdf-lib": "^1.17.1",
     "pg": "^8.18.0",
     "postgres": "^3.4.8",
     "radix-ui": "^1.4.3",
