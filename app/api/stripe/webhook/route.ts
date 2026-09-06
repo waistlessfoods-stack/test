@@ -2,7 +2,7 @@ import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 import { sendOrderConfirmationOnce } from "@/lib/email/send-order-confirmation";
 import {
   getStripeSecretKey,
@@ -50,9 +50,15 @@ export async function POST(request: Request) {
 
     console.log("[Stripe Webhook] Event received:", event.type);
 
-    // Handle the checkout.session.completed event
-    if (event.type === "checkout.session.completed") {
+    // Delayed payment methods complete checkout before payment settles.
+    if (
+      event.type === "checkout.session.completed" ||
+      event.type === "checkout.session.async_payment_succeeded"
+    ) {
       const session = event.data.object as Stripe.Checkout.Session;
+      if (session.payment_status !== "paid" && session.payment_status !== "no_payment_required") {
+        return NextResponse.json({ received: true });
+      }
       const metadataOrderId = Number(session.metadata?.orderId);
 
       let updated: Array<{ id: number }> = [];
@@ -74,7 +80,10 @@ export async function POST(request: Request) {
             checkoutSessionId: session.id,
           })}::jsonb`,
         })
-        .where(eq(orders.stripeSessionId, session.id))
+        .where(and(
+          eq(orders.stripeSessionId, session.id),
+          ne(orders.status, "refunded"),
+        ))
         .returning({ id: orders.id });
 
       // Fallback match by explicit orderId metadata when session id did not match.
@@ -96,7 +105,10 @@ export async function POST(request: Request) {
               checkoutSessionId: session.id,
             })}::jsonb`,
           })
-          .where(eq(orders.id, metadataOrderId))
+          .where(and(
+            eq(orders.id, metadataOrderId),
+            ne(orders.status, "refunded"),
+          ))
           .returning({ id: orders.id });
       }
 

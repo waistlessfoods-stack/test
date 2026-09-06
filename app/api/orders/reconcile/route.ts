@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
 import {
@@ -53,12 +53,7 @@ export async function POST() {
         const session = await stripe.checkout.sessions.retrieve(order.stripeSessionId);
 
         if (session.payment_status === "paid") {
-          const previousMetadata =
-            typeof order.metadata === "object" && order.metadata !== null
-              ? (order.metadata as Record<string, unknown>)
-              : {};
-
-          await db
+          const updated = await db
             .update(orders)
             .set({
               status: "completed",
@@ -67,16 +62,19 @@ export async function POST() {
                   ? session.payment_intent
                   : null,
               updatedAt: new Date(),
-              metadata: {
-                ...previousMetadata,
+              // Preserve email markers written by a concurrent webhook.
+              metadata: sql`coalesce(${orders.metadata}, '{}'::jsonb) || ${JSON.stringify({
                 paymentStatus: session.payment_status,
                 amountTotal: session.amount_total,
                 customerDetails: session.customer_details,
                 reconciledAt: new Date().toISOString(),
                 checkoutSessionId: session.id,
-              },
+              })}::jsonb`,
             })
-            .where(eq(orders.id, order.id));
+            .where(and(eq(orders.id, order.id), eq(orders.status, "pending")))
+            .returning({ id: orders.id });
+
+          if (updated.length === 0) continue;
 
           updatedCount += 1;
 
@@ -112,7 +110,10 @@ export async function POST() {
         and(
           inArray(orders.userId, ownerIds),
           eq(orders.status, "completed"),
-          sql`${orders.metadata}->>'orderConfirmationError' is not null`
+          or(
+            sql`${orders.metadata}->>'orderConfirmationError' is not null`,
+            sql`${orders.metadata}->>'orderAdminNotificationError' is not null`,
+          )
         )
       )
       .orderBy(desc(orders.createdAt));

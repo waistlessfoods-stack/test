@@ -11,6 +11,7 @@ import { useClerk } from "@clerk/nextjs";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/lib/cart-context";
 import ConsultationDialog from "@/components/consultation-dialog";
+import { getConsultationBookingUrl } from "@/lib/consultation-scheduling";
 import { useSession } from "@/lib/auth-client";
 import { getIconPath } from "@/lib/social-links";
 import type { SocialLink } from "@/lib/contentful-links";
@@ -957,7 +958,7 @@ export default function Header({
       <ConsultationDialog
         isOpen={isEnquiryDialogOpen}
         onOpenChange={setIsEnquiryDialogOpen}
-        schedulingUrl={process.env.NEXT_PUBLIC_GOOGLE_BOOKING_URL}
+        schedulingUrl={getConsultationBookingUrl(process.env.NEXT_PUBLIC_GOOGLE_BOOKING_URL)}
       />
     </header>
   );

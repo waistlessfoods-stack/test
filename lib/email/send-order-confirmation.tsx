@@ -5,13 +5,15 @@ import { orders } from "@/lib/db/schema";
 import { isStoredOrderItems } from "@/lib/order-checkout-snapshot";
 import { logError, logInfo, maskEmail } from "@/lib/structured-log";
 import OrderConfirmationEmail from "@/lib/email/templates/order-confirmation-email";
-import { sendEmail } from "@/lib/email/mailer";
+import AdminOrderNotificationEmail from "@/lib/email/templates/admin-order-notification-email";
+import { fromEmail, sendEmail } from "@/lib/email/mailer";
 
 type SendOrderConfirmationOptions = {
   orderId: number;
   customerName?: string | null;
 };
 
+type Audience = "customer" | "admin";
 const CLAIM_TIMEOUT_MS = 10 * 60 * 1000;
 
 function formatCurrency(amount: number, currency: string) {
@@ -21,128 +23,142 @@ function formatCurrency(amount: number, currency: string) {
   }).format(amount);
 }
 
-export async function sendOrderConfirmationOnce({
-  orderId,
-  customerName,
-}: SendOrderConfirmationOptions): Promise<boolean> {
+async function sendOrderEmailOnce(
+  { orderId, customerName }: SendOrderConfirmationOptions,
+  audience: Audience,
+): Promise<boolean> {
+  // Preserve existing customer markers so delivered receipts stay sent.
+  const prefix = audience === "customer" ? "orderConfirmation" : "orderAdminNotification";
+  const claimedKey = `${prefix}ClaimedAt`;
+  const sentKey = `${prefix}SentAt`;
+  const errorKey = `${prefix}Error`;
   const claimedAt = new Date().toISOString();
   const staleBefore = new Date(Date.now() - CLAIM_TIMEOUT_MS).toISOString();
   const [claimedOrder] = await db
     .update(orders)
     .set({
       metadata: sql`(
-        coalesce(${orders.metadata}, '{}'::jsonb)
-        - 'orderConfirmationError'
-      ) || jsonb_build_object('orderConfirmationClaimedAt', ${claimedAt}::text)`,
+        coalesce(${orders.metadata}, '{}'::jsonb) - ${errorKey}::text
+      ) || jsonb_build_object(${claimedKey}::text, ${claimedAt}::text)`,
     })
     .where(
       and(
         eq(orders.id, orderId),
-        sql`${orders.metadata}->>'orderConfirmationSentAt' is null`,
+        eq(orders.status, "completed"),
+        sql`${orders.metadata}->>${sentKey}::text is null`,
         sql`(
-          ${orders.metadata}->>'orderConfirmationClaimedAt' is null
-          or ${orders.metadata}->>'orderConfirmationClaimedAt' < ${staleBefore}::text
-        )`
-      )
+          ${orders.metadata}->>${claimedKey}::text is null
+          or ${orders.metadata}->>${claimedKey}::text < ${staleBefore}::text
+        )`,
+      ),
     )
     .returning();
 
-  if (!claimedOrder) {
-    return false;
-  }
+  if (!claimedOrder) return false;
 
+  // A stale worker must not erase a replacement worker's claim or result.
+  const ownsClaim = and(
+    eq(orders.id, orderId),
+    sql`${orders.metadata}->>${claimedKey}::text = ${claimedAt}::text`,
+  );
   const email = claimedOrder.customerEmail;
-  const items = claimedOrder.items;
+  const recipient = audience === "admin"
+    ? process.env.ADMIN_EMAIL?.trim() || fromEmail
+    : email;
 
-  if (!email || !isStoredOrderItems(items) || items.length === 0) {
-    await db
-      .update(orders)
-      .set({
-        metadata: sql`(
-          coalesce(${orders.metadata}, '{}'::jsonb)
-          - 'orderConfirmationClaimedAt'
-        ) || jsonb_build_object(
-          'orderConfirmationError',
-          'Missing customer email or valid order items'
-        )`,
-      })
-      .where(eq(orders.id, orderId));
+  try {
+    const items = claimedOrder.items;
+    if (!email || !recipient || !isStoredOrderItems(items) || items.length === 0) {
+      throw new Error("Missing customer email or valid order items");
+    }
 
-    logError("order.confirmation_invalid_order", {
-      orderId,
-      hasEmail: Boolean(email),
-      hasValidItems: isStoredOrderItems(items),
-    });
-    throw new Error("Order confirmation data is incomplete.");
-  }
-
-  const resolvedCustomerName =
-    customerName?.trim() || email.split("@")[0] || "there";
-  const result = await sendEmail({
-    to: email,
-    subject: `WaistLess Foods Order Confirmation #${claimedOrder.id}`,
-    react: React.createElement(OrderConfirmationEmail, {
+    const metadata = claimedOrder.metadata as {
+      customerDetails?: { name?: unknown };
+    } | null;
+    const storedName = metadata?.customerDetails?.name;
+    const resolvedCustomerName = customerName?.trim()
+      || (typeof storedName === "string" ? storedName.trim() : "")
+      || email.split("@")[0]
+      || "Customer";
+    const isTest = claimedOrder.stripeSessionId.startsWith("cs_test_");
+    const details = {
       customerName: resolvedCustomerName,
       orderNumber: String(claimedOrder.id),
-      orderTotal: formatCurrency(
-        claimedOrder.amount / 100,
-        claimedOrder.currency
-      ),
+      orderTotal: formatCurrency(claimedOrder.amount / 100, claimedOrder.currency),
       orderDate: claimedOrder.createdAt.toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
       }),
       items: items.map((item) => ({
-        name: item.eventDate
-          ? `${item.name} — ${item.eventDate}`
-          : item.name,
+        name: item.eventDate ? `${item.name} — ${item.eventDate}` : item.name,
         quantity: item.quantity,
         price: formatCurrency(item.price, claimedOrder.currency),
       })),
-      includesCookingClass: items.some(
-        (item) => item.kind === "cooking_class"
-      ),
-    }),
-  });
+      includesCookingClass: items.some((item) => item.kind === "cooking_class"),
+    };
+    const result = await sendEmail({
+      to: recipient,
+      subject: audience === "admin"
+        ? `${isTest ? "[TEST] " : ""}WaistLess Foods New Paid Order #${claimedOrder.id}`
+        : `WaistLess Foods Order Confirmation #${claimedOrder.id}`,
+      ...(audience === "admin" ? { replyTo: email } : {}),
+      react: audience === "admin"
+        ? React.createElement(AdminOrderNotificationEmail, {
+          ...details,
+          customerEmail: email,
+          isTest,
+        })
+        : React.createElement(OrderConfirmationEmail, details),
+    });
 
-  if (result.error) {
+    if (result.error) throw new Error(result.error.message);
+
     await db
       .update(orders)
       .set({
         metadata: sql`(
           coalesce(${orders.metadata}, '{}'::jsonb)
-          - 'orderConfirmationClaimedAt'
+          - ${claimedKey}::text - ${errorKey}::text
+        ) || jsonb_build_object(${sentKey}::text, ${new Date().toISOString()}::text)`,
+      })
+      .where(ownsClaim);
+  } catch (error) {
+    await db
+      .update(orders)
+      .set({
+        metadata: sql`(
+          coalesce(${orders.metadata}, '{}'::jsonb) - ${claimedKey}::text
         ) || jsonb_build_object(
-          'orderConfirmationError',
-          ${result.error.message}::text
+          ${errorKey}::text,
+          ${error instanceof Error ? error.message : "Email delivery failed"}::text
         )`,
       })
-      .where(eq(orders.id, orderId));
+      .where(ownsClaim);
 
-    logError("order.confirmation_failed", {
+    logError("order.email_failed", {
       orderId,
-      email: maskEmail(email),
-      error: result.error,
+      audience,
+      email: maskEmail(recipient),
+      error,
     });
-    throw new Error("Order confirmation email could not be sent.");
+    throw new Error(`Order ${audience} email could not be sent.`);
   }
 
-  const sentAt = new Date().toISOString();
-  await db
-    .update(orders)
-    .set({
-      metadata: sql`(
-        coalesce(${orders.metadata}, '{}'::jsonb)
-        - 'orderConfirmationClaimedAt'
-        - 'orderConfirmationError'
-      ) || jsonb_build_object('orderConfirmationSentAt', ${sentAt}::text)`,
-    })
-    .where(eq(orders.id, orderId));
-
-  logInfo("order.confirmation_sent", {
-    orderId,
-    email: maskEmail(email),
-  });
+  logInfo("order.email_sent", { orderId, audience, email: maskEmail(recipient) });
   return true;
+}
+
+export async function sendOrderConfirmationOnce(
+  options: SendOrderConfirmationOptions,
+): Promise<boolean> {
+  // Independent claims and results let a retry send only the notification due.
+  const results = await Promise.allSettled([
+    sendOrderEmailOnce(options, "customer"),
+    sendOrderEmailOnce(options, "admin"),
+  ]);
+  if (results.some((result) => result.status === "rejected")) {
+    throw new Error("One or more order emails could not be sent.");
+  }
+  return results.some((result) => result.status === "fulfilled" && result.value);
 }
