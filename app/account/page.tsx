@@ -46,6 +46,12 @@ export default function AccountPage() {
             <span className="mt-3 block text-sm font-medium text-[#086b70]">Open your collection →</span>
           </Link>
 
+          <Link href="/account/service-invoices" className="mb-7 block rounded-xl border border-[#cbdcd6] bg-[#f3f8f6] p-5 text-[#173d40] hover:border-[#086b70]">
+            <span className="block font-semibold">Private Chef & Catering Invoices</span>
+            <span className="mt-2 block text-sm leading-6 text-slate-600">View your personalized invoices, pay securely, and download a copy.</span>
+            <span className="mt-3 block text-sm font-medium text-[#086b70]">Open your invoices →</span>
+          </Link>
+
           <div className="space-y-6">
             <div className="rounded-lg border border-slate-200 p-5">
               <p className="text-sm font-medium text-slate-600">Name</p>

@@ -1,0 +1,33 @@
+{
+  "localOnly": true,
+  "stripeMode": "test",
+  "checks": {
+    "anonymousProtected": true,
+    "realStripeDraftAndIdempotency": true,
+    "stripeHostedInvoiceAndPdf": true,
+    "testSendAcceptedNoEmailDelivered": true,
+    "verifiedMemberRead": true,
+    "realTestPaymentAndTracking": true,
+    "paidInvoiceCannotBeVoided": true,
+    "realStripeVoid": true
+  },
+  "screenshots": [
+    "01-invoice-editor-desktop.png",
+    "02-invoice-editor-mobile.png",
+    "03-draft-review.png",
+    "04-issued-invoice.png",
+    "05-member-invoice-desktop.png",
+    "06-member-invoice-mobile.png",
+    "07-member-paid-mobile.png",
+    "08-admin-paid-tracking.png"
+  ],
+  "cleanup": {
+    "temporaryClerkUserRemoved": true,
+    "noPayableQaInvoicesRemain": true,
+    "labelledStripeTestCustomersRetained": 2
+  },
+  "testInvoiceIds": [
+    "in_1UCwPbFayO2LBJqWHaZ27DIF",
+    "in_1UCwPyFayO2LBJqWFePXBE8O"
+  ]
+}
