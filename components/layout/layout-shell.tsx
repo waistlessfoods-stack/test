@@ -11,6 +11,7 @@ import {
 } from "@/lib/contentful-management";
 import type { SocialLink } from "@/lib/contentful-links";
 import SiteAccessGate from "@/components/layout/site-access-gate";
+import StorefrontFrame from "@/components/layout/storefront-frame";
 
 const FALLBACK_SOCIAL_LINKS: SocialLink[] = [
   {
@@ -63,9 +64,12 @@ export default async function LayoutShell({ children }: { children: ReactNode })
 
   return (
     <SiteAccessGate>
-      <Header socialLinks={socialLinks} headerSettings={headerSettings} />
-      {children}
-      <Footer socialLinks={socialLinks} footerSettings={footerSettings} />
+      <StorefrontFrame
+        header={<Header socialLinks={socialLinks} headerSettings={headerSettings} />}
+        footer={<Footer socialLinks={socialLinks} footerSettings={footerSettings} />}
+      >
+        {children}
+      </StorefrontFrame>
     </SiteAccessGate>
   );
 }

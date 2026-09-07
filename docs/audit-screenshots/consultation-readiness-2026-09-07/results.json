@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-09-07T12:37:19.790Z",
+  "liveSite": "https://waistlessfoods.com",
+  "checks": {
+    "liveFormOpens": true,
+    "clientRedirectWithMockedLeadResponse": true,
+    "correctGoogleSchedule": true,
+    "thirtyMinuteAppointments": true,
+    "threeRequiredQuestions": true
+  },
+  "mutations": "none; website lead POST intercepted in browser; Google Book button never clicked",
+  "notVerified": [
+    "Actual lead persistence and email delivery in this run",
+    "Google appointment creation",
+    "Calendar invitation and Meet link",
+    "Test cancellation"
+  ]
+}

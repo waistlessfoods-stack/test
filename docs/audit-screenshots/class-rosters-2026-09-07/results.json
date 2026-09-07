@@ -1,0 +1,23 @@
+{
+  "localOnly": true,
+  "populatedScreenshotsUseFixtures": true,
+  "mutations": "none",
+  "checks": {
+    "realAnonymousApiDenied": true,
+    "realAdminPageProtected": true,
+    "realAuthenticatedDatabaseRead": true,
+    "confirmedSeatsAndDefaultFilters": true,
+    "mobileNoOverflow": true,
+    "filteredCsvDownload": true,
+    "refundedAndPendingHistoryVisible": true,
+    "testModeSeparated": true,
+    "emptyState": true,
+    "failureHidesStaleRoster": true
+  },
+  "screenshots": [
+    "01-class-roster-desktop.png",
+    "02-class-roster-mobile.png",
+    "03-all-statuses-mobile.png",
+    "04-test-mode-mobile.png"
+  ]
+}

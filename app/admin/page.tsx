@@ -5,6 +5,12 @@ import { useAdminAuth } from '@/components/admin/admin-auth';
 
 const NAV_ITEMS = [
   {
+    href: '/admin/class-rosters',
+    label: 'Class Registrations',
+    description: 'View cooking-class purchasers, confirmed seats, and private CSV rosters',
+    icon: <span aria-hidden="true" className="text-xl">☷</span>,
+  },
+  {
     href: '/admin/service-invoices',
     label: 'Service Invoices',
     description: 'Prepare private-chef and catering invoices, send payment links, and track balances',
