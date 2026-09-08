@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Mail, RefreshCw, ShieldCheck } from 'lucide-react';
 import type { Campaign } from '@/lib/newsletter-campaigns';
-import { NEWSLETTER_ADDRESS_PLACEHOLDER } from '@/lib/newsletter-address';
 
 type State = { campaign: Campaign | null; counts: Record<string, number>; recent: { id: number; email: string; status: string }[]; settings: { enabled: boolean; addressConfigured: boolean; dailyLimit: number }; message?: string; attempted?: boolean };
 const button = 'min-h-11 rounded-lg border border-teal-700 px-4 py-2 text-sm font-semibold text-teal-800 disabled:opacity-40';
@@ -60,8 +59,8 @@ export default function NewsletterCampaign({ id, version, dirty }: { id: string;
     {error && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-4 text-sm text-red-800">{error}</p>}
     {message && <p role="status" className="mt-4 rounded-lg bg-teal-50 p-4 text-sm text-teal-900">{message}</p>}
     {data && <>
-      <p className="mt-5 rounded-lg bg-amber-50 p-4 text-sm leading-6 text-amber-950">{data.settings.enabled ? `Newsletter cap: ${data.settings.dailyLimit} attempted emails per rolling 24 hours, across all campaigns.` : 'Subscriber sending is disabled. You can still edit, preview, and send administrator-only tests.'} {!data.settings.addressConfigured && <> The preview footer uses: <strong>{NEWSLETTER_ADDRESS_PLACEHOLDER}</strong>. Replace it later using NEWSLETTER_MAILING_ADDRESS before preparing a real subscriber campaign.</>} Google mailbox limits also apply to order emails and ordinary mail; this cap cannot guarantee spare quota.</p>
-      {!campaign ? <div className="mt-5"><button disabled={busy || dirty || !data.settings.addressConfigured} onClick={() => act('prepare')} className={button}>Prepare saved issue & audience</button><p className="mt-2 text-xs leading-5 text-slate-500">{dirty ? 'Save your edits first. ' : ''}Only active subscribers are included—not customers or members who have not subscribed.</p></div> : <>
+      <p className="mt-5 rounded-lg bg-amber-50 p-4 text-sm leading-6 text-amber-950">{data.settings.enabled ? `Newsletter cap: ${data.settings.dailyLimit} attempted emails per rolling 24 hours, across all campaigns.` : 'Subscriber sending is disabled. You can still edit, preview, and send administrator-only tests.'} Google mailbox limits also apply to order emails and ordinary mail; this cap cannot guarantee spare quota.</p>
+      {!campaign ? <div className="mt-5"><button disabled={busy || dirty} onClick={() => act('prepare')} className={button}>Prepare saved issue & audience</button><p className="mt-2 text-xs leading-5 text-slate-500">{dirty ? 'Save your edits first. ' : ''}Only active subscribers are included—not customers or members who have not subscribed.</p></div> : <>
         <div className="mt-5 flex flex-wrap items-center gap-3"><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase text-slate-700">{campaign.status}</span><span className="text-sm text-slate-500">Frozen version {campaign.issue_version} · One campaign per issue</span></div>
         {campaign.issue_version !== version && <p className="mt-3 text-sm text-amber-900">The editor has a newer version. This campaign still sends the frozen content below.</p>}
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-5">{[['pending', 'Pending'], ['accepted', 'Accepted by Google'], ['uncertain', 'Needs review'], ['skipped', 'Skipped'], ['sending', 'In flight']].map(([key, label]) => <div key={key} className="rounded-xl border border-slate-200 p-4"><p className="text-xs text-slate-500">{label}</p><p className="mt-2 text-2xl font-semibold text-[#173d40]">{data.counts[key] || 0}</p></div>)}</div>

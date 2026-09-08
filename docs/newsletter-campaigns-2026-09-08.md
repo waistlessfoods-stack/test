@@ -1,22 +1,17 @@
 # Gmail newsletter campaigns — September 8, 2026
 
-Implemented using the existing `Email` / `AppPassword` Gmail connection. No new sending provider, dependency, VPS, cron schedule, or unattended worker is required. **No subscriber email was sent during implementation or testing.** Release mode: administrator previews with a placeholder footer; real subscriber sending disabled.
+Implemented using the existing `Email` / `AppPassword` Gmail connection. No new sending provider, dependency, VPS, cron schedule, or unattended worker is required. **No subscriber email was sent during implementation or testing.** At the owner's request, the mailing-address blocker is removed and production sending is available with explicit batch confirmation.
 
 ## Amber's workflow
 
-### Placeholder-first deployment
+### Mailing address deferred
 
-At the owner's request, the business mailing address can be deferred for deployment.
-Admin email previews and administrator-only test emails show
-`[Business mailing address — add before sending]` when no real address is configured.
-Editing, PDF previews, archive publication, and administrator-only tests remain
-available. No address variable is required to deploy this preview mode.
-
-Real campaign preparation and subscriber sends remain blocked while the address
-is missing or a recognized placeholder, even if the sending flag is accidentally
-enabled. Replace the footer later with `NEWSLETTER_MAILING_ADDRESS`, then enable
-`NEWSLETTER_SENDING_ENABLED` and redeploy when ready. The placeholder is not used
-for real subscriber emails.
+The address is optional in the application for now. Missing addresses and known
+placeholders are omitted from both previews and subscriber emails. Campaigns can
+be prepared and sent without them. Unsubscribe links remain in subscriber emails.
+Add `NEWSLETTER_MAILING_ADDRESS` later to include it in future campaign snapshots.
+This is an owner-requested application change, not an assessment of marketing-email
+compliance or a guarantee of inbox delivery.
 
 1. Open an issue in **Admin → Newsletter studio**. Save changes and use the existing administrator-only preview test.
 2. Under **Send to subscribers**, choose **Prepare saved issue & audience**. This freezes the saved subject, content, mailing address, and current active subscriber list. Preparation sends nothing. Publication to the member archive is independent and still sends nothing.
@@ -33,7 +28,7 @@ for real subscriber emails.
 - `accepted` means Gmail accepted SMTP, **not confirmed inbox delivery**. No opens/clicks, automatic bounce suppression, spam complaint feed, or Gmail inbox-delivery tracking is claimed.
 - SMTP errors and interrupted sends become `uncertain`; they are never automatically retried. The campaign pauses. Review those recipients in Gmail, then explicitly resume only never-attempted recipients. A crash after SMTP acceptance but before recording success may also require review. This favors avoiding duplicate emails; it cannot promise exactly-once SMTP delivery.
 - Per-recipient signed unsubscribe link and RFC 8058 headers are included. The new one-click POST route validates the token and payload, requires no login, and has no mutating GET. Existing browser unsubscribe confirmation remains unchanged. Gmail's displayed one-click unsubscribe UI and DKIM header coverage must still be verified on a real received campaign message.
-- The subscriber campaign footer requires Amber's approved business mailing address. Administrator previews use an explicitly labelled placeholder until then. No real address has been invented or taken from private sources.
+- Mailing addresses are optional; placeholders are never presented as real addresses. No address has been invented or taken from private sources.
 - Vercel Preview deployments are blocked from sending even if the enable flag is present. Local sending also defaults off. Administrator authentication and same-origin mutation checks remain required.
 - Public classes, preview gate, invoices, and automatic order-email behavior are unchanged.
 
@@ -45,25 +40,24 @@ The additive migration created three campaign tables in the database configured 
 pnpm db:migrate-newsletter-campaigns
 ```
 
-Keep the existing `Email` and `AppPassword` on the server. Set these Vercel **Production** variables after reviewing the setup:
+Keep the existing `Email` and `AppPassword` on the server. Production sending is now enabled by default when `VERCEL_ENV=production` and those credentials are present. Optional configuration:
 
 ```text
-NEWSLETTER_MAILING_ADDRESS=<Amber-approved business mailing address>
 NEWSLETTER_DAILY_LIMIT=100
-NEWSLETTER_SENDING_ENABLED=false
+NEWSLETTER_SENDING_ENABLED=true
 ```
 
-Push and deploy. Verify the admin page loads. Verify the approved sender address, SPF/DKIM/DMARC configuration and mailbox sending limits, and test an approved message/recipient without broadcasting the real subscriber list. Enable `NEWSLETTER_SENDING_ENABLED=true` only when ready for deliberate subscriber campaigns, then redeploy. Do not place these settings or credentials in `NEXT_PUBLIC_` variables.
+`NEWSLETTER_SENDING_ENABLED=false` is an explicit kill switch. Local development still requires explicit `true`; Vercel Preview deployments cannot send. No campaign runs automatically: an authenticated administrator must prepare it and confirm each batch. Verify the approved sender, domain authentication, mailbox limits, and approved test-recipient delivery separately. Do not place these settings or credentials in `NEXT_PUBLIC_` variables.
 
 Automatic scheduling is not implemented in this manual first version. Vercel Hobby cron is daily with imprecise timing, so it is not used as a short-interval mail queue. See [Vercel cron limits](https://vercel.com/docs/cron-jobs/usage-and-pricing). Google account limits still apply: [Workspace sending limits](https://support.google.com/a/answer/166852) and [email sender guidance](https://support.google.com/mail/answer/81126).
 
 ## Verification
 
-- 15 campaign tests: configuration guardrails, frozen/deduplicated audience, preparation idempotency, disabled sends, placeholder-footer rejection, unsubscribe recheck, in-flight exclusion, cooldown, rolling cap, ambiguous SMTP outcomes, stale claims, cancellation, empty audience, signed one-click opt-out, admin and origin guards, and actual template rendering.
+- 15 campaign tests: configuration guardrails, frozen/deduplicated audience, preparation idempotency, disabled sends, optional-address preparation/sending, placeholder omission, unsubscribe recheck, in-flight exclusion, cooldown, rolling cap, ambiguous SMTP outcomes, stale claims, cancellation, empty audience, signed one-click opt-out, admin and origin guards, and actual template rendering.
 - Campaign database tests used PostgreSQL TEMP tables inside a rolled-back transaction with a mocked SMTP callback. Concurrent service calls were exercised through a serialized test transaction adapter; this is not a distributed load test.
 - 15 existing newsletter tests and 17 order-notification regression tests passed, without real emails.
 - Production build, TypeScript, and targeted ESLint passed.
-- 11 browser checks passed against a local production build, including placeholder preview mode. The real authenticated campaign database read passed and confirmed local sending is disabled. Populated issue/campaign interactions use browser-only fixtures, not production records.
+- 11 browser checks passed against a local production build, including preparation without an address. The real authenticated campaign database read passed and confirmed local sending is disabled. Populated issue/campaign interactions use browser-only fixtures, not production records.
 - Live campaign email/inbox delivery is **not** verified. No customer campaign was prepared or sent.
 
 Repeat checks:
@@ -78,4 +72,4 @@ pnpm build
 
 Browser QA: with the local server on port 3010 and sending disabled, run `node scripts/qa-newsletter-campaigns.mjs`.
 
-Screenshots: [desktop](audit-screenshots/newsletter-campaigns-2026-09-08/01-campaign-desktop.png), [mobile](audit-screenshots/newsletter-campaigns-2026-09-08/02-campaign-mobile.png), [paused](audit-screenshots/newsletter-campaigns-2026-09-08/03-paused-campaign-mobile.png). These are focused panel captures with sample data; the floating storefront header is hidden only during capture so it cannot obscure a tall screenshot. Application header behavior is unchanged.
+Screenshots: [desktop](audit-screenshots/newsletter-sending-2026-09-08/01-campaign-desktop.png), [mobile](audit-screenshots/newsletter-sending-2026-09-08/02-campaign-mobile.png), [paused](audit-screenshots/newsletter-sending-2026-09-08/03-paused-campaign-mobile.png). These are focused panel captures with sample data; the floating storefront header is hidden only during capture so it cannot obscure a tall screenshot. Application header behavior is unchanged.

@@ -1,5 +1,5 @@
 // Production verification. Optional --create-qa-draft creates and removes one
-// private QA draft when no issue exists. Never sends mail or prepares a campaign.
+// private QA draft/campaign. Never calls the send action or sends mail.
 import 'dotenv/config';
 import assert from 'node:assert/strict';
 import { createHmac, randomBytes } from 'node:crypto';
@@ -8,7 +8,7 @@ import { chromium } from '@playwright/test';
 import postgres from 'postgres';
 
 const base = 'https://www.waistlessfoods.com';
-const directory = 'docs/audit-screenshots/newsletter-deployed-2026-09-08';
+const directory = 'docs/audit-screenshots/newsletter-sending-deployed-2026-09-08';
 await mkdir(directory, { recursive: true });
 const report = { checkedAt: new Date().toISOString(), mutations: 'none', checks: {} };
 let temporaryDraft = null;
@@ -25,22 +25,22 @@ try {
   const state = await context.request.get(base + '/api/admin/newsletters/900001/campaign');
   assert.equal(state.status(), 200);
   const configuration = await state.json();
-  assert.equal(configuration.settings.enabled, false);
+  assert.equal(configuration.settings.enabled, true);
   assert.equal(configuration.settings.addressConfigured, false);
   report.checks.realDatabaseRead = true;
-  report.checks.liveSubscriberSendingDisabled = true;
-  report.checks.placeholderModeConfigured = true;
+  report.checks.liveSubscriberSendingEnabled = true;
+  report.checks.addressNotRequired = true;
   const list = await context.request.get(base + '/api/admin/newsletters');
   assert.equal(list.status(), 200);
   const { issues } = await list.json();
-  if (!issues.length && process.argv.includes('--create-qa-draft')) {
+  if (process.argv.includes('--create-qa-draft')) {
     const title = `QA DEPLOYMENT PREVIEW ONLY ${Date.now()}`;
     const response = await context.request.post(base + '/api/admin/newsletters', { headers: { Origin: base }, data: { title, subject: 'QA preview — do not send', previewText: 'Temporary deployment check.', body: 'This private QA draft checks the placeholder footer and PDF preview. It is never published or emailed.', ctaLabel: '', ctaUrl: '' } });
     assert.equal(response.status(), 201);
     const created = (await response.json()).issue;
     temporaryDraft = { id: created.id, title };
     assert.equal(created.status, 'draft');
-    issues.push(created);
+    issues.unshift(created);
     report.mutations = 'One private QA draft created for preview verification; cleanup required. No campaign or email.';
   }
   assert.ok(issues.length, 'An existing issue is needed for read-only preview verification');
@@ -48,8 +48,8 @@ try {
   const preview = await context.request.get(`${base}/api/admin/newsletters/${id}?format=email`);
   assert.equal(preview.status(), 200);
   const html = await preview.text();
-  assert.ok(html.includes('PREVIEW ONLY') && html.includes('add before sending'));
-  report.checks.realPreviewContainsPlaceholder = true;
+  assert.ok(html.includes('PREVIEW ONLY') && !html.includes('add before sending'));
+  report.checks.realPreviewOmitsPlaceholder = true;
   const pdf = await context.request.get(`${base}/api/admin/newsletters/${id}?format=pdf`);
   assert.equal(pdf.status(), 200);
   assert.ok(pdf.headers()['content-type'].includes('application/pdf'));
@@ -57,7 +57,22 @@ try {
   const page = await context.newPage();
   await page.goto(`${base}/admin/newsletters/${id}`);
   const section = page.getByRole('region', { name: 'Send to subscribers' });
-  await section.getByText('[Business mailing address — add before sending]', { exact: true }).waitFor();
+  await section.getByRole('button', { name: 'Prepare saved issue & audience' }).waitFor();
+  assert.equal(await section.getByRole('button', { name: 'Prepare saved issue & audience' }).isEnabled(), true);
+  report.checks.preparationNotBlocked = true;
+  if (temporaryDraft) {
+    page.once('dialog', dialog => dialog.accept());
+    await section.getByRole('button', { name: 'Prepare saved issue & audience' }).click();
+    await section.getByRole('button', { name: 'Send next 5 subscribers' }).waitFor();
+    const prepared = await context.request.get(`${base}/api/admin/newsletters/${id}/campaign`);
+    assert.equal(prepared.status(), 200);
+    const data = await prepared.json();
+    assert.equal(data.campaign.mailing_address, '');
+    assert.equal(data.counts.accepted || 0, 0);
+    assert.equal(await section.getByRole('button', { name: 'Send next 5 subscribers' }).isEnabled(), (data.counts.pending || 0) > 0);
+    report.checks.realCampaignPreparedWithoutAddress = true;
+    report.checks.sendControlMatchesAudience = true;
+  }
   await section.screenshot({ path: `${directory}/desktop.png`, animations: 'disabled', style: 'header { visibility: hidden !important; }' });
   await page.setViewportSize({ width: 390, height: 844 });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
@@ -71,9 +86,16 @@ try {
   if (temporaryDraft) {
     const sql = postgres(process.env.DATABASE_URL, { max: 1, connect_timeout: 10 });
     try {
-      const removed = await sql`DELETE FROM newsletter_issues WHERE id=${temporaryDraft.id} AND title=${temporaryDraft.title} AND status='draft' AND NOT EXISTS (SELECT 1 FROM newsletter_campaigns WHERE issue_id=${temporaryDraft.id}) RETURNING id`;
-      assert.equal(removed.length, 1, 'Exact QA draft removed from the configured database');
-      report.mutations = 'One private QA draft created and removed. No published issues, campaigns, subscribers, or emails changed.';
+      await sql.begin(async transaction => {
+        const owned = await transaction`SELECT id FROM newsletter_issues WHERE id=${temporaryDraft.id} AND title=${temporaryDraft.title} AND status='draft' FOR UPDATE`;
+        assert.equal(owned.length, 1, 'Exact private QA draft identified before cleanup');
+        const attempted = await transaction`SELECT d.id FROM newsletter_deliveries d JOIN newsletter_campaigns c ON c.id=d.campaign_id WHERE c.issue_id=${temporaryDraft.id} AND d.attempted_at IS NOT NULL`;
+        assert.equal(attempted.length, 0, 'Never remove evidence of an attempted send');
+        await transaction`DELETE FROM newsletter_deliveries WHERE campaign_id IN (SELECT id FROM newsletter_campaigns WHERE issue_id=${temporaryDraft.id})`;
+        await transaction`DELETE FROM newsletter_campaigns WHERE issue_id=${temporaryDraft.id}`;
+        await transaction`DELETE FROM newsletter_issues WHERE id=${temporaryDraft.id} AND title=${temporaryDraft.title} AND status='draft'`;
+      });
+      report.mutations = 'One private QA draft and unsent QA campaign created and removed. No subscriber records changed and no email sent.';
       report.checks.qaDraftRemoved = true;
       console.log('Temporary QA draft removed. No email was sent.');
     } finally { await sql.end(); }

@@ -1,6 +1,4 @@
-// Placeholder is for administrator previews only, never a subscriber footer.
-export const NEWSLETTER_ADDRESS_PLACEHOLDER = '[Business mailing address — add before sending]';
-
+// Optional footer text: never show a known placeholder as a real address.
 export function isNewsletterAddressReady(value: string): boolean {
   const address = value.trim();
   return address.length >= 8 && address.length <= 500 &&

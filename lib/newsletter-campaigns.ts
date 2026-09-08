@@ -12,9 +12,14 @@ export type CampaignConfig = { enabled: boolean; mailingAddress: string; dailyLi
 export function campaignConfig(env: Record<string, string | undefined>): CampaignConfig {
   const cap = Number(env.NEWSLETTER_DAILY_LIMIT || 100);
   const mailingAddress = env.NEWSLETTER_MAILING_ADDRESS?.trim() || '';
+  // Owner-approved production enablement. Explicit false remains a kill switch;
+  // local development still requires explicit opt-in, and previews cannot send.
+  const production = env.VERCEL_ENV === 'production';
+  const requested = env.NEWSLETTER_SENDING_ENABLED === 'true' ||
+    (env.NEWSLETTER_SENDING_ENABLED === undefined && production);
   return {
-    enabled: isNewsletterAddressReady(mailingAddress) && env.NEWSLETTER_SENDING_ENABLED === 'true' && !!env.Email && !!env.AppPassword && (!env.VERCEL || env.VERCEL_ENV === 'production'),
-    mailingAddress,
+    enabled: requested && !!env.Email && !!env.AppPassword && (!env.VERCEL || production),
+    mailingAddress: isNewsletterAddressReady(mailingAddress) ? mailingAddress : '',
     dailyLimit: Number.isInteger(cap) && cap >= 1 && cap <= 100 ? cap : 100,
   };
 }
@@ -31,7 +36,6 @@ export function createCampaignService(database: CampaignDatabase) {
   }
 
   async function prepare(issueId: number, version: number, config: CampaignConfig) {
-    if (!isNewsletterAddressReady(config.mailingAddress)) throw new NewsletterInputError('Previews can use a placeholder. Add the business mailing address before freezing a subscriber campaign.');
     return database.transaction(async query => {
       // The issue lock makes repeated preparation idempotent, even across tabs.
       const [issue] = await query('SELECT * FROM newsletter_issues WHERE id=$1 FOR UPDATE', [issueId]);
@@ -41,7 +45,7 @@ export function createCampaignService(database: CampaignDatabase) {
       if (issue.version !== version) throw new NewsletterInputError('Save or reload the latest issue before preparing.');
       const content = parseNewsletterContent({ ...issue, previewText: issue.preview_text, ctaLabel: issue.cta_label, ctaUrl: issue.cta_url });
       assertNewsletterReady(content);
-      const [created] = await query('INSERT INTO newsletter_campaigns(issue_id,issue_version,snapshot,mailing_address) VALUES ($1,$2,$3::jsonb,$4) RETURNING id', [issueId, version, JSON.stringify(content), config.mailingAddress]);
+      const [created] = await query('INSERT INTO newsletter_campaigns(issue_id,issue_version,snapshot,mailing_address) VALUES ($1,$2,$3::jsonb,$4) RETURNING id', [issueId, version, JSON.stringify(content), isNewsletterAddressReady(config.mailingAddress) ? config.mailingAddress : '']);
       const id = Number(created.id);
       await query(`INSERT INTO newsletter_deliveries(campaign_id,subscriber_id,email)
         SELECT $1, min(id), lower(trim(email)) FROM subscribers
@@ -58,7 +62,6 @@ export function createCampaignService(database: CampaignDatabase) {
       const [campaignRow] = await query('SELECT * FROM newsletter_campaigns WHERE issue_id=$1 FOR UPDATE', [issueId]);
       if (!campaignRow) throw new NewsletterInputError('Prepare and review the campaign first.');
       const campaign = campaignRow as unknown as Campaign;
-      if (!isNewsletterAddressReady(campaign.mailing_address)) throw new NewsletterInputError('This campaign has a placeholder footer and cannot be sent.');
       // A terminated function may leave a claimed row. Never send it again.
       const stale = await query("UPDATE newsletter_deliveries SET status='uncertain' WHERE status='sending' AND attempted_at < now()-interval '2 minutes' RETURNING campaign_id");
       for (const row of stale) await query("UPDATE newsletter_campaigns SET status='paused' WHERE id=$1 AND status='ready'", [Number(row.campaign_id)]);

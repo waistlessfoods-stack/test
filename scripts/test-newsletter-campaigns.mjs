@@ -11,28 +11,33 @@ const { campaignConfig, createCampaignService } = load('lib/newsletter-campaigns
 let passed = 0;
 async function test(name, run) { await run(); passed++; console.log(`PASS ${name}`); }
 const env = { Email: 'qa@example.com', AppPassword: 'mock-only', NEWSLETTER_SENDING_ENABLED: 'true', NEWSLETTER_MAILING_ADDRESS: '123 Test Street, Test City, TX 77000' };
-await test('Sending defaults off, caps are bounded, and Vercel previews cannot send', () => {
+await test('Production defaults on; explicit off, local isolation, caps and preview blocks remain', () => {
   assert.equal(campaignConfig({}).enabled, false);
   assert.equal(campaignConfig(env).enabled, true);
   assert.equal(campaignConfig({ ...env, VERCEL: '1', VERCEL_ENV: 'preview' }).enabled, false);
   assert.equal(campaignConfig({ ...env, NEWSLETTER_DAILY_LIMIT: '9999' }).dailyLimit, 100);
   assert.equal(campaignConfig({ ...env, NEWSLETTER_DAILY_LIMIT: '25' }).dailyLimit, 25);
-  assert.equal(campaignConfig({ ...env, NEWSLETTER_MAILING_ADDRESS: '' }).enabled, false);
-  assert.equal(campaignConfig({ ...env, NEWSLETTER_MAILING_ADDRESS: '[Business mailing address — add before sending]' }).enabled, false);
+  assert.equal(campaignConfig({ ...env, NEWSLETTER_MAILING_ADDRESS: '' }).enabled, true);
+  assert.equal(campaignConfig({ ...env, NEWSLETTER_MAILING_ADDRESS: '[Business mailing address — add before sending]' }).mailingAddress, '');
+  assert.equal(campaignConfig({ ...env, NEWSLETTER_SENDING_ENABLED: undefined }).enabled, false);
+  assert.equal(campaignConfig({ ...env, NEWSLETTER_SENDING_ENABLED: undefined, VERCEL: '1', VERCEL_ENV: 'production' }).enabled, true);
+  assert.equal(campaignConfig({ ...env, NEWSLETTER_SENDING_ENABLED: 'false', VERCEL: '1', VERCEL_ENV: 'production' }).enabled, false);
 });
 const issue = { title: 'QA seasonal table', subject: 'QA newsletter', previewText: 'Seasonal ideas', body: 'Only synthetic newsletter content for automated tests.', ctaLabel: '', ctaUrl: '' };
 await test('Subscriber email has opt-out and address, without preview banner', async () => {
   const Email = load('lib/email/templates/newsletter-issue-email.tsx').default;
-  const html = await render(React.createElement(Email, { issue, campaign: { mailingAddress: 'QA ADDRESS ONLY', unsubscribeUrl: 'https://example.com/unsubscribe?token=test' } }));
-  assert.ok(html.includes('QA ADDRESS ONLY')); assert.ok(html.includes('Unsubscribe from newsletters')); assert.ok(!html.includes('PREVIEW ONLY'));
+  const html = await render(React.createElement(Email, { issue, campaign: { mailingAddress: env.NEWSLETTER_MAILING_ADDRESS, unsubscribeUrl: 'https://example.com/unsubscribe?token=test' } }));
+  assert.ok(html.includes(env.NEWSLETTER_MAILING_ADDRESS)); assert.ok(html.includes('Unsubscribe from newsletters')); assert.ok(!html.includes('PREVIEW ONLY'));
+  const noAddress = await render(React.createElement(Email, { issue, campaign: { mailingAddress: '[Business mailing address — add before sending]', unsubscribeUrl: 'https://example.com/unsubscribe?token=test' } }));
+  assert.ok(noAddress.includes('Unsubscribe from newsletters')); assert.ok(!noAddress.includes('Business mailing address')); assert.ok(!noAddress.includes('PREVIEW ONLY'));
   const preview = await render(React.createElement(Email, { issue }));
   assert.ok(preview.includes('PREVIEW ONLY'));
   const originalAddress = process.env.NEWSLETTER_MAILING_ADDRESS;
   try {
     delete process.env.NEWSLETTER_MAILING_ADDRESS;
     const placeholderPreview = await render(React.createElement(Email, { issue }));
-    assert.ok(placeholderPreview.includes('Business mailing address'));
-    assert.ok(placeholderPreview.includes('add before sending'));
+    assert.ok(!placeholderPreview.includes('Business mailing address'));
+    assert.ok(!placeholderPreview.includes('add before sending'));
   } finally {
     if (originalAddress !== undefined) process.env.NEWSLETTER_MAILING_ADDRESS = originalAddress;
   }
@@ -113,20 +118,24 @@ try {
     await query("UPDATE newsletter_issues SET body='Changed later', version=2 WHERE id=1");
     assert.equal((await service.read(1)).campaign.snapshot.body, issue.body);
   });
-  await test('Missing address and stale versions cannot prepare a new campaign', async () => {
-    await reset(); await assert.rejects(() => service.prepare(1, 1, { ...config, mailingAddress: '' }));
-    await assert.rejects(() => service.prepare(1, 1, { ...config, mailingAddress: '[Business mailing address — add before sending]' }));
+  await test('Stale versions are blocked; preparation works without an address', async () => {
+    await reset();
     await assert.rejects(() => service.prepare(1, 2, config)); assert.equal((await service.read(1)).campaign, null);
+    await service.prepare(1, 1, { ...config, mailingAddress: '' });
+    assert.equal((await service.read(1)).campaign.mailing_address, '');
   });
   await test('Disabled sending never calls SMTP', async () => {
     await service.prepare(1, 1, config);
     await assert.rejects(() => service.sendNext(1, { ...config, enabled: false }, () => { throw new Error('must not run'); }));
     assert.equal((await service.read(1)).counts.pending, 2);
   });
-  await test('Frozen placeholder footer blocks SMTP even with an enabled config', async () => {
-    await query("UPDATE newsletter_campaigns SET mailing_address='[Business mailing address — add before sending]'");
-    await assert.rejects(() => service.sendNext(1, config, async () => { throw new Error('must not send'); }));
-    await query('UPDATE newsletter_campaigns SET mailing_address=$1', [config.mailingAddress]);
+  await test('Placeholder is omitted and a campaign can send with no address', async () => {
+    await reset(); await service.prepare(1, 1, { ...config, mailingAddress: '[Business mailing address — add before sending]' });
+    assert.equal((await service.read(1)).campaign.mailing_address, '');
+    let sent = false;
+    await service.sendNext(1, { ...config, mailingAddress: '' }, async campaign => { assert.equal(campaign.mailing_address, ''); sent = true; return 'mock-no-address'; });
+    assert.equal(sent, true);
+    await reset(); await service.prepare(1, 1, { ...config, mailingAddress: '' });
   });
   await test('Opt-out after preparation is skipped before send', async () => {
     await query("UPDATE subscribers SET active=false WHERE email='one@example.com'");

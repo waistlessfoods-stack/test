@@ -6,7 +6,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { chromium } from '@playwright/test';
 
 const base = 'http://localhost:3010';
-const directory = 'docs/audit-screenshots/newsletter-campaigns-2026-09-08';
+const directory = 'docs/audit-screenshots/newsletter-sending-2026-09-08';
 await mkdir(directory, { recursive: true });
 const issue = { id: 900001, version: 1, status: 'draft', title: 'QA SAMPLE — A seasonal table', subject: 'A little inspiration for your next gathering', previewText: 'Fresh ideas from Chef Amber’s kitchen.', body: 'Good food brings people together. This sample newsletter shows how a saved issue becomes a carefully reviewed email campaign.\n\nStart with seasonal vegetables, add a favorite herb, and make room at the table for someone you love.', ctaLabel: 'Explore recipes', ctaUrl: 'https://www.waistlessfoods.com/recipes' };
 let state = { campaign: null, counts: {}, recent: [], settings: { enabled: true, addressConfigured: true, dailyLimit: 100 } };
@@ -93,12 +93,13 @@ try {
   await section.getByRole('button', { name: 'Refresh progress' }).click();
   await section.getByRole('alert').waitFor();
   assert.equal(sends, 1); report.checks.networkErrorVisible = true;
-  state = { campaign: null, counts: {}, recent: [], settings: { enabled: false, addressConfigured: false, dailyLimit: 100 } };
+  state = { campaign: null, counts: {}, recent: [], settings: { enabled: true, addressConfigured: false, dailyLimit: 100 } };
   await section.getByRole('button', { name: 'Refresh progress' }).click();
-  await section.getByText('[Business mailing address — add before sending]', { exact: true }).waitFor();
-  assert.equal(await section.getByRole('button', { name: 'Prepare saved issue & audience' }).isEnabled(), false);
-  await section.screenshot({ path: `${directory}/04-placeholder-mode-mobile.png`, animations: 'disabled', style: captureStyle });
-  report.checks.placeholderPreviewMode = true;
+  await section.getByRole('button', { name: 'Prepare saved issue & audience' }).waitFor();
+  assert.equal(await section.getByRole('button', { name: 'Prepare saved issue & audience' }).isEnabled(), true);
+  assert.ok(!(await section.innerText()).includes('add before sending'));
+  await section.screenshot({ path: `${directory}/04-no-address-mobile.png`, animations: 'disabled', style: captureStyle });
+  report.checks.addressDoesNotBlockPreparation = true;
   console.log(JSON.stringify(report, null, 2));
 } finally {
   await browser.close();
