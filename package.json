@@ -40,6 +40,7 @@
     "db:import-client-service-reviews": "node scripts/import-client-service-reviews.mjs",
     "db:migrate-newsletter-subscribers": "node scripts/migrate-newsletter-subscribers.mjs",
     "db:migrate-newsletter-issues": "node scripts/migrate-newsletter-issues.mjs",
+    "db:migrate-newsletter-campaigns": "node scripts/migrate-newsletter-campaigns.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"

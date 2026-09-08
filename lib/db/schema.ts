@@ -8,6 +8,7 @@ import {
   serial,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -57,6 +58,37 @@ export const newsletterIssues = pgTable("newsletter_issues", {
 ]);
 
 export type NewsletterIssue = typeof newsletterIssues.$inferSelect;
+
+export const newsletterCampaigns = pgTable("newsletter_campaigns", {
+  id: serial("id").primaryKey(),
+  issueId: integer("issue_id").notNull().unique().references(() => newsletterIssues.id),
+  issueVersion: integer("issue_version").notNull(),
+  snapshot: jsonb("snapshot").notNull(),
+  mailingAddress: text("mailing_address").notNull(),
+  status: text("status").notNull().default("ready"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [check("newsletter_campaigns_status_check", sql`${table.status} in ('ready','paused','completed','cancelled')`)]);
+
+export const newsletterDeliveries = pgTable("newsletter_deliveries", {
+  id: serial("id").primaryKey(),
+  campaignId: integer("campaign_id").notNull().references(() => newsletterCampaigns.id),
+  subscriberId: integer("subscriber_id").notNull(),
+  email: text("email").notNull(),
+  status: text("status").notNull().default("pending"),
+  attemptedAt: timestamp("attempted_at", { withTimezone: true }),
+  messageId: text("message_id"),
+}, table => [
+  uniqueIndex("newsletter_deliveries_campaign_id_email_key").on(table.campaignId, table.email),
+  index("newsletter_deliveries_queue_idx").on(table.campaignId, table.status, table.id),
+  index("newsletter_deliveries_attempt_idx").on(table.attemptedAt),
+  check("newsletter_deliveries_status_check", sql`${table.status} in ('pending','sending','accepted','uncertain','skipped')`),
+]);
+
+export const newsletterDispatchLock = pgTable("newsletter_dispatch_lock", {
+  id: integer("id").primaryKey(),
+  nextAt: timestamp("next_at", { withTimezone: true }).notNull().defaultNow(),
+  busyUntil: timestamp("busy_until", { withTimezone: true }).notNull().defaultNow(),
+}, table => [check("newsletter_dispatch_lock_id_check", sql`${table.id} = 1`)]);
 
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),

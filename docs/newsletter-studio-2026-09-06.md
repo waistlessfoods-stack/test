@@ -1,5 +1,9 @@
 # Newsletter Studio: first-version handoff
 
+September 8 follow-up: Gmail campaign sending has now been implemented locally;
+see [campaign setup and verification](newsletter-campaigns-2026-09-08.md).
+The original first-version boundaries below are retained as historical context.
+
 Implemented and locally verified on September 6, 2026. These changes have not been pushed or deployed by the assistant.
 
 ## What Amber can do

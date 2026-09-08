@@ -32,7 +32,7 @@ test('email template escapes content and clearly labels administrator-only previ
   assert.ok(!html.includes('<script>'));
   assert.ok(html.includes('&lt;script&gt;'));
   assert.ok(html.includes('PREVIEW ONLY'));
-  assert.ok(html.includes('Broadcast sending is not enabled'));
+  assert.ok(html.includes('Administrator preview. No subscriber status was changed.'));
 });
 test('PDF is downloadable, paginated, and supports long unbroken words', async () => {
   const short = await PDFDocument.load(await createNewsletterPdf(content));

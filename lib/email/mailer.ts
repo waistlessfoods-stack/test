@@ -34,6 +34,7 @@ export async function sendEmail({
   text,
   react,
   replyTo,
+  headers,
 }: {
   to: string | string[];
   subject: string;
@@ -41,6 +42,7 @@ export async function sendEmail({
   text?: string;
   react?: React.ReactElement;
   replyTo?: string | string[];
+  headers?: Record<string, string>;
 }) {
   if (!gmailUser || !gmailAppPassword) {
     logError('email.send_config_missing', {
@@ -87,6 +89,7 @@ export async function sendEmail({
       html: emailHtml,
       text: emailText,
       replyTo: replyToAddresses,
+      headers,
     });
 
     logInfo('email.sent', {

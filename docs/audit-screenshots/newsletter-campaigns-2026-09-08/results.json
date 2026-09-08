@@ -1,0 +1,17 @@
+{
+  "fixtures": true,
+  "mutations": "none; all campaign/issue browser requests intercepted",
+  "checks": {
+    "realRouteGuards": true,
+    "realDatabaseReadAndSendingDisabled": true,
+    "prepareDoesNotSendAndDirtyIsBlocked": true,
+    "decliningConfirmationDoesNotSend": true,
+    "mobileNoOverflow": true,
+    "uncertainSendStopsBatch": true,
+    "resumeDoesNotSend": true,
+    "disabledSendingExplained": true,
+    "cancelControls": true,
+    "networkErrorVisible": true,
+    "placeholderPreviewMode": true
+  }
+}

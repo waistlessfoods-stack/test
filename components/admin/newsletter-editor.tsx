@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { NewsletterContent } from "@/lib/newsletter-content";
 import NewsletterArticle from "@/components/newsletter-article";
+import NewsletterCampaign from "@/components/admin/newsletter-campaign";
 
 type Issue = NewsletterContent & { id: number; version: number; status: "draft" | "published"; updatedAt: string };
 const empty: NewsletterContent = { title: "", subject: "", previewText: "", body: "", ctaLabel: "", ctaUrl: "" };
@@ -78,6 +79,7 @@ export default function NewsletterEditor({ id }: { id: string }) {
           </section>
           <section className="min-w-0"><div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-sm font-semibold uppercase tracking-wider text-[#367577]">{emailPreview ? "Saved email preview" : "Live archive preview"}</h2><span className="text-xs text-slate-500">No broadcast will be sent</span></div>{emailPreview ? <iframe key={issue.version} title="Saved newsletter email preview" sandbox="" src={`/api/admin/newsletters/${id}?format=email`} className="h-[950px] w-full rounded-2xl border border-[#dce8e5] bg-white" /> : <NewsletterArticle issue={content} />}</section>
         </div>}
+        {issue && <NewsletterCampaign id={id} version={issue.version} dirty={dirty} />}
       </div>
     </main>
   );
