@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-09-08T04:43:05.571Z",
+  "mutations": "none",
+  "checks": {
+    "homepage": true,
+    "anonymousApiProtected": true,
+    "adminAuthenticationRetained": true,
+    "realDatabaseRead": true,
+    "rosterFinishedLoading": true,
+    "updatedAdminWorkspaceLive": true,
+    "desktopAndMobileNoOverflow": true,
+    "storefrontRestoredOnNavigation": true
+  },
+  "screenshots": [
+    "desktop.png",
+    "mobile.png"
+  ],
+  "origin": "https://www.waistlessfoods.com"
+}

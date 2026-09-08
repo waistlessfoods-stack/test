@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-09-08T13:13:27.837Z",
+  "mutations": "One private QA draft created and removed. No published issues, campaigns, subscribers, or emails changed.",
+  "checks": {
+    "adminApiProtected": true,
+    "realDatabaseRead": true,
+    "liveSubscriberSendingDisabled": true,
+    "placeholderModeConfigured": true,
+    "realPreviewContainsPlaceholder": true,
+    "pdfPreviewWorks": true,
+    "liveUiAndMobileLayout": true,
+    "unsubscribeGetDoesNotMutate": true,
+    "qaDraftRemoved": true
+  }
+}
