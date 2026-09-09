@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-09-09T03:40:47.457Z",
+  "recipient": "zul***@gmail.com",
+  "commit": "99301990e0012ac6e6b24f13a002f6d645ef0c02",
+  "deployment": "https://vercel.com/waistlessfoods-projects/test/3E4BTnkZJhgyXvBWpHKs6AbpqbM5",
+  "status": "accepted_by_gmail",
+  "broadcast": false,
+  "subscriptionChanges": false,
+  "sendMethod": "Shared Gmail mailer invoked locally using the template from the successful Vercel deployment commit",
+  "checks": {
+    "deployedBrandedTemplate": "No saved issues for live preview; verified Vercel success for the exact unchanged local template commit instead.",
+    "logoLoadedAndFourBrowserPreviews": true,
+    "websiteLinkOpens": true,
+    "unsubscribePageOpensWithoutSubmitting": true
+  },
+  "subject": "[TEST] WaistLess Foods — updated logo & newsletter design",
+  "messageId": "<8669807d-7f5d-4680-3367-1e0ee9fbf7c2@waistlessfoods.com>",
+  "inboxDelivery": "Requires recipient confirmation; browser previews are not inbox screenshots."
+}

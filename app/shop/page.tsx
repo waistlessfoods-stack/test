@@ -38,5 +38,5 @@ export default async function Shop({ searchParams }: ShopPageProps) {
     ? resolvedSearchParams.category[0]
     : resolvedSearchParams.category;
 
-  return <ShopPageClient data={visibleData} initialCategory={initialCategory} />;
+  return <ShopPageClient key={initialCategory ?? 'all'} data={visibleData} initialCategory={initialCategory} />;
 }

@@ -3,7 +3,9 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Check, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { Check, ChefHat, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import CookingClassCard from '@/components/shop/cooking-class-card';
+import { filterShopItems, normalizeShopCategory as normalizeCategory, type ShopView } from '@/lib/shop-filter';
 import { Container } from "@/components/ui/container";
 import {
   Carousel,
@@ -27,13 +29,6 @@ type ShopPageClientProps = {
   initialCategory?: string;
 };
 
-function normalizeCategory(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
 export default function ShopPageClient({
   data,
   initialCategory,
@@ -48,11 +43,9 @@ export default function ShopPageClient({
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
     () => (initialCategoryMatch ? new Set([initialCategoryMatch.id]) : new Set())
   );
-  const [onlyCookingClasses, setOnlyCookingClasses] = useState(
-    () =>
-      normalizeCategory(initialCategory ?? "") === "cooking-classes" &&
-      !initialCategoryMatch
-  );
+  const [view, setView] = useState<ShopView>(() => normalizeCategory(initialCategory ?? '') === 'cooking-classes' ? 'classes' : initialCategoryMatch ? 'recipes' : 'all');
+  const onlyCookingClasses = view === 'classes';
+  const recipeCategories = data.categories.filter(category => !normalizeCategory(category.name).includes('cooking-class'));
   const [searchQuery, setSearchQuery] = useState("");
   const [unlockedRecipeIds, setUnlockedRecipeIds] = useState<Set<string>>(new Set());
   const { data: session, isPending } = useSession();
@@ -113,7 +106,7 @@ export default function ShopPageClient({
   }, [session?.user?.id, isPending]);
 
   const toggleCategory = (categoryId: string) => {
-    setOnlyCookingClasses(false);
+    setView('recipes');
     const newSelected = new Set(selectedCategories);
     if (newSelected.has(categoryId)) {
       newSelected.delete(categoryId);
@@ -123,28 +116,10 @@ export default function ShopPageClient({
     setSelectedCategories(newSelected);
   };
 
-  // Filter only paid recipes
-  const paidRecipes = data.recipes.filter((recipe) => 
-    recipe.price && recipe.price !== "Free"
-  );
-
-  // Filter paid recipes based on selected categories and search query
-  const filteredRecipes = paidRecipes.filter((recipe) => {
-    // Filter by category
-    const categoryMatch =
-      selectedCategories.size === 0 ||
-      (recipe.categoryIds ?? []).some((categoryId) => selectedCategories.has(categoryId));
-    
-    // Filter by search query
-    const searchMatch = searchQuery === "" || 
-      recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      recipe.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const productTypeMatch =
-      !onlyCookingClasses || isCookingClassProduct(recipe);
-
-    return categoryMatch && searchMatch && productTypeMatch;
-  });
+  const filteredItems = filterShopItems(data.recipes, view, selectedCategories, searchQuery);
+  const filteredRecipes = filteredItems.filter(item => !isCookingClassProduct(item));
+  const filteredClasses = filteredItems.filter(isCookingClassProduct);
+  const hasClasses = data.recipes.some(isCookingClassProduct);
 
   const visibleUnlockedRecipeIds = session?.user?.id
     ? unlockedRecipeIds
@@ -194,14 +169,19 @@ export default function ShopPageClient({
             SHOP
           </h2>
 
+          <div role="group" aria-label="Shop product type" className="mb-8 flex w-full max-w-lg rounded-xl border border-[#d5e3df] bg-white p-1.5">
+            {([['all', 'All'], ['recipes', 'Recipes'], ['classes', 'Cooking classes']] as const).map(([value, label]) => <button key={value} type="button" aria-pressed={view === value} onClick={() => { setView(value); setSelectedCategories(new Set()); }} className={`min-h-12 min-w-0 flex-1 rounded-lg px-3 py-3 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00676e] ${view === value ? 'bg-[#00676e] text-white' : 'text-[#405f60] hover:bg-[#eef5f2]'}`}>{label}</button>)}
+          </div>
+
           <div className="relative w-full mb-12 lg:mb-8 2xl:mb-8">
             <Input
               placeholder="Search recipes, classes, and products"
+              aria-label="Search shop"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-20 lg:h-14 2xl:h-16 bg-white rounded-lg px-10 lg:px-7 2xl:px-8 border-none shadow-sm text-xl lg:text-base 2xl:text-lg placeholder:text-black/40"
+              className="w-full h-14 bg-white rounded-lg pl-5 pr-14 border-none shadow-sm text-base placeholder:text-black/40"
             />
-            <Search className="absolute right-10 lg:right-7 2xl:right-8 top-1/2 -translate-y-1/2 w-8 lg:w-5 2xl:w-6 h-8 lg:h-5 2xl:h-6 text-[#0F8DAB] stroke-[2.5]" />
+            <Search aria-hidden="true" className="absolute right-5 top-1/2 -translate-y-1/2 size-5 text-[#00676e]" />
           </div>
 
           {(selectedCategories.size > 0 || onlyCookingClasses) && (
@@ -214,7 +194,7 @@ export default function ShopPageClient({
               <Button 
                 onClick={() => {
                   setSelectedCategories(new Set());
-                  setOnlyCookingClasses(false);
+                  setView('all');
                 }}
                 className="bg-[#0F8DAB] hover:bg-[#0d7a94] text-white font-bold px-8 lg:px-5 2xl:px-6 py-3 lg:py-1.5 2xl:py-2 rounded-lg lg:rounded-md 2xl:rounded-md text-base lg:text-xs 2xl:text-sm transition-colors"
               >
@@ -223,10 +203,10 @@ export default function ShopPageClient({
             </div>
           )}
 
-          <div className="w-full mb-20 lg:mb-12 2xl:mb-14 relative px-4">
+          {view !== 'classes' && recipeCategories.length > 0 && <div className="w-full mb-20 lg:mb-12 2xl:mb-14 relative px-4">
             <Carousel setApi={setApi} opts={{ align: "start", loop: true }}>
               <CarouselContent className="-ml-4">
-                {data.categories.map((cat: RecipeCategory) => {
+                {recipeCategories.map((cat: RecipeCategory) => {
                   const isSelected = selectedCategories.has(cat.id);
 
                   return (
@@ -286,7 +266,7 @@ export default function ShopPageClient({
                 })}
               </CarouselContent>
             </Carousel>
-            {data.categories.length > 1 && (
+            {recipeCategories.length > 1 && (
               <>
                 <CarouselArrowButton
                   side="previous"
@@ -306,8 +286,18 @@ export default function ShopPageClient({
                 </CarouselArrowButton>
               </>
             )}
-          </div>
+          </div>}
 
+          {view !== 'recipes' && <section aria-labelledby="shop-classes-title" className="mb-12 w-full rounded-2xl border border-[#dedfd3] bg-[#faf8f3] p-5 sm:p-8">
+            <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+              <div className="max-w-xl"><p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#388082]"><ChefHat aria-hidden="true" className="size-4" />Cook. Learn. Gather.</p><h2 id="shop-classes-title" className="font-serif text-3xl text-[#183e40] sm:text-4xl">A seat at Chef Amber’s table</h2><p className="mt-3 text-sm leading-6 text-[#586c6a]">Explore public cooking classes, find your date, and purchase your seat right here.</p></div>
+              <span className="text-sm text-[#586c6a]" aria-live="polite">{filteredClasses.length} {filteredClasses.length === 1 ? 'class' : 'classes'}</span>
+            </div>
+            {filteredClasses.length ? <div className="grid gap-6 md:grid-cols-2">{filteredClasses.map(item => <CookingClassCard key={item.id} item={item} />)}</div> : <div className="rounded-xl border border-dashed border-[#b6ceca] bg-white p-8 text-center"><h3 className="mb-2 text-lg font-semibold text-[#183e40]">{hasClasses ? 'No classes match your search' : 'Public classes are coming to the table'}</h3><p className="mx-auto mb-5 max-w-lg text-sm leading-6 text-[#586c6a]">{hasClasses ? 'Try a different class name or date.' : 'No public classes are currently available. In-home cooking classes are available for booking.'}</p>{hasClasses ? <Button onClick={() => setSearchQuery('')} className="bg-[#00676e] text-white">Clear search</Button> : <Link href="/services/cooking-classes" className="inline-flex min-h-11 items-center rounded-md bg-[#00676e] px-5 py-3 text-sm font-semibold text-white hover:bg-[#00545a]">Explore private classes</Link>}</div>}
+          </section>}
+
+          {view !== 'classes' && <section aria-labelledby="shop-recipes-title" className="w-full">
+          <div className="mb-6 flex items-baseline justify-between gap-4"><h2 id="shop-recipes-title" className="font-serif text-3xl text-[#183e40]">Recipes for your kitchen</h2><span className="text-sm text-[#586c6a]" aria-live="polite">{filteredRecipes.length} {filteredRecipes.length === 1 ? 'recipe' : 'recipes'}</span></div>
           {filteredRecipes.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-2xl text-gray-500">
@@ -399,6 +389,7 @@ export default function ShopPageClient({
               })}
             </div>
           )}
+          </section>}
         </Container>
       </section>
     </div>

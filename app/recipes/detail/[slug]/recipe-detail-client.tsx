@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
 import { useSession } from "@/lib/auth-client";
+import CookingClassDetail from "@/components/shop/cooking-class-detail";
 import {
   isCookingClassProduct,
   type Recipe,
@@ -101,7 +102,7 @@ export default function RecipeDetailClient({
         price: isNaN(priceValue) ? 0 : priceValue,
         quantity: 1,
         imagePath: recipe.imagePath,
-        kind: recipe.productKind,
+        kind: isCookingClass ? 'cooking_class' : recipe.productKind,
         maxQuantity: isCookingClass ? recipe.capacity ?? 10 : 20,
       });
 
@@ -138,7 +139,7 @@ export default function RecipeDetailClient({
         price: isNaN(priceValue) ? 0 : priceValue,
         quantity: 1,
         imagePath: recipe.imagePath,
-        kind: recipe.productKind,
+        kind: isCookingClass ? 'cooking_class' : recipe.productKind,
         maxQuantity: isCookingClass ? recipe.capacity ?? 10 : 20,
       });
 
@@ -147,6 +148,10 @@ export default function RecipeDetailClient({
       console.error("Error in order now:", error);
     }
   };
+
+  if (isCookingClass) {
+    return <CookingClassDetail item={recipe} onAddSeat={handleAddToCart} adding={isAddingToCart} />;
+  }
 
   return (
     <div className="w-full bg-white overflow-x-hidden font-metropolis">
