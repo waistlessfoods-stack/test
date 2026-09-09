@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-09-08T13:58:57.949Z",
+  "recipient": "zul***@gmail.com",
+  "status": "accepted_by_gmail",
+  "broadcast": false,
+  "checks": {
+    "unsubscribePageOpens": true,
+    "renderAndMobileLayout": true,
+    "websiteLinkOpens": true
+  },
+  "subscriberHandling": "Existing subscription status left unchanged.",
+  "subject": "[TEST] WaistLess Foods newsletter — inbox check",
+  "messageId": "<46232490-10a9-4984-5e86-6ceb91bda742@waistlessfoods.com>",
+  "inboxDelivery": "Requires recipient confirmation; no access to this personal Gmail inbox."
+}

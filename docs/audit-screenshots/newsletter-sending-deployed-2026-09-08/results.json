@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-09-08T13:25:15.879Z",
+  "mutations": "One private QA draft and unsent QA campaign created and removed. No subscriber records changed and no email sent.",
+  "checks": {
+    "adminApiProtected": true,
+    "realDatabaseRead": true,
+    "liveSubscriberSendingEnabled": true,
+    "addressNotRequired": true,
+    "realPreviewOmitsPlaceholder": true,
+    "pdfPreviewWorks": true,
+    "preparationNotBlocked": true,
+    "realCampaignPreparedWithoutAddress": true,
+    "sendControlMatchesAudience": true,
+    "liveUiAndMobileLayout": true,
+    "unsubscribeGetDoesNotMutate": true,
+    "qaDraftRemoved": true
+  }
+}
