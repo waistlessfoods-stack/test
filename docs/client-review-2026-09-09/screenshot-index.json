@@ -1,0 +1,200 @@
+[
+  {
+    "section": "Consultations",
+    "title": "Website consultation form",
+    "file": "docs/client-review-2026-09-09/consultation-form.png",
+    "note": "Live website capture. Final booking, invitation and Meet-link verification remain open."
+  },
+  {
+    "section": "Consultations",
+    "title": "Google appointment schedule",
+    "file": "docs/audit-screenshots/consultation-readiness-2026-09-07/02-google-schedule.png",
+    "note": "Google schedule capture: 30-minute consultation. No appointment was created in this check."
+  },
+  {
+    "section": "Consultations",
+    "title": "Required event questions",
+    "file": "docs/audit-screenshots/consultation-readiness-2026-09-07/03-google-required-questions.png",
+    "note": "Google form capture: event details, event dates and budget. This is not a booking confirmation."
+  },
+  {
+    "section": "Service requests",
+    "title": "Private Chef request",
+    "file": "docs/client-review-2026-09-09/private-chef.png",
+    "note": "Live service-page capture, September 9. Amber can review and update her service booking-process copy in Contentful."
+  },
+  {
+    "section": "Service requests",
+    "title": "Catering request",
+    "file": "docs/client-review-2026-09-09/catering.png",
+    "note": "Live service-page capture, September 9. Amber can review and update her service booking-process copy in Contentful."
+  },
+  {
+    "section": "Service requests",
+    "title": "Private and public class actions",
+    "file": "docs/client-review-2026-09-09/cooking-classes.png",
+    "note": "Live service-page capture, September 9. Amber can review and update her service booking-process copy in Contentful."
+  },
+  {
+    "section": "Paid recipe access and PDFs",
+    "title": "Paid recipe - desktop",
+    "file": "docs/client-review-2026-09-09/recipe-desktop.png",
+    "note": "Live protected admin preview, September 9. Full paid content is restricted; customers can use Print / Save PDF after purchase."
+  },
+  {
+    "section": "Paid recipe access and PDFs",
+    "title": "Paid recipe - mobile",
+    "file": "docs/client-review-2026-09-09/recipe-mobile.png",
+    "note": "Live protected admin preview, September 9. Full paid content is restricted; customers can use Print / Save PDF after purchase."
+  },
+  {
+    "section": "Paid recipe access and PDFs",
+    "title": "Paid recipe - print",
+    "file": "docs/client-review-2026-09-09/recipe-print.png",
+    "note": "Live protected admin preview, September 9. Full paid content is restricted; customers can use Print / Save PDF after purchase."
+  },
+  {
+    "section": "Cooking classes in Shop",
+    "title": "Class cards - desktop",
+    "file": "docs/audit-screenshots/shop-classes-2026-09-09/classes-desktop.png",
+    "note": "Design verification with sample classes and photos, not real enrollment. Public classes remain disabled."
+  },
+  {
+    "section": "Cooking classes in Shop",
+    "title": "Class cards - mobile",
+    "file": "docs/audit-screenshots/shop-classes-2026-09-09/classes-mobile.png",
+    "note": "Design verification with sample classes and photos, not real enrollment. Public classes remain disabled."
+  },
+  {
+    "section": "Cooking classes in Shop",
+    "title": "Class details - desktop",
+    "file": "docs/audit-screenshots/shop-classes-2026-09-09/class-detail-desktop.png",
+    "note": "Design verification with sample classes and photos, not real enrollment. Public classes remain disabled."
+  },
+  {
+    "section": "Cooking classes in Shop",
+    "title": "Class details - mobile",
+    "file": "docs/audit-screenshots/shop-classes-2026-09-09/class-detail-mobile.png",
+    "note": "Design verification with sample classes and photos, not real enrollment. Public classes remain disabled."
+  },
+  {
+    "section": "Cooking classes in Shop",
+    "title": "Unavailable classes",
+    "file": "docs/audit-screenshots/shop-classes-2026-09-09/classes-unavailable-mobile.png",
+    "note": "Design verification with sample classes and photos, not real enrollment. Public classes remain disabled."
+  },
+  {
+    "section": "Class registrations",
+    "title": "Registrations - desktop",
+    "file": "docs/audit-screenshots/class-rosters-ui-2026-09-07/01-class-roster-desktop.png",
+    "note": "Sample purchaser roster. Counts are seats purchased, not individual guest names. No real registrations shown."
+  },
+  {
+    "section": "Class registrations",
+    "title": "Registrations - mobile",
+    "file": "docs/audit-screenshots/class-rosters-ui-2026-09-07/02-class-roster-mobile.png",
+    "note": "Sample purchaser roster. Counts are seats purchased, not individual guest names. No real registrations shown."
+  },
+  {
+    "section": "Class registrations",
+    "title": "Registration filters",
+    "file": "docs/audit-screenshots/class-rosters-ui-2026-09-07/03-all-statuses-mobile.png",
+    "note": "Sample purchaser roster. Counts are seats purchased, not individual guest names. No real registrations shown."
+  },
+  {
+    "section": "Newsletter design",
+    "title": "Newsletter - desktop",
+    "file": "docs/audit-screenshots/newsletter-design-2026-09-09/desktop-light.png",
+    "note": "Current branded template with sample copy. Browser preview; email clients can render differently."
+  },
+  {
+    "section": "Newsletter design",
+    "title": "Newsletter - mobile",
+    "file": "docs/audit-screenshots/newsletter-design-2026-09-09/mobile-light.png",
+    "note": "Current branded template with sample copy. Browser preview; email clients can render differently."
+  },
+  {
+    "section": "Newsletter design",
+    "title": "Newsletter - desktop dark mode",
+    "file": "docs/audit-screenshots/newsletter-design-2026-09-09/desktop-dark.png",
+    "note": "Current branded template with sample copy. Browser preview; email clients can render differently."
+  },
+  {
+    "section": "Newsletter design",
+    "title": "Newsletter - mobile dark mode",
+    "file": "docs/audit-screenshots/newsletter-design-2026-09-09/mobile-dark.png",
+    "note": "Current branded template with sample copy. Browser preview; email clients can render differently."
+  },
+  {
+    "section": "Newsletter management",
+    "title": "Newsletter editor - desktop",
+    "file": "docs/client-review-2026-09-09/newsletter-editor-desktop.png",
+    "note": "Current live editor with browser-only sample content and branded preview. No draft was saved, published or sent."
+  },
+  {
+    "section": "Newsletter management",
+    "title": "Newsletter editor - mobile",
+    "file": "docs/client-review-2026-09-09/newsletter-editor-mobile.png",
+    "note": "Current live editor with browser-only sample content and branded preview. No draft was saved, published or sent."
+  },
+  {
+    "section": "Newsletter management",
+    "title": "Member newsletter archive",
+    "file": "docs/audit-screenshots/newsletter-studio-2026-09-06/04-member-archive.png",
+    "note": "Earlier functional screen with sample content. The email design has since been refreshed; publication and sending are separate."
+  },
+  {
+    "section": "Newsletter management",
+    "title": "Member newsletter issue",
+    "file": "docs/audit-screenshots/newsletter-studio-2026-09-06/05-member-issue.png",
+    "note": "Earlier functional screen with sample content. The email design has since been refreshed; publication and sending are separate."
+  },
+  {
+    "section": "Newsletter management",
+    "title": "Member issue - mobile",
+    "file": "docs/audit-screenshots/newsletter-studio-2026-09-06/06-member-mobile.png",
+    "note": "Earlier functional screen with sample content. The email design has since been refreshed; publication and sending are separate."
+  },
+  {
+    "section": "Newsletter management",
+    "title": "Campaign sending - desktop",
+    "file": "docs/audit-screenshots/newsletter-sending-2026-09-08/01-campaign-desktop.png",
+    "note": "Sample campaign controls. Sending uses explicit manual batches, not automatic scheduling. No campaign was sent in this capture."
+  },
+  {
+    "section": "Newsletter management",
+    "title": "Campaign sending - mobile",
+    "file": "docs/audit-screenshots/newsletter-sending-2026-09-08/02-campaign-mobile.png",
+    "note": "Sample campaign controls. Sending uses explicit manual batches, not automatic scheduling. No campaign was sent in this capture."
+  },
+  {
+    "section": "Private Chef and Catering invoices",
+    "title": "Service invoice editor - desktop",
+    "file": "docs/audit-screenshots/service-invoices-2026-09-07/10-invoice-editor-desktop.png",
+    "note": "Stripe sandbox/sample data. No real charge or invoice inbox delivery is demonstrated; live verification remains open."
+  },
+  {
+    "section": "Private Chef and Catering invoices",
+    "title": "Service invoice editor - mobile",
+    "file": "docs/audit-screenshots/service-invoices-2026-09-07/11-invoice-editor-mobile.png",
+    "note": "Stripe sandbox/sample data. No real charge or invoice inbox delivery is demonstrated; live verification remains open."
+  },
+  {
+    "section": "Private Chef and Catering invoices",
+    "title": "Invoice payment tracking",
+    "file": "docs/audit-screenshots/service-invoices-2026-09-07/09-admin-paid-tracking-desktop.png",
+    "note": "Stripe sandbox/sample data. No real charge or invoice inbox delivery is demonstrated; live verification remains open."
+  },
+  {
+    "section": "Private Chef and Catering invoices",
+    "title": "Customer invoice - mobile",
+    "file": "docs/audit-screenshots/service-invoices-2026-09-07/06-member-invoice-mobile.png",
+    "note": "Stripe sandbox/sample data. No real charge or invoice inbox delivery is demonstrated; live verification remains open."
+  },
+  {
+    "section": "Private Chef and Catering invoices",
+    "title": "Customer paid status",
+    "file": "docs/audit-screenshots/service-invoices-2026-09-07/07-member-paid-mobile.png",
+    "note": "Stripe sandbox/sample data. No real charge or invoice inbox delivery is demonstrated; live verification remains open."
+  }
+]
