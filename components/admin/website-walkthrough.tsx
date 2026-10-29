@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowUpRight, Check, Compass } from "lucide-react";
+import WalkthroughScreenshots from "@/components/admin/walkthrough-screenshots";
 
 const stops = [
   {
@@ -117,6 +118,7 @@ export default function WebsiteWalkthrough() {
           </p>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight md:text-5xl">Your website, step by step.</h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-white/85">Use this guide during the walkthrough or whenever you need a reminder. Open a page, explore it together, then return here for the next step.</p>
+          <p className="mt-4 max-w-2xl text-sm leading-6 text-[#b6dcda]">Each workflow includes screenshots with step numbers. Live screens, sample data, and simulated test results are labelled. Use the check notes to see what still needs verification.</p>
           <p className="mt-4 text-sm leading-6 text-[#b6dcda]">Page links open in a new tab. Customer pages may ask for the website preview password or customer sign-in. Contentful has its own sign-in.</p>
         </header>
 
@@ -155,6 +157,7 @@ export default function WebsiteWalkthrough() {
                   {stop.links.map(link => <a key={link.label} href={link.href} target="_blank" rel="noopener" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#edf4f2] px-4 py-3 text-sm font-semibold text-[#245e60] transition-colors hover:bg-[#dceae5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#367577]">{link.label}<ArrowUpRight aria-hidden="true" className="size-4 shrink-0" /><span className="sr-only"> (opens in a new tab)</span></a>)}
                 </div>
                 {stop.note && <p className="mt-5 rounded-xl border border-[#e9dfbd] bg-[#fcf9ef] p-4 text-sm leading-6 text-[#695523]">{stop.note}</p>}
+                <WalkthroughScreenshots section={stop.id} />
                 <label className="mt-6 flex min-h-11 cursor-pointer items-center gap-3 border-t border-[#e2ebe7] pt-5 text-sm font-medium">
                   <input type="checkbox" checked={reviewed.includes(stop.id)} onChange={event => setReviewed(current => event.target.checked ? [...current, stop.id] : current.filter(id => id !== stop.id))} className="size-5 shrink-0 accent-[#388082]" />
                   We reviewed {stop.title.toLowerCase()}

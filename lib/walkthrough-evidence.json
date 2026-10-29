@@ -1,0 +1,438 @@
+{
+  "capturedOn": "2026-10-30",
+  "sections": [
+    {
+      "id": "consultations",
+      "checked": "The live form opens. A browser-only request response reaches the Google schedule. Google event questions are reviewed when available. The admin example uses a synthetic inquiry.",
+      "remaining": "A real saved inquiry, delivered emails, completed Google appointment, calendar invitation, and Google Meet link."
+    },
+    {
+      "id": "services",
+      "checked": "Private Chef and Catering request pages, required-field validation, and confirmation states with simulated submission responses.",
+      "remaining": "Persisted service requests and customer/admin confirmation delivery using an agreed test recipient. Replace the Catering starting-price placeholder ($XXX) during content review."
+    },
+    {
+      "id": "classes",
+      "checked": "Private-class inquiry validation and simulated confirmation, the live unavailable-class view, and a sample class roster. Database-backed roster access and filtering passed isolated temporary-table tests.",
+      "remaining": "Public-class enrollment, actual payment and seat allocation, and customer notifications before enrollment is enabled."
+    },
+    {
+      "id": "recipes",
+      "checked": "Owner-only paid recipe previews, complete recipe layout, and print styling. No purchase was needed for the admin preview.",
+      "remaining": "A final customer purchase-to-unlock check and the customer’s Print / Save PDF experience after payment."
+    },
+    {
+      "id": "newsletters",
+      "checked": "Save, preview, publish, and campaign preparation with browser-only sample responses. Publishing did not send an email. Newsletter authorization, publication and PDF-download APIs passed temporary-table tests with a mocked mailer.",
+      "remaining": "Real inbox delivery and a fresh customer sign-in/archive/download check. The member-archive image is explicitly dated September 6."
+    },
+    {
+      "id": "management",
+      "checked": "Invoice draft and issue controls with simulated Stripe responses. Invoice business rules and HTTP guards passed mocked tests. Review moderation and admin navigation use sample or non-customer views.",
+      "remaining": "Real invoice delivery, live payment reconciliation and a real review publication cycle. No real invoice, charge, email or review change occurred."
+    },
+    {
+      "id": "content",
+      "checked": "Contentful’s separate sign-in screen, the published homepage, and read-only storefront settings.",
+      "remaining": "Editing and publishing an entry in the owner’s Contentful session, final content approval, and approval to lift the preview restriction."
+    }
+  ],
+  "screenshots": [
+    {
+      "section": "consultations",
+      "step": 1,
+      "file": "consultation-form.jpg",
+      "title": "Open the consultation form",
+      "kind": "Live screen",
+      "caption": "The current website asks for event details before Google scheduling.",
+      "capturedOn": "2026-10-30",
+      "width": 680,
+      "height": 624
+    },
+    {
+      "section": "consultations",
+      "step": 2,
+      "file": "consultation-complete.jpg",
+      "title": "Complete the event details",
+      "kind": "Sample data",
+      "caption": "The form contains browser-only sample information. No inquiry is saved.",
+      "capturedOn": "2026-10-30",
+      "width": 680,
+      "height": 624
+    },
+    {
+      "section": "consultations",
+      "step": 2,
+      "file": "consultation-result.jpg",
+      "title": "Review the request response",
+      "kind": "UI test",
+      "caption": "The response is simulated to test the client flow. No lead or email was created.",
+      "capturedOn": "2026-10-30",
+      "width": 680,
+      "height": 410
+    },
+    {
+      "section": "consultations",
+      "step": 2,
+      "file": "google-calendar.jpg",
+      "title": "Choose a consultation time",
+      "kind": "Live screen",
+      "caption": "Google appointment schedule. No appointment was booked in this check.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1000
+    },
+    {
+      "section": "consultations",
+      "step": 2,
+      "file": "google-required-details.jpg",
+      "title": "Review Google’s booking questions",
+      "kind": "Live screen",
+      "caption": "Required event details, dates, and budget were checked. The Book button was not clicked.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1000
+    },
+    {
+      "section": "consultations",
+      "step": 3,
+      "file": "consultation-admin.jpg",
+      "title": "Find the inquiry in Admin",
+      "kind": "Sample data",
+      "caption": "A synthetic pending inquiry shows where consultation details appear.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1000
+    },
+    {
+      "section": "services",
+      "step": 1,
+      "file": "private-actions.jpg",
+      "title": "Review Private Chef requests",
+      "kind": "Live screen",
+      "caption": "Current service actions and booking-process information.",
+      "capturedOn": "2026-10-30",
+      "width": 620,
+      "height": 1922
+    },
+    {
+      "section": "services",
+      "step": 1,
+      "file": "private-inquiry.jpg",
+      "title": "Review the request form",
+      "kind": "Live screen",
+      "caption": "This form requests availability. It does not confirm a booking.",
+      "capturedOn": "2026-10-30",
+      "width": 761,
+      "height": 1161
+    },
+    {
+      "section": "services",
+      "step": 1,
+      "file": "catering-actions.jpg",
+      "title": "Review Catering requests",
+      "kind": "Live screen",
+      "caption": "Current service actions and booking-process information.",
+      "capturedOn": "2026-10-30",
+      "width": 620,
+      "height": 1911
+    },
+    {
+      "section": "services",
+      "step": 1,
+      "file": "catering-inquiry.jpg",
+      "title": "Review the request form",
+      "kind": "Live screen",
+      "caption": "This form requests availability. It does not confirm a booking.",
+      "capturedOn": "2026-10-30",
+      "width": 761,
+      "height": 1161
+    },
+    {
+      "section": "services",
+      "step": 2,
+      "file": "private-result.jpg",
+      "title": "Review the request result",
+      "kind": "UI test",
+      "caption": "Simulated successful response. No request record or confirmation email was created.",
+      "capturedOn": "2026-10-30",
+      "width": 761,
+      "height": 275
+    },
+    {
+      "section": "services",
+      "step": 2,
+      "file": "catering-result.jpg",
+      "title": "Review the request result",
+      "kind": "UI test",
+      "caption": "Simulated successful response. No request record or confirmation email was created.",
+      "capturedOn": "2026-10-30",
+      "width": 761,
+      "height": 275
+    },
+    {
+      "section": "services",
+      "step": 2,
+      "file": "service-admin.jpg",
+      "title": "Manage service inquiries",
+      "kind": "Sample data",
+      "caption": "A synthetic private-chef inquiry demonstrates the booking-request workspace.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1000
+    },
+    {
+      "section": "services",
+      "step": 3,
+      "file": "service-process.jpg",
+      "title": "Review the service process",
+      "kind": "Live screen",
+      "caption": "The gray How to Book information comes from Contentful. Editing it was not tested.",
+      "capturedOn": "2026-10-30",
+      "width": 419,
+      "height": 933
+    },
+    {
+      "section": "classes",
+      "step": 1,
+      "file": "cooking-classes-actions.jpg",
+      "title": "Choose private or public classes",
+      "kind": "Live screen",
+      "caption": "Current service actions and booking-process information.",
+      "capturedOn": "2026-10-30",
+      "width": 620,
+      "height": 1687
+    },
+    {
+      "section": "classes",
+      "step": 1,
+      "file": "cooking-classes-inquiry.jpg",
+      "title": "Review the request form",
+      "kind": "Live screen",
+      "caption": "This form requests availability. It does not confirm a booking.",
+      "capturedOn": "2026-10-30",
+      "width": 761,
+      "height": 1161
+    },
+    {
+      "section": "classes",
+      "step": 2,
+      "file": "cooking-classes-result.jpg",
+      "title": "Review the request result",
+      "kind": "UI test",
+      "caption": "Simulated successful response. No request record or confirmation email was created.",
+      "capturedOn": "2026-10-30",
+      "width": 761,
+      "height": 275
+    },
+    {
+      "section": "classes",
+      "step": 2,
+      "file": "public-classes.jpg",
+      "title": "Check public-class availability",
+      "kind": "Live screen",
+      "caption": "Current unavailable-class message. Enrollment was not enabled or tested.",
+      "capturedOn": "2026-10-30",
+      "width": 1184,
+      "height": 412
+    },
+    {
+      "section": "classes",
+      "step": 3,
+      "file": "class-roster.jpg",
+      "title": "Review class registrations",
+      "kind": "Sample data",
+      "caption": "Synthetic sandbox purchaser and seat counts. No real enrollment is shown.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 903
+    },
+    {
+      "section": "recipes",
+      "step": 1,
+      "file": "paid-recipe-list.jpg",
+      "title": "Choose a paid recipe preview",
+      "kind": "Live screen",
+      "caption": "Protected Admin recipe list. No purchase is required for the owner preview.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1000
+    },
+    {
+      "section": "recipes",
+      "step": 1,
+      "file": "paid-recipe-full.jpg",
+      "title": "Inspect the full recipe",
+      "kind": "Live screen",
+      "caption": "Protected full-recipe owner preview. This is not proof of a completed customer payment.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 2311
+    },
+    {
+      "section": "recipes",
+      "step": 2,
+      "file": "paid-recipe-print.jpg",
+      "title": "Preview Print / Save PDF",
+      "kind": "Live screen",
+      "caption": "Current print layout from the protected preview. Customer purchase unlocking is tested separately.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1000
+    },
+    {
+      "section": "recipes",
+      "step": 3,
+      "file": "recipe-collection.jpg",
+      "title": "Review the published recipe collection",
+      "kind": "Live screen",
+      "caption": "Published website content. Contentful editing itself was not exercised.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1000
+    },
+    {
+      "section": "newsletters",
+      "step": 1,
+      "file": "newsletter-studio.jpg",
+      "title": "Open Newsletter Studio",
+      "kind": "Sample data",
+      "caption": "Current studio with one synthetic issue. No draft was created in the database.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1000
+    },
+    {
+      "section": "newsletters",
+      "step": 1,
+      "file": "newsletter-editor.jpg",
+      "title": "Write and save an issue",
+      "kind": "UI test",
+      "caption": "Save was tested against a browser-only response. No issue was stored or emailed.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1902
+    },
+    {
+      "section": "newsletters",
+      "step": 1,
+      "file": "newsletter-preview.jpg",
+      "title": "Review the branded email",
+      "kind": "Sample data",
+      "caption": "Real email template with sample copy. Browser rendering is not inbox delivery.",
+      "capturedOn": "2026-10-30",
+      "width": 832,
+      "height": 950
+    },
+    {
+      "section": "newsletters",
+      "step": 2,
+      "file": "newsletter-publish.jpg",
+      "title": "Publish to the member archive",
+      "kind": "UI test",
+      "caption": "Publishing was simulated. It did not prepare or send an email campaign.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1986
+    },
+    {
+      "section": "newsletters",
+      "step": 3,
+      "file": "newsletter-campaign.jpg",
+      "title": "Review before sending",
+      "kind": "UI test",
+      "caption": "Audience preparation was simulated. No subscriber send button was confirmed.",
+      "capturedOn": "2026-10-30",
+      "width": 1280,
+      "height": 670
+    },
+    {
+      "section": "newsletters",
+      "step": 4,
+      "file": "member-archive-reference.png",
+      "title": "Read the member archive",
+      "kind": "Earlier sample",
+      "caption": "September 6 sample capture from the earlier authenticated archive test. Not recaptured as a signed-in member today.",
+      "capturedOn": "2026-09-06",
+      "width": 1440,
+      "height": 1798
+    },
+    {
+      "section": "management",
+      "step": 1,
+      "file": "invoice-editor.jpg",
+      "title": "Prepare a service invoice",
+      "kind": "Sample data",
+      "caption": "Current invoice editor with sample details. No Stripe invoice has been created.",
+      "capturedOn": "2026-10-30",
+      "width": 1152,
+      "height": 849
+    },
+    {
+      "section": "management",
+      "step": 1,
+      "file": "invoice-issued.jpg",
+      "title": "Review the invoice and payment controls",
+      "kind": "UI test",
+      "caption": "Draft save and issue were simulated. The sample link is not payable. No email or charge occurred.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1502
+    },
+    {
+      "section": "management",
+      "step": 2,
+      "file": "admin-tools.jpg",
+      "title": "Find orders and account tools",
+      "kind": "Live screen",
+      "caption": "Admin navigation shows Dashboard and All Accounts. No customer records are displayed.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1000
+    },
+    {
+      "section": "management",
+      "step": 3,
+      "file": "review-moderation.jpg",
+      "title": "Review before approving",
+      "kind": "Sample data",
+      "caption": "Synthetic pending service review. No real review was approved or changed.",
+      "capturedOn": "2026-10-30",
+      "width": 1152,
+      "height": 365
+    },
+    {
+      "section": "content",
+      "step": 1,
+      "file": "contentful-access.jpg",
+      "title": "Open Contentful",
+      "kind": "Live screen",
+      "caption": "Contentful requires its own account. Entry editing and publishing were not tested in this session.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1000
+    },
+    {
+      "section": "content",
+      "step": 2,
+      "file": "homepage-review.jpg",
+      "title": "Review the published homepage",
+      "kind": "Live screen",
+      "caption": "Current homepage for content review. No Contentful content was changed.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1000
+    },
+    {
+      "section": "content",
+      "step": 3,
+      "file": "storefront-settings.jpg",
+      "title": "Review storefront settings",
+      "kind": "Live screen",
+      "caption": "Existing storefront configuration. No setting was saved or launch restriction changed.",
+      "capturedOn": "2026-10-30",
+      "width": 1360,
+      "height": 1000
+    }
+  ]
+}

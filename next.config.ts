@@ -13,6 +13,9 @@ const allowedDevOrigins = process.env.ALLOWED_DEV_ORIGINS?.split(",")
   .filter(Boolean);
 
 const nextConfig: NextConfig = {
+  outputFileTracingIncludes: {
+    "/api/admin/walkthrough-images/*": ["./docs/walkthrough-evidence/2026-10-30/*"],
+  },
   turbopack: {
     root: path.resolve(__dirname),
   },
