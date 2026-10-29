@@ -9,5 +9,7 @@ export default function StorefrontFrame({ children, header, footer }: {
 }) {
   const pathname = usePathname();
   const isRosterWorkspace = pathname === "/admin/class-rosters" || pathname.startsWith("/admin/class-rosters/");
-  return <>{!isRosterWorkspace && header}{children}{!isRosterWorkspace && footer}</>;
+  const isWalkthrough = pathname === "/admin/walkthrough";
+  const isWorkspace = isRosterWorkspace || isWalkthrough;
+  return <>{!isWorkspace && header}{children}{!isWorkspace && footer}</>;
 }

@@ -5,6 +5,12 @@ import { useAdminAuth } from '@/components/admin/admin-auth';
 
 const NAV_ITEMS = [
   {
+    href: '/admin/walkthrough',
+    label: 'Website Walkthrough',
+    description: 'Follow the website tour with direct links, explanations, and a meeting checklist',
+    icon: <span aria-hidden="true" className="text-xl">↗</span>,
+  },
+  {
     href: '/admin/class-rosters',
     label: 'Class Registrations',
     description: 'View cooking-class purchasers, confirmed seats, and private CSV rosters',
