@@ -3,7 +3,7 @@ import { buildNoIndexMetadata } from "@/lib/seo";
 
 export const metadata = buildNoIndexMetadata(
   "Website Walkthrough",
-  "Website review and proposed ongoing support, following the WaistLess Foods presentation."
+  "A practical guide to the WaistLess Foods website, Contentful, and administration tools."
 );
 
 export default function WalkthroughPage() {

@@ -7,7 +7,7 @@ const NAV_ITEMS = [
   {
     href: '/admin/walkthrough',
     label: 'Website Walkthrough',
-    description: 'Follow the presentation, explore website tools, and discuss optional team support',
+    description: 'Learn the website workflows with direct links, explanations, and a review checklist',
     icon: <span aria-hidden="true" className="text-xl">↗</span>,
   },
   {
