@@ -13,8 +13,8 @@
     },
     {
       "id": "classes",
-      "checked": "Private-class inquiry validation and simulated confirmation, the live unavailable-class view, and a sample class roster. The October 31 local walkthrough checks shared Admin navigation, built-in sample selection, two seats in one order, search, status filtering, sample CSV export, and returning to live mode. Database-backed roster access and filtering passed isolated temporary-table tests.",
-      "remaining": "Deploy the October 31 navigation and sample workflow, then check the deployed page. Public-class enrollment, actual payment and seat allocation, and customer notifications still need verification before enrollment is enabled."
+      "checked": "Private-class inquiry validation and simulated confirmation, the live unavailable-class view, and a sample class roster. The October 31 screenshots show shared Admin navigation, built-in sample selection, two seats in one order, search, status filtering, sample CSV export, and returning to live mode. The same sample workflow, navigation links, CSV export, and mobile layout also passed read-only checks on the live website on October 31. Database-backed roster access and filtering passed isolated temporary-table tests.",
+      "remaining": "Public-class enrollment, actual payment and seat allocation, and customer notifications still need verification before enrollment is enabled."
     },
     {
       "id": "recipes",
@@ -86,7 +86,7 @@
       "section": "consultations",
       "step": 2,
       "file": "google-required-details.jpg",
-      "title": "Review Google’s booking questions",
+      "title": "Review Googleâ€™s booking questions",
       "kind": "Live screen",
       "caption": "Required event details, dates, and budget were checked. The Book button was not clicked.",
       "capturedOn": "2026-10-30",

@@ -1,204 +1,204 @@
 {
-  "base": "http://localhost:3015",
-  "checkedAt": "2026-10-31T12:10:08.255Z",
+  "base": "https://www.waistlessfoods.com",
+  "checkedAt": "2026-10-31T12:13:11.315Z",
   "links": [
     {
       "label": "Admin home",
-      "href": "http://localhost:3015/admin",
+      "href": "https://www.waistlessfoods.com/admin",
       "status": 200,
-      "destination": "http://localhost:3015/admin"
+      "destination": "https://www.waistlessfoods.com/admin"
     },
     {
       "label": "Dashboard\n(opens in a new tab)",
-      "href": "http://localhost:3015/admin/dashboard",
+      "href": "https://www.waistlessfoods.com/admin/dashboard",
       "status": 200,
-      "destination": "http://localhost:3015/admin/dashboard"
+      "destination": "https://www.waistlessfoods.com/admin/dashboard"
     },
     {
       "label": "Booking requests\n(opens in a new tab)",
-      "href": "http://localhost:3015/admin/bookings",
+      "href": "https://www.waistlessfoods.com/admin/bookings",
       "status": 200,
-      "destination": "http://localhost:3015/admin/bookings"
+      "destination": "https://www.waistlessfoods.com/admin/bookings"
     },
     {
       "label": "Class registrations\n(opens in a new tab)",
-      "href": "http://localhost:3015/admin/class-rosters",
+      "href": "https://www.waistlessfoods.com/admin/class-rosters",
       "status": 200,
-      "destination": "http://localhost:3015/admin/class-rosters"
+      "destination": "https://www.waistlessfoods.com/admin/class-rosters"
     },
     {
       "label": "Service invoices\n(opens in a new tab)",
-      "href": "http://localhost:3015/admin/service-invoices",
+      "href": "https://www.waistlessfoods.com/admin/service-invoices",
       "status": 200,
-      "destination": "http://localhost:3015/admin/service-invoices"
+      "destination": "https://www.waistlessfoods.com/admin/service-invoices"
     },
     {
       "label": "Newsletter Studio\n(opens in a new tab)",
-      "href": "http://localhost:3015/admin/newsletters",
+      "href": "https://www.waistlessfoods.com/admin/newsletters",
       "status": 200,
-      "destination": "http://localhost:3015/admin/newsletters"
+      "destination": "https://www.waistlessfoods.com/admin/newsletters"
     },
     {
       "label": "Paid recipe previews\n(opens in a new tab)",
-      "href": "http://localhost:3015/admin/recipes",
+      "href": "https://www.waistlessfoods.com/admin/recipes",
       "status": 200,
-      "destination": "http://localhost:3015/admin/recipes"
+      "destination": "https://www.waistlessfoods.com/admin/recipes"
     },
     {
       "label": "Review moderation\n(opens in a new tab)",
-      "href": "http://localhost:3015/admin/reviews",
+      "href": "https://www.waistlessfoods.com/admin/reviews",
       "status": 200,
-      "destination": "http://localhost:3015/admin/reviews"
+      "destination": "https://www.waistlessfoods.com/admin/reviews"
     },
     {
       "label": "All accounts\n(opens in a new tab)",
-      "href": "http://localhost:3015/admin/accounts",
+      "href": "https://www.waistlessfoods.com/admin/accounts",
       "status": 200,
-      "destination": "http://localhost:3015/admin/accounts"
+      "destination": "https://www.waistlessfoods.com/admin/accounts"
     },
     {
       "label": "Storefront settings\n(opens in a new tab)",
-      "href": "http://localhost:3015/admin/settings",
+      "href": "https://www.waistlessfoods.com/admin/settings",
       "status": 200,
-      "destination": "http://localhost:3015/admin/settings"
+      "destination": "https://www.waistlessfoods.com/admin/settings"
     },
     {
       "label": "Walkthrough guide",
-      "href": "http://localhost:3015/admin/walkthrough",
+      "href": "https://www.waistlessfoods.com/admin/walkthrough",
       "status": 200,
-      "destination": "http://localhost:3015/admin/walkthrough"
+      "destination": "https://www.waistlessfoods.com/admin/walkthrough"
     },
     {
       "label": "1\nComplimentary consultations",
-      "href": "http://localhost:3015/admin/walkthrough#consultations",
+      "href": "https://www.waistlessfoods.com/admin/walkthrough#consultations",
       "status": 200,
-      "destination": "http://localhost:3015/admin/walkthrough#consultations"
+      "destination": "https://www.waistlessfoods.com/admin/walkthrough#consultations"
     },
     {
       "label": "2\nPrivate chef & catering requests",
-      "href": "http://localhost:3015/admin/walkthrough#services",
+      "href": "https://www.waistlessfoods.com/admin/walkthrough#services",
       "status": 200,
-      "destination": "http://localhost:3015/admin/walkthrough#services"
+      "destination": "https://www.waistlessfoods.com/admin/walkthrough#services"
     },
     {
       "label": "3\nPrivate & public cooking classes",
-      "href": "http://localhost:3015/admin/walkthrough#classes",
+      "href": "https://www.waistlessfoods.com/admin/walkthrough#classes",
       "status": 200,
-      "destination": "http://localhost:3015/admin/walkthrough#classes"
+      "destination": "https://www.waistlessfoods.com/admin/walkthrough#classes"
     },
     {
       "label": "4\nPaid recipes & downloads",
-      "href": "http://localhost:3015/admin/walkthrough#recipes",
+      "href": "https://www.waistlessfoods.com/admin/walkthrough#recipes",
       "status": 200,
-      "destination": "http://localhost:3015/admin/walkthrough#recipes"
+      "destination": "https://www.waistlessfoods.com/admin/walkthrough#recipes"
     },
     {
       "label": "5\nNewsletters & the member archive",
-      "href": "http://localhost:3015/admin/walkthrough#newsletters",
+      "href": "https://www.waistlessfoods.com/admin/walkthrough#newsletters",
       "status": 200,
-      "destination": "http://localhost:3015/admin/walkthrough#newsletters"
+      "destination": "https://www.waistlessfoods.com/admin/walkthrough#newsletters"
     },
     {
       "label": "6\nInvoices, orders & customer reviews",
-      "href": "http://localhost:3015/admin/walkthrough#management",
+      "href": "https://www.waistlessfoods.com/admin/walkthrough#management",
       "status": 200,
-      "destination": "http://localhost:3015/admin/walkthrough#management"
+      "destination": "https://www.waistlessfoods.com/admin/walkthrough#management"
     },
     {
       "label": "7\nContent edits & launch review",
-      "href": "http://localhost:3015/admin/walkthrough#content",
+      "href": "https://www.waistlessfoods.com/admin/walkthrough#content",
       "status": 200,
-      "destination": "http://localhost:3015/admin/walkthrough#content"
+      "destination": "https://www.waistlessfoods.com/admin/walkthrough#content"
     },
     {
       "label": "Homepage\n(opens in a new tab)",
-      "href": "http://localhost:3015/",
+      "href": "https://www.waistlessfoods.com/",
       "status": 200,
-      "destination": "http://localhost:3015/"
+      "destination": "https://www.waistlessfoods.com/"
     },
     {
       "label": "Open full-size image\n(opens in a new tab)",
-      "href": "http://localhost:3015/api/admin/walkthrough-images/consultation-form.jpg",
+      "href": "https://www.waistlessfoods.com/api/admin/walkthrough-images/consultation-form.jpg",
       "status": 200,
-      "destination": "http://localhost:3015/api/admin/walkthrough-images/consultation-form.jpg"
+      "destination": "https://www.waistlessfoods.com/api/admin/walkthrough-images/consultation-form.jpg"
     },
     {
       "label": "Private chef\n(opens in a new tab)",
-      "href": "http://localhost:3015/services/private",
+      "href": "https://www.waistlessfoods.com/services/private",
       "status": 200,
-      "destination": "http://localhost:3015/services/private"
+      "destination": "https://www.waistlessfoods.com/services/private"
     },
     {
       "label": "Catering\n(opens in a new tab)",
-      "href": "http://localhost:3015/services/catering",
+      "href": "https://www.waistlessfoods.com/services/catering",
       "status": 200,
-      "destination": "http://localhost:3015/services/catering"
+      "destination": "https://www.waistlessfoods.com/services/catering"
     },
     {
       "label": "Open full-size image\n(opens in a new tab)",
-      "href": "http://localhost:3015/api/admin/walkthrough-images/private-actions.jpg",
+      "href": "https://www.waistlessfoods.com/api/admin/walkthrough-images/private-actions.jpg",
       "status": 200,
-      "destination": "http://localhost:3015/api/admin/walkthrough-images/private-actions.jpg"
+      "destination": "https://www.waistlessfoods.com/api/admin/walkthrough-images/private-actions.jpg"
     },
     {
       "label": "Cooking classes\n(opens in a new tab)",
-      "href": "http://localhost:3015/services/cooking-classes",
+      "href": "https://www.waistlessfoods.com/services/cooking-classes",
       "status": 200,
-      "destination": "http://localhost:3015/services/cooking-classes"
+      "destination": "https://www.waistlessfoods.com/services/cooking-classes"
     },
     {
       "label": "Public-class shop\n(opens in a new tab)",
-      "href": "http://localhost:3015/shop?category=cooking-classes",
+      "href": "https://www.waistlessfoods.com/shop?category=cooking-classes",
       "status": 200,
-      "destination": "http://localhost:3015/shop?category=cooking-classes"
+      "destination": "https://www.waistlessfoods.com/shop?category=cooking-classes"
     },
     {
       "label": "Open full-size image\n(opens in a new tab)",
-      "href": "http://localhost:3015/api/admin/walkthrough-images/cooking-classes-actions.jpg",
+      "href": "https://www.waistlessfoods.com/api/admin/walkthrough-images/cooking-classes-actions.jpg",
       "status": 200,
-      "destination": "http://localhost:3015/api/admin/walkthrough-images/cooking-classes-actions.jpg"
+      "destination": "https://www.waistlessfoods.com/api/admin/walkthrough-images/cooking-classes-actions.jpg"
     },
     {
       "label": "Recipe collection\n(opens in a new tab)",
-      "href": "http://localhost:3015/recipes",
+      "href": "https://www.waistlessfoods.com/recipes",
       "status": 200,
-      "destination": "http://localhost:3015/recipes"
+      "destination": "https://www.waistlessfoods.com/recipes"
     },
     {
       "label": "Shop\n(opens in a new tab)",
-      "href": "http://localhost:3015/shop",
+      "href": "https://www.waistlessfoods.com/shop",
       "status": 200,
-      "destination": "http://localhost:3015/shop"
+      "destination": "https://www.waistlessfoods.com/shop"
     },
     {
       "label": "Open full-size image\n(opens in a new tab)",
-      "href": "http://localhost:3015/api/admin/walkthrough-images/paid-recipe-list.jpg",
+      "href": "https://www.waistlessfoods.com/api/admin/walkthrough-images/paid-recipe-list.jpg",
       "status": 200,
-      "destination": "http://localhost:3015/api/admin/walkthrough-images/paid-recipe-list.jpg"
+      "destination": "https://www.waistlessfoods.com/api/admin/walkthrough-images/paid-recipe-list.jpg"
     },
     {
       "label": "Email subscribers\n(opens in a new tab)",
-      "href": "http://localhost:3015/admin/newsletters/subscribers",
+      "href": "https://www.waistlessfoods.com/admin/newsletters/subscribers",
       "status": 200,
-      "destination": "http://localhost:3015/admin/newsletters/subscribers"
+      "destination": "https://www.waistlessfoods.com/admin/newsletters/subscribers"
     },
     {
       "label": "Member archive\n(opens in a new tab)",
-      "href": "http://localhost:3015/account/newsletters",
+      "href": "https://www.waistlessfoods.com/account/newsletters",
       "status": 200,
-      "destination": "http://localhost:3015/account/newsletters"
+      "destination": "https://www.waistlessfoods.com/account/newsletters"
     },
     {
       "label": "Open full-size image\n(opens in a new tab)",
-      "href": "http://localhost:3015/api/admin/walkthrough-images/newsletter-studio.jpg",
+      "href": "https://www.waistlessfoods.com/api/admin/walkthrough-images/newsletter-studio.jpg",
       "status": 200,
-      "destination": "http://localhost:3015/api/admin/walkthrough-images/newsletter-studio.jpg"
+      "destination": "https://www.waistlessfoods.com/api/admin/walkthrough-images/newsletter-studio.jpg"
     },
     {
       "label": "Open full-size image\n(opens in a new tab)",
-      "href": "http://localhost:3015/api/admin/walkthrough-images/invoice-editor.jpg",
+      "href": "https://www.waistlessfoods.com/api/admin/walkthrough-images/invoice-editor.jpg",
       "status": 200,
-      "destination": "http://localhost:3015/api/admin/walkthrough-images/invoice-editor.jpg"
+      "destination": "https://www.waistlessfoods.com/api/admin/walkthrough-images/invoice-editor.jpg"
     },
     {
       "label": "Open Contentful\n(opens in a new tab)",
@@ -208,15 +208,15 @@
     },
     {
       "label": "Services\n(opens in a new tab)",
-      "href": "http://localhost:3015/services",
+      "href": "https://www.waistlessfoods.com/services",
       "status": 200,
-      "destination": "http://localhost:3015/services"
+      "destination": "https://www.waistlessfoods.com/services"
     },
     {
       "label": "Open full-size image\n(opens in a new tab)",
-      "href": "http://localhost:3015/api/admin/walkthrough-images/contentful-access.jpg",
+      "href": "https://www.waistlessfoods.com/api/admin/walkthrough-images/contentful-access.jpg",
       "status": 200,
-      "destination": "http://localhost:3015/api/admin/walkthrough-images/contentful-access.jpg"
+      "destination": "https://www.waistlessfoods.com/api/admin/walkthrough-images/contentful-access.jpg"
     }
   ],
   "checks": [

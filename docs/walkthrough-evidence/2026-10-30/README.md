@@ -52,7 +52,14 @@ Eight new screenshots cover opening registrations from the admin portal,
 selecting the sample, reviewing seats versus orders, searching, downloading the
 filtered sample CSV, filtering/resetting, mobile use, and returning to live
 orders. These are captures of the working local application, not browser response
-fixtures. Deployment and a deployed check remain outstanding for this update.
+fixtures. Production deployment of commit `41e9239` and read-only verification
+completed on October 31 at `https://www.waistlessfoods.com`. All 36 unique Admin
+navigation and guide destinations returned success, and the guide anchors exist.
+The live sample flow, two seats in one order, search, status reset, sample CSV,
+mobile layout, and return to live orders passed. All 44 protected images and
+gallery controls passed, including anonymous rejection and no-store headers.
+The live reports are saved in `.runtime/walkthrough-evidence/admin-links-qa.json`
+and `.runtime/walkthrough-evidence/gallery-qa.json`.
 
 October 31 validation: the sample flow and all 44 gallery images passed browser
 checks, including mobile overflow, protected image delivery, and restored public

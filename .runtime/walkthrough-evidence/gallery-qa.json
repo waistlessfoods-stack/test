@@ -1,5 +1,5 @@
 {
-  "base": "http://localhost:3015",
+  "base": "https://www.waistlessfoods.com",
   "screenshots": 44,
   "checks": [
     "Anonymous image access denied.",
