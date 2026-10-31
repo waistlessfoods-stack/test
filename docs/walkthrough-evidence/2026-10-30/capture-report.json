@@ -203,7 +203,7 @@
       "section": "consultations",
       "step": 2,
       "file": "google-required-details.jpg",
-      "title": "Review Google’s booking questions",
+      "title": "Review Google\u00e2\u20ac\u2122s booking questions",
       "kind": "Live screen",
       "caption": "Required event details, dates, and budget were checked. The Book button was not clicked.",
       "capturedOn": "2026-10-30"
@@ -324,6 +324,78 @@
       "kind": "Live screen",
       "caption": "Current unavailable-class message. Enrollment was not enabled or tested.",
       "capturedOn": "2026-10-30"
+    },
+    {
+      "section": "classes",
+      "step": 3,
+      "file": "class-admin-navigation.jpg",
+      "title": "Open Class registrations from Admin",
+      "kind": "Local sample walkthrough",
+      "caption": "Shared Admin tools navigation keeps registrations alongside bookings, invoices, newsletters, and the walkthrough guide.",
+      "capturedOn": "2026-10-31"
+    },
+    {
+      "section": "classes",
+      "step": 4,
+      "file": "class-sample-selection.jpg",
+      "title": "Choose Sample walkthrough",
+      "kind": "Local sample walkthrough",
+      "caption": "Choose Sample walkthrough under Order environment. The demonstration is separate from live and sandbox order history.",
+      "capturedOn": "2026-10-31"
+    },
+    {
+      "section": "classes",
+      "step": 5,
+      "file": "class-sample-overview.jpg",
+      "title": "Review one order for two seats",
+      "kind": "Local sample walkthrough",
+      "caption": "Fresh Pasta Workshop and Alex Sample are fictional. Two seats belong to one confirmed sample order; no seats are reserved.",
+      "capturedOn": "2026-10-31"
+    },
+    {
+      "section": "classes",
+      "step": 6,
+      "file": "class-sample-search.jpg",
+      "title": "Search the purchaser or order",
+      "kind": "Local sample walkthrough",
+      "caption": "Search by purchaser name, email, phone, or order number. Alex matches the sample purchaser.",
+      "capturedOn": "2026-10-31"
+    },
+    {
+      "section": "classes",
+      "step": 7,
+      "file": "class-sample-export.jpg",
+      "title": "Download the filtered sample CSV",
+      "kind": "Local sample walkthrough",
+      "caption": "Export CSV downloads the currently filtered sample roster. The file name starts with class-roster-sample; it contains fictional contact information.",
+      "capturedOn": "2026-10-31"
+    },
+    {
+      "section": "classes",
+      "step": 8,
+      "file": "class-sample-filter.jpg",
+      "title": "Check status filters and reset",
+      "kind": "Local sample walkthrough",
+      "caption": "Pending payment has no matching sample order. Reset filters restores the confirmed sample purchaser; pending seats are not reservations.",
+      "capturedOn": "2026-10-31"
+    },
+    {
+      "section": "classes",
+      "step": 9,
+      "file": "class-sample-mobile.jpg",
+      "title": "Use the roster on a phone",
+      "kind": "Local sample walkthrough",
+      "caption": "The same sample class, seat totals, purchaser search, and CSV export are available on mobile.",
+      "capturedOn": "2026-10-31"
+    },
+    {
+      "section": "classes",
+      "step": 10,
+      "file": "class-return-live.jpg",
+      "title": "Return to Live registrations",
+      "kind": "Local sample walkthrough",
+      "caption": "Switch back to Live registrations to review actual orders. Only the environment selector is captured to keep any customer records private.",
+      "capturedOn": "2026-10-31"
     }
   ],
   "checks": [
@@ -338,12 +410,7 @@
     "Blocked unhandled POST /api/admin/settings",
     "Newsletter save, publish, preview, and campaign preparation tested with synthetic responses. Publication did not prepare a campaign.",
     "Google booking form contains the three required event questions. No appointment created.",
-    "private: incomplete request is blocked by client validation.",
-    "private: completed request reaches the confirmation state with a simulated API response.",
-    "catering: incomplete request is blocked by client validation.",
-    "catering: completed request reaches the confirmation state with a simulated API response.",
-    "cooking-classes: incomplete request is blocked by client validation.",
-    "cooking-classes: completed request reaches the confirmation state with a simulated API response."
+    "2026-10-31: Protected sample API, shared navigation and current page, sample selection, one order/two seats, search, filtered CSV, status reset, mobile overflow, return to live, and no JavaScript errors passed."
   ],
   "limitations": [
     "Real booking persistence, customer/admin email delivery, Google appointment creation and Meet invitation, live payments, and Contentful publishing are not verified by browser simulations."

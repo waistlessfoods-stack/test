@@ -39,7 +39,11 @@ const stops = [
     steps: [
       "Open Cooking Classes to review Request a Private Class and Explore Public Classes.",
       "Open the public-class Shop view. If enrollment is disabled or no classes are offered, review the unavailable message.",
-      "Use Class Registrations to view purchasers and confirmed seats, and download a class roster when registrations exist.",
+      "Select Class registrations in the shared Admin tools navigation. Actual classes appear here after an order contains a cooking-class item; private-class enquiries remain in Booking Requests.",
+      "Choose Sample walkthrough under Order environment, or use View sample registration in an empty roster. This opens the fictional Fresh Pasta Workshop: Alex Sample, one order, two seats. It does not create a customer, charge, booking, or reserved seat.",
+      "Select the class and compare Confirmed seats (2) with Confirmed orders (1). Search for Alex or the sample order number. Use Order status to inspect the filters; the sample has one confirmed order and no pending payment.",
+      "Select Export CSV to download the currently filtered sample roster. Clear a search or reset the status if no registrations match. Keep real roster contact details private; they are not marketing consent.",
+      "Switch Order environment back to Live registrations for actual paid orders, or Test / QA registrations for sandbox checkout history. The shared navigation also opens bookings, invoices, newsletters, and the walkthrough guide.",
     ],
     links: [{ label: "Cooking classes", href: "/services/cooking-classes" }, { label: "Public-class shop", href: "/shop?category=cooking-classes" }, { label: "Class registrations", href: "/admin/class-rosters" }],
     note: "Public-class enrollment needs a separate readiness review before it is enabled. An empty roster is expected when there are no registrations.",

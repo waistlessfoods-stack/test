@@ -1,9 +1,10 @@
 # Website walkthrough screenshots and checks
 
-The admin walkthrough includes 36 screenshots across seven workflows. Captions
+The admin walkthrough includes 44 screenshots across seven workflows. Captions
 identify live screens, browser-only sample data, simulated UI tests, and one
-earlier member-archive reference from September 6. The other 35 images were
-captured on October 30, 2026. Every image is served through an authenticated,
+earlier member-archive reference from September 6. Another 35 images were
+captured on October 30, 2026, and eight local sample-roster walkthrough images
+were captured on October 31. Every image is served through an authenticated,
 allow-listed admin endpoint with private/no-store caching. Full paid-recipe
 images are not published under `public/`.
 
@@ -39,6 +40,27 @@ with clearly labelled synthetic responses. No real email or payment was sent.
 
 ## Remaining verification
 
+The October 31 update adds shared navigation to all authenticated admin pages
+and a built-in **Sample walkthrough** option in Class registrations. It contains
+one fictional Alex Sample order for two seats in **SAMPLE - Fresh Pasta Workshop**.
+The sample is generated separately from database orders, requires admin access,
+and supports the same search, status filters, and CSV export. No customer,
+registration, charge, email, or seat reservation is created. Actual Test / QA
+orders remain separate. The empty state also links directly to the sample.
+
+Eight new screenshots cover opening registrations from the admin portal,
+selecting the sample, reviewing seats versus orders, searching, downloading the
+filtered sample CSV, filtering/resetting, mobile use, and returning to live
+orders. These are captures of the working local application, not browser response
+fixtures. Deployment and a deployed check remain outstanding for this update.
+
+October 31 validation: the sample flow and all 44 gallery images passed browser
+checks, including mobile overflow, protected image delivery, and restored public
+header/footer when navigating out of Admin. Lint and TypeScript passed. Roster
+tests reported 11 passes and one opt-in integration skip. The Webpack production
+build passed (`pnpm exec next build --webpack`); the default Turbopack build hit
+a Google Manrope font-resolution error in the root layout.
+
 Real lead persistence and inbox delivery, Google appointment creation and Meet
 invitation, customer purchase/unlock, live invoice payment reconciliation,
 public-class enrollment, a fresh signed-in member archive/download session,
@@ -59,6 +81,7 @@ node --env-file=.env --test scripts/test-service-invoices.mjs scripts/test-newsl
 node --env-file=.env scripts/test-newsletters.mjs --integration
 node --env-file=.env scripts/test-class-rosters.mjs --integration
 node scripts/qa-walkthrough-screenshots.mjs
+node scripts/capture-class-roster-guide.mjs
 ```
 
 The capture script uses the existing admin session signing configuration without

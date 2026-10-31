@@ -1,0 +1,52 @@
+import { createRequire } from 'node:module';
+import assert from 'node:assert/strict';
+const require = createRequire('C:/Users/MSI/code/waistlessfoods/package.json');
+require('dotenv').config({quiet:true});
+const { chromium } = require('@playwright/test');
+const base = process.env.WALKTHROUGH_BASE_URL || 'http://localhost:3015';
+const ids = ['overview','website-tools','website-tour','recurring-work','team','newsletter-example','working-together','support-options','trial','launch-closeout','next-steps'];
+const titles = ['More time for WaistLess Foods','The website tools we can put to work','Live website walkthrough','The recurring work around your website','One contact, a team behind the work','One newsletter can support several updates','How we would work together','Monthly support options to discuss','A three-month trial','Launch closeout and ongoing support','What would you like to hand over?'];
+const browser = await chromium.launch({headless:true});
+try {
+ const context = await browser.newContext({viewport:{width:1440,height:1080}});
+ const page = await context.newPage();
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(base+'/admin/walkthrough#website-tour');
+ await page.getByRole('button',{name:'Access Admin'}).waitFor();
+ assert.equal(await page.getByRole('heading',{name:titles[0],exact:true}).count(),0);
+ await page.locator('#password').fill(process.env.ADMIN_PASSWORD);
+ await page.getByRole('button',{name:'Access Admin'}).click();
+ await page.getByRole('heading',{name:titles[0],exact:true}).waitFor();
+ await page.waitForFunction(()=>Math.abs(document.getElementById('website-tour').getBoundingClientRect().top)<50);
+ const nav=page.getByRole('navigation',{name:'Presentation sections'});
+ assert.equal(await nav.getByRole('link').count(),11);
+ for(let i=0;i<ids.length;i++) {
+   assert.equal(await nav.getByRole('link').nth(i).getAttribute('href'),'#'+ids[i]);
+   assert.ok((await nav.getByRole('link').nth(i).innerText()).includes(titles[i]));
+   await nav.getByRole('link').nth(i).click();
+   assert.equal(new URL(page.url()).hash,'#'+ids[i]);
+   assert.equal(await page.locator('#'+ids[i]).count(),1);
+ }
+ for (const id of ['consultations','services','classes','recipes','newsletters','management','content']) assert.equal(await page.locator('#'+id).count(),1);
+ const options = page.locator('#support-options');
+ for(const expected of ['USD $300','USD $650–750','5 total hours','15 total hours','5 technical / 8 design or admin / 2 coordination','have not been accepted']) assert.ok((await options.innerText()).includes(expected));
+ assert.equal(await page.getByRole('checkbox').count(),7);
+ await page.getByRole('checkbox').first().check();
+ assert.equal(await page.getByRole('status').innerText(),'1 of 7 website workflows reviewed');
+ await page.getByRole('button',{name:'Reset ticks'}).click();
+ assert.equal(await page.getByRole('status').innerText(),'0 of 7 website workflows reviewed');
+ await nav.getByRole('link').nth(7).click();
+ await options.screenshot({path:'.runtime/amber-presentation/options-desktop.png'});
+ const [popup] = await Promise.all([page.waitForEvent('popup'),page.getByRole('link',{name:'Dashboard (opens in a new tab)',exact:true}).click()]);
+ await popup.waitForURL(base+'/admin/dashboard');await popup.close();
+ await page.setViewportSize({width:390,height:844});
+ await page.goto(base+'/admin/walkthrough#support-options');
+ await page.getByRole('heading',{name:'Monthly support options to discuss',exact:true}).waitFor();
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await options.screenshot({path:'.runtime/amber-presentation/options-mobile.png'});
+ await page.goto(base+'/admin');
+ await page.getByRole('link',{name:/Website Walkthrough/}).click();
+ await page.getByRole('heading',{name:titles[0],exact:true}).waitFor();
+ assert.deepEqual(errors,[]);
+ console.log(JSON.stringify({base,slides:11,workflows:7,anchors:true,proposedPricing:true,progress:true,newTab:true,mobile:true,adminEntry:true,pageErrors:errors}));
+} finally {await browser.close();}

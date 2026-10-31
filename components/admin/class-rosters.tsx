@@ -10,6 +10,8 @@ const secondaryButton = "inline-flex min-h-11 items-center justify-center gap-2 
 
 export default function ClassRosterAdmin() {
   const [mode, setMode] = useState<RosterMode>("live");
+  const [sample, setSample] = useState(false);
+  const [loadedSample, setLoadedSample] = useState(false);
   const [status, setStatus] = useState<RosterStatus>("completed");
   const [query, setQuery] = useState("");
   const [selectedKey, setSelectedKey] = useState("");
@@ -25,38 +27,39 @@ export default function ClassRosterAdmin() {
     const controller = new AbortController();
     async function load() {
       try {
-        const response = await fetch(`/api/admin/class-rosters?mode=${mode}`, { cache: "no-store", signal: controller.signal });
+        const response = await fetch(`/api/admin/class-rosters?mode=${mode}${sample ? "&sample=1" : ""}`, { cache: "no-store", signal: controller.signal });
         const next = await response.json();
         if (!response.ok) throw new Error(next.error || "Unable to load registrations.");
-        if (!controller.signal.aborted) { setData(next); setLoadedMode(mode); setError(""); }
+        if (!controller.signal.aborted) { setData(next); setLoadedMode(mode); setLoadedSample(sample); setError(""); }
       } catch (e) {
         if (!controller.signal.aborted) { setData(null); setError(e instanceof Error ? e.message : "Unable to load registrations."); }
       } finally { if (!controller.signal.aborted) setLoading(false); }
     }
     void load();
     return () => controller.abort();
-  }, [mode, reload]);
+  }, [mode, sample, reload]);
 
-  const current = loadedMode === mode && !loading ? data : null;
+  const current = loadedMode === mode && loadedSample === sample && !loading ? data : null;
   const group = current?.classes.find(group => group.key === selectedKey) || current?.classes[0];
   const needle = query.trim().toLowerCase().replace(/^#(?=\d)/, "");
   const rows = group?.registrations.filter(row => (status === "all" || row.status === status) && (!needle || [String(row.orderId), row.name, row.email, row.phone].some(value => value.toLowerCase().includes(needle)))) || [];
 
   function selectClass(key: string) { setSelectedKey(key); setQuery(""); setNotice(""); }
-  function changeMode(value: RosterMode) {
-    setMode(value); setSelectedKey(""); setQuery(""); setLoading(true); setError(""); setNotice("");
+  function changeMode(value: RosterMode | "sample") {
+    setSample(value === "sample"); setMode(value === "sample" ? "test" : value); setSelectedKey(""); setQuery(""); setStatus("completed"); setLoading(true); setError(""); setNotice("");
   }
   async function download() {
     if (!group) return;
     setExporting(true); setError(""); setNotice("");
     try {
       const params = new URLSearchParams({ mode, status, class: group.key, q: query, format: "csv" });
+      if (sample) params.set("sample", "1");
       const response = await fetch(`/api/admin/class-rosters?${params}`, { cache: "no-store" });
       if (!response.ok) { const body = await response.json(); throw new Error(body.error || "Export failed."); }
       const url = URL.createObjectURL(await response.blob());
-      const anchor = document.createElement("a"); anchor.href = url; anchor.download = `class-roster-${mode}-${group.key.slice(0, 12)}-${status}.csv`;
+      const anchor = document.createElement("a"); anchor.href = url; anchor.download = `class-roster-${sample ? "sample" : mode}-${group.key.slice(0, 12)}-${status}.csv`;
       document.body.appendChild(anchor); anchor.click(); anchor.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-      setNotice("CSV downloaded with your current filters. Keep customer contact details private.");
+      setNotice(sample ? "Sample CSV downloaded. These are fictional details, not a live registration." : "CSV downloaded with your current filters. Keep customer contact details private.");
     } catch (e) { setError(e instanceof Error ? e.message : "Export failed."); }
     finally { setExporting(false); }
   }
@@ -85,7 +88,8 @@ export default function ClassRosterAdmin() {
           </button>
         </div>
 
-        {mode !== "live" && <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">{mode === "test" ? "TEST / QA ONLY — These registrations do not belong on a live class roster." : "UNCLASSIFIED — Verify the payment environment before treating these as live registrations."}</p>}
+        {sample && <p className="mb-4 rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm leading-6 text-teal-900">SAMPLE WALKTHROUGH — Alex Sample demonstrates one order for two seats. No customer, payment, registration, or reserved seat has been created. Select Live registrations to return to actual orders.</p>}
+        {!sample && mode !== "live" && <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">{mode === "test" ? "TEST / QA ONLY — These registrations do not belong on a live class roster." : "UNCLASSIFIED — Verify the payment environment before treating these as live registrations."}</p>}
         {error && <p role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>}
         {notice && <p role="status" className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</p>}
         {!!current?.invalidLines && <p role="alert" className="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900">{current.invalidLines} malformed item(s) were excluded. Review the original orders before relying on these totals.</p>}
@@ -94,8 +98,9 @@ export default function ClassRosterAdmin() {
           <aside aria-label="Class selection" className="min-w-0 rounded-xl border border-slate-200 bg-white lg:sticky lg:top-6">
             <div className="border-b border-slate-100 p-4">
               <label htmlFor="roster-mode" className="mb-2 block text-xs font-semibold text-slate-500">Order environment</label>
-              <select id="roster-mode" className={control} value={mode} onChange={event => changeMode(event.target.value as RosterMode)}>
+              <select id="roster-mode" className={control} value={sample ? "sample" : mode} onChange={event => changeMode(event.target.value as RosterMode | "sample")}>
                 <option value="live">Live registrations</option><option value="test">Test / QA registrations</option><option value="unknown">Unclassified orders</option>
+                <option value="sample">Sample walkthrough</option>
               </select>
             </div>
             <div className="p-4 lg:hidden">
@@ -148,7 +153,7 @@ export default function ClassRosterAdmin() {
               <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 px-5 py-3 text-[11px] leading-5 text-slate-400 sm:px-6"><span>{rows.length} registration order{rows.length === 1 ? "" : "s"} shown · totals are before filters</span><span className="inline-flex items-center gap-1.5"><LockKeyhole size={11} aria-hidden="true" />Private roster</span></div>
             </section>}
 
-            {!loading && current && !group && <section className="rounded-xl border border-slate-200 bg-white px-6 py-14 text-center"><UsersRound size={30} className="mx-auto text-teal-600" aria-hidden="true" /><h2 className="mt-4 text-xl font-semibold text-[#173d40]">No class registrations yet</h2><p className="mx-auto mt-3 max-w-md text-sm leading-7 text-slate-500">Classes appear after an order contains a cooking-class item. Private-class enquiries remain in Booking Requests.</p><Link href="/admin/bookings" className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-teal-700">View booking requests <ArrowUpRight size={15} aria-hidden="true" /></Link></section>}
+            {!loading && current && !group && <section className="rounded-xl border border-slate-200 bg-white px-6 py-14 text-center"><UsersRound size={30} className="mx-auto text-teal-600" aria-hidden="true" /><h2 className="mt-4 text-xl font-semibold text-[#173d40]">No class registrations yet</h2><p className="mx-auto mt-3 max-w-md text-sm leading-7 text-slate-500">Classes appear after an order contains a cooking-class item. Private-class enquiries remain in Booking Requests.</p><div className="mt-5 flex flex-wrap justify-center gap-3"><button onClick={() => changeMode("sample")} className={secondaryButton}>View sample registration</button><Link href="/admin/bookings" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-teal-700">View booking requests <ArrowUpRight size={15} aria-hidden="true" /></Link></div></section>}
 
             <details className="mt-4 rounded-lg border border-slate-200/80 bg-white/60 text-xs text-slate-500">
               <summary className="cursor-pointer rounded-lg px-4 py-3.5 font-medium outline-teal-700">About these counts & CSV privacy</summary>

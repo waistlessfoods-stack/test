@@ -4,6 +4,7 @@ import {
   AdminAuthProvider,
 } from "@/components/admin/admin-auth";
 import { buildNoIndexMetadata } from "@/lib/seo";
+import AdminNavigation from "@/components/admin/admin-navigation";
 
 export const metadata = buildNoIndexMetadata(
   "Admin Portal",
@@ -13,7 +14,7 @@ export const metadata = buildNoIndexMetadata(
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <AdminAuthProvider>
-      <AdminAccessGate>{children}</AdminAccessGate>
+      <AdminAccessGate><AdminNavigation />{children}</AdminAccessGate>
     </AdminAuthProvider>
   );
 }

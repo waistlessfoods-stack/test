@@ -68,6 +68,32 @@ test('query validation defaults to live paid orders and rejects invalid filters'
   for (const query of ['mode=all', 'status=paid', 'class=../../../secret', 'format=html', `q=${'x'.repeat(151)}`]) assert.throws(() => parseRosterQuery(new URLSearchParams(query)));
 });
 
+test('sample roster is protected, isolated from database orders, and exports only fictional data', async t => {
+  const previous = process.env.ADMIN_PASSWORD;
+  process.env.ADMIN_PASSWORD ||= 'roster-sample-test-only';
+  t.after(() => { if (previous === undefined) delete process.env.ADMIN_PASSWORD; else process.env.ADMIN_PASSWORD = previous; });
+  let databaseReads = 0;
+  const modules = sourceLoader({ 'server-only': {}, '@/lib/class-roster-data': { readClassRosters: async () => { databaseReads++; throw new Error('Sample must not query orders'); } } });
+  const route = modules('app/api/admin/class-rosters/route.ts');
+  const token = modules('lib/admin-session.ts').createAdminSessionToken();
+  const request = (query, auth = true) => new NextRequest(`https://qa.example.com/api/admin/class-rosters?${query}`, { headers: auth ? { cookie: `wlf_admin_session=${token}` } : {} });
+  for (const query of ['mode=test&sample=1', 'mode=test&sample=1&format=csv']) assert.equal((await route.GET(request(query, false))).status, 401);
+  assert.equal((await route.GET(request('mode=live&sample=1'))).status, 400);
+  const response = await route.GET(request('mode=test&sample=1'));
+  assert.equal(response.status, 200); assert.match(response.headers.get('cache-control'), /private, no-store/);
+  const data = await response.json();
+  assert.equal(data.classes.length, 1);
+  const group = data.classes[0];
+  assert.equal(group.confirmedSeats, 2); assert.equal(group.confirmedOrders, 1);
+  assert.equal(group.registrations[0].email, 'alex@example.com');
+  const csv = await route.GET(request(`mode=test&sample=1&format=csv&class=${group.key}`));
+  assert.equal(csv.status, 200); assert.match(csv.headers.get('content-disposition'), /class-roster-sample-/);
+  assert.match(await csv.text(), /SAMPLE - Fresh Pasta Workshop/);
+  const filtered = await route.GET(request(`mode=test&sample=1&format=csv&class=${group.key}&q=nobody`));
+  assert.doesNotMatch(await filtered.text(), /alex@example.com/);
+  assert.equal(databaseReads, 0);
+});
+
 test('real SQL and HTTP read-only roster integration', { skip: !process.argv.includes('--integration') && 'Pass --integration with DATABASE_URL' }, async t => {
   assert.ok(process.env.DATABASE_URL); process.env.ADMIN_PASSWORD ||= 'roster-test-only';
   const url = new URL(process.env.DATABASE_URL);

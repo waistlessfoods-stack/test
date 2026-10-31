@@ -13,8 +13,8 @@
     },
     {
       "id": "classes",
-      "checked": "Private-class inquiry validation and simulated confirmation, the live unavailable-class view, and a sample class roster. Database-backed roster access and filtering passed isolated temporary-table tests.",
-      "remaining": "Public-class enrollment, actual payment and seat allocation, and customer notifications before enrollment is enabled."
+      "checked": "Private-class inquiry validation and simulated confirmation, the live unavailable-class view, and a sample class roster. The October 31 local walkthrough checks shared Admin navigation, built-in sample selection, two seats in one order, search, status filtering, sample CSV export, and returning to live mode. Database-backed roster access and filtering passed isolated temporary-table tests.",
+      "remaining": "Deploy the October 31 navigation and sample workflow, then check the deployed page. Public-class enrollment, actual payment and seat allocation, and customer notifications still need verification before enrollment is enabled."
     },
     {
       "id": "recipes",
@@ -246,6 +246,94 @@
       "capturedOn": "2026-10-30",
       "width": 1360,
       "height": 903
+    },
+    {
+      "section": "classes",
+      "step": 3,
+      "file": "class-admin-navigation.jpg",
+      "title": "Open Class registrations from Admin",
+      "kind": "Local sample walkthrough",
+      "caption": "Shared Admin tools navigation keeps registrations alongside bookings, invoices, newsletters, and the walkthrough guide.",
+      "capturedOn": "2026-10-31",
+      "width": 1440,
+      "height": 1080
+    },
+    {
+      "section": "classes",
+      "step": 4,
+      "file": "class-sample-selection.jpg",
+      "title": "Choose Sample walkthrough",
+      "kind": "Local sample walkthrough",
+      "caption": "Choose Sample walkthrough under Order environment. The demonstration is separate from live and sandbox order history.",
+      "capturedOn": "2026-10-31",
+      "width": 256,
+      "height": 355
+    },
+    {
+      "section": "classes",
+      "step": 5,
+      "file": "class-sample-overview.jpg",
+      "title": "Review one order for two seats",
+      "kind": "Local sample walkthrough",
+      "caption": "Fresh Pasta Workshop and Alex Sample are fictional. Two seats belong to one confirmed sample order; no seats are reserved.",
+      "capturedOn": "2026-10-31",
+      "width": 1440,
+      "height": 883
+    },
+    {
+      "section": "classes",
+      "step": 6,
+      "file": "class-sample-search.jpg",
+      "title": "Search the purchaser or order",
+      "kind": "Local sample walkthrough",
+      "caption": "Search by purchaser name, email, phone, or order number. Alex matches the sample purchaser.",
+      "capturedOn": "2026-10-31",
+      "width": 1440,
+      "height": 883
+    },
+    {
+      "section": "classes",
+      "step": 7,
+      "file": "class-sample-export.jpg",
+      "title": "Download the filtered sample CSV",
+      "kind": "Local sample walkthrough",
+      "caption": "Export CSV downloads the currently filtered sample roster. The file name starts with class-roster-sample; it contains fictional contact information.",
+      "capturedOn": "2026-10-31",
+      "width": 1440,
+      "height": 945
+    },
+    {
+      "section": "classes",
+      "step": 8,
+      "file": "class-sample-filter.jpg",
+      "title": "Check status filters and reset",
+      "kind": "Local sample walkthrough",
+      "caption": "Pending payment has no matching sample order. Reset filters restores the confirmed sample purchaser; pending seats are not reservations.",
+      "capturedOn": "2026-10-31",
+      "width": 1440,
+      "height": 1011
+    },
+    {
+      "section": "classes",
+      "step": 9,
+      "file": "class-sample-mobile.jpg",
+      "title": "Use the roster on a phone",
+      "kind": "Local sample walkthrough",
+      "caption": "The same sample class, seat totals, purchaser search, and CSV export are available on mobile.",
+      "capturedOn": "2026-10-31",
+      "width": 390,
+      "height": 1472
+    },
+    {
+      "section": "classes",
+      "step": 10,
+      "file": "class-return-live.jpg",
+      "title": "Return to Live registrations",
+      "kind": "Local sample walkthrough",
+      "caption": "Switch back to Live registrations to review actual orders. Only the environment selector is captured to keep any customer records private.",
+      "capturedOn": "2026-10-31",
+      "width": 356,
+      "height": 101
     },
     {
       "section": "recipes",

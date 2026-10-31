@@ -1,0 +1,9 @@
+{
+  "base": "http://localhost:3015",
+  "screenshots": 44,
+  "checks": [
+    "Anonymous image access denied.",
+    "Every image serves only with admin authentication, no-store headers, and an allow-listed filename.",
+    "All gallery selectors, images, full-size links, notes, review ticks and mobile layout passed."
+  ]
+}
