@@ -1,6 +1,6 @@
 # Shop and public-class payment readiness - November 1, 2026
 
-This continuation addresses the [October 31 meeting checklist](meeting-notes-website-planning-2026-10-31.md). Checkout, customer order status, signed payment events, confirmation templates, and class rosters have been verified locally. Real card payments, received emails, deployed configuration, and Amber's walkthrough remain open. No real checkout, charge, customer order, class publication, or email was created by these checks.
+This continuation addresses the [October 31 meeting checklist](meeting-notes-website-planning-2026-10-31.md). The code was pushed and automatically deployed on November 1; production checkout guards and live-mode invoice reads passed. Checkout, customer order status, signed payment events, confirmation templates, and class rosters passed isolated local checks. Real card payments, received emails, invoice webhook configuration, and Amber's walkthrough remain open. No real checkout, charge, customer order, class publication, or email was created by these checks. See the [post-push audit](post-push-meeting-audit-2026-11-01.md).
 
 ## Checkout corrections
 
@@ -38,9 +38,9 @@ The [read-only local readiness check](audit-screenshots/shop-payment-flow-2026-1
 - Local key mode is **test** and matches its configured mode; a webhook secret is configured. This is configuration evidence, not proof that Stripe can deliver to a local endpoint.
 - Public class enrollment is **disabled**, and the published Shop has **zero public classes**. No class/date/price has been invented or published for this work. Keep the unavailable message until Amber supplies and approves the actual class.
 - No stored class orders were found, and no isolated checkout-test schemas remained after cleanup.
-- On November 1, the user confirmed that **paid shop and public-class order notifications also belong at `info@waistlessfoods.com`**. The shared order-confirmation sender now uses that address independently of the old `ADMIN_EMAIL` setting and SMTP sender. Customer receipts still go to the purchaser. The same routing applies to webhook and customer reconciliation paths; existing sent markers prevent old notifications from being resent automatically. Real inbox delivery and deployment remain pending.
+- On November 1, the user confirmed that **paid shop and public-class order notifications also belong at `info@waistlessfoods.com`**. The deployed shared order-confirmation sender uses that address independently of the old `ADMIN_EMAIL` setting and SMTP sender. Customer receipts still go to the purchaser. The same routing applies to webhook and customer reconciliation paths; existing sent markers prevent old notifications from being resent automatically. Real inbox delivery remains pending.
 
-The earlier [Stripe inspection](audit-screenshots/service-agreements-2026-11-01/readiness.json) found no test-account endpoints and no invoice lifecycle events on the live website endpoint. Deploy the reviewed code and configure the appropriate endpoint before claiming end-to-end provider delivery. Do not enable class enrollment or remove the general preview restriction as part of an unrelated deployment.
+The post-deployment [Stripe inspection](audit-screenshots/service-agreements-2026-11-01/readiness.json) still found no test-account endpoints and no invoice lifecycle events on the live website endpoint. The code is deployed; configure the appropriate endpoint before claiming end-to-end provider delivery. Class enrollment and the general preview restriction were retained.
 
 ## Local evidence
 
@@ -59,7 +59,7 @@ See [browser screenshots and results](audit-screenshots/shop-payment-flow-2026-1
 
 Before a live test, confirm the exact invoice/class, recipient accounts, amount, who will pay, and any refund arrangement. The following sequence is prepared; no transaction is authorized merely by this document.
 
-1. Review/deploy the code with the general preview restriction and class release flag retained. Confirm the correct production database, key mode, webhook signature secret, and enabled event types. If the deployment uses another database, apply the agreement/newsletter migrations already documented.
+1. Confirm the deployed production database, key mode, webhook signature secret, and enabled event types, retaining the preview restriction and class release flag. The November 1 code deployment and protected reads passed; invoice events still need configuration. If a future deployment uses another database, apply the agreement/newsletter migrations already documented.
 2. Obtain and review Amber's actual agreement PDF. Prepare the real event's agreement from its inquiry and verify every imported term and event field before sending. Review customer private-link signing and account copy access.
 3. For the agreed Private Chef/Catering test, issue the specifically approved deposit/full invoice, verify the customer invoice/link and account access, and make the authorized transaction together. Check Stripe state, the website invoice record, the customer's receipt, and `info@waistlessfoods.com` payment notification. Inbox arrival must be checked independently of SMTP acceptance.
 4. Prepare Amber's actual public class with its approved date/time zone, per-seat price, description, and capacity. Review it before enabling public enrollment. In test mode first, buy multiple seats and inspect the actual hosted checkout, receipt, order history, and test roster. Run the separately approved live transaction only after agreeing its amount/quantity.

@@ -1,0 +1,307 @@
+{
+  "auditedAt": "2026-11-01T06:47:44.866Z",
+  "sourceCommit": "debe1cb3c41f3e24fa9f76d9c219083ba3c0f86f",
+  "branch": "main",
+  "remote": "upstream",
+  "remoteRepository": "https://github.com/waistlessfoods-stack/test",
+  "deployment": {
+    "state": "success",
+    "statuses": [
+      {
+        "context": "Vercel",
+        "state": "success",
+        "description": "Deployment has completed",
+        "url": "https://vercel.com/waistlessfoods-projects/test/G4BgM32u4KAia2V93U81yD8JqNCM"
+      }
+    ]
+  },
+  "quality": {
+    "typeScript": "passed",
+    "productionBuild": "passed",
+    "lint": {
+      "errors": 0,
+      "existingWarnings": 25
+    }
+  },
+  "tests": {
+    "completedAt": "2026-11-01T06:41:59.938Z",
+    "suites": [
+      {
+        "name": "admin-identity",
+        "exitCode": 0,
+        "tests": 2,
+        "seconds": 0.4
+      },
+      {
+        "name": "booking-requests",
+        "exitCode": 0,
+        "tests": 6,
+        "seconds": 0.8
+      },
+      {
+        "name": "service-invoices",
+        "exitCode": 0,
+        "tests": 13,
+        "seconds": 2.6
+      },
+      {
+        "name": "newsletter-media",
+        "exitCode": 0,
+        "tests": 4,
+        "seconds": 0.9
+      },
+      {
+        "name": "recipe-administration",
+        "exitCode": 0,
+        "tests": 4,
+        "seconds": 0.6
+      },
+      {
+        "name": "class-rosters",
+        "exitCode": 0,
+        "tests": 17,
+        "seconds": 11.2
+      },
+      {
+        "name": "newsletters",
+        "exitCode": 0,
+        "tests": 16,
+        "seconds": 16
+      },
+      {
+        "name": "service-workflow",
+        "exitCode": 0,
+        "tests": 14,
+        "seconds": 30
+      },
+      {
+        "name": "order-notifications",
+        "exitCode": 0,
+        "tests": 19,
+        "seconds": 51.5
+      },
+      {
+        "name": "newsletter-campaigns",
+        "exitCode": 0,
+        "tests": 16,
+        "seconds": 88.2
+      },
+      {
+        "name": "shop-checkout",
+        "exitCode": 0,
+        "tests": 13,
+        "seconds": 71.9
+      }
+    ],
+    "totalTests": 124,
+    "passed": true
+  },
+  "browsers": {
+    "completedAt": "2026-11-01T06:44:09.646Z",
+    "checks": [
+      {
+        "name": "qa-newsletter-media",
+        "exitCode": 0,
+        "seconds": 21.1
+      },
+      {
+        "name": "qa-service-workflow",
+        "exitCode": 0,
+        "seconds": 25
+      },
+      {
+        "name": "qa-recipe-administration",
+        "exitCode": 0,
+        "seconds": 6.6
+      },
+      {
+        "name": "qa-shop-release-guards",
+        "exitCode": 0,
+        "seconds": 4.3
+      },
+      {
+        "name": "qa-october-meeting",
+        "exitCode": 0,
+        "seconds": 6.7
+      },
+      {
+        "name": "qa-shop-payment-flow",
+        "exitCode": 0,
+        "seconds": 22.5
+      },
+      {
+        "name": "production-forms",
+        "exitCode": 0,
+        "seconds": 10.5
+      }
+    ],
+    "passed": true
+  },
+  "anonymousProductionRoutes": {
+    "inspectedAt": "2026-11-01T06:42:30.144Z",
+    "base": "https://www.waistlessfoods.com",
+    "readOnly": true,
+    "checks": [
+      {
+        "path": "/api/admin/service-agreements",
+        "status": 401,
+        "expectedStatus": 401,
+        "passed": true,
+        "error": "Admin session required"
+      },
+      {
+        "path": "/api/admin/service-invoices",
+        "status": 401,
+        "expectedStatus": 401,
+        "passed": true,
+        "error": "Admin session required"
+      },
+      {
+        "path": "/api/admin/newsletters",
+        "status": 401,
+        "expectedStatus": 401,
+        "passed": true,
+        "error": "Admin session required"
+      },
+      {
+        "path": "/api/admin/recipes/refresh",
+        "status": 405,
+        "expectedStatus": 405,
+        "passed": true,
+        "error": null
+      },
+      {
+        "path": "/api/account/service-agreements",
+        "status": 401,
+        "expectedStatus": 401,
+        "passed": true,
+        "error": "Sign in to view your agreements."
+      },
+      {
+        "path": "/api/newsletters/1/download",
+        "status": 401,
+        "expectedStatus": 401,
+        "passed": true,
+        "error": "Sign in to download newsletters."
+      }
+    ],
+    "passed": true
+  },
+  "authenticatedProductionReads": {
+    "inspectedAt": "2026-11-01T06:43:29.307Z",
+    "base": "https://www.waistlessfoods.com",
+    "readOnly": true,
+    "noCustomerDetailsRecorded": true,
+    "checks": [
+      {
+        "path": "/api/admin/service-agreements",
+        "status": 200,
+        "passed": true
+      },
+      {
+        "path": "/api/admin/service-invoices",
+        "status": 200,
+        "passed": true,
+        "stripeMode": "live"
+      },
+      {
+        "path": "/api/admin/newsletters",
+        "status": 200,
+        "passed": true
+      },
+      {
+        "path": "/api/admin/class-rosters",
+        "status": 200,
+        "passed": true,
+        "stripeMode": "live"
+      }
+    ],
+    "passed": true
+  },
+  "database": {
+    "inspectedAt": "2026-11-01T06:44:00.950Z",
+    "readOnly": true,
+    "columns": [
+      {
+        "table_name": "newsletter_issues",
+        "column_name": "media",
+        "data_type": "jsonb"
+      },
+      {
+        "table_name": "service_agreements",
+        "column_name": "content",
+        "data_type": "jsonb"
+      },
+      {
+        "table_name": "service_agreements",
+        "column_name": "document_hash",
+        "data_type": "text"
+      },
+      {
+        "table_name": "service_agreements",
+        "column_name": "signature",
+        "data_type": "jsonb"
+      },
+      {
+        "table_name": "service_invoice_records",
+        "column_name": "agreement_id",
+        "data_type": "text"
+      },
+      {
+        "table_name": "service_invoice_records",
+        "column_name": "invoice_id",
+        "data_type": "text"
+      }
+    ],
+    "qaSchemasPresent": 0,
+    "passed": true
+  },
+  "productionRelease": {
+    "inspectedAt": "2026-11-01T06:45:33.092Z",
+    "base": "https://www.waistlessfoods.com",
+    "readOnly": true,
+    "previewRestrictionRetained": true,
+    "paymentEnvironmentText": "Current payment environment: live. Checkout uses real payments. Coordinate an explicitly approved transaction with Amber before paying.",
+    "classEnrollmentText": "Public class enrollment is disabled. Class verification uses a prepared class after its date, capacity, and release are approved.",
+    "passed": true
+  },
+  "productionForms": {
+    "base": "https://www.waistlessfoods.com",
+    "checks": [
+      "private: approved form copy, guest-count styles at 1/10/49/50/51, keyboard/button bounds, 390px layout",
+      "private: standard service price hidden",
+      "catering: approved form copy, guest-count styles at 1/10/49/50/51, keyboard/button bounds, 390px layout",
+      "catering: standard service price hidden",
+      "cooking-classes: approved form copy, guest-count styles at 1/10/49/50/51, keyboard/button bounds, 390px layout",
+      "cooking-classes: standard service price hidden",
+      "Admin entry offers account sign-in alongside existing password access"
+    ],
+    "noSubmissionsOrEmails": true
+  },
+  "productionRecipes": {
+    "browser": "https://www.waistlessfoods.com",
+    "mutations": "none",
+    "checks": [
+      "Signed administrator session sees the complete paid recipe in both admin and storefront full views without an order; CMS edit links point to the existing master entry without credentials; mobile layout fits.",
+      "Anonymous full view redirects to the purchase preview; admin preview shows the existing admin sign-in gate; public recipe/shop HTML contains no protected recipe fields. Purchaser authorization remains covered by route tests."
+    ],
+    "paidRecipeSlug": "triple-berry-french-toast",
+    "passed": true
+  },
+  "productionCheckoutGuards": {
+    "base": "https://www.waistlessfoods.com",
+    "noPaymentOrEmail": true,
+    "checks": [
+      "Both new/resume checkout APIs reject anonymous customers and cross-origin mutations on the actual production build.",
+      "Checkout verification page requires the administrator session, displays the configured payment environment and class release state, and directs testing through the real Shop instead of an arbitrary charge."
+    ],
+    "passed": true
+  },
+  "pdfReview": {
+    "agreementPages": 2,
+    "newsletterPages": 2,
+    "allFourPagesRenderedAndVisuallyInspected": true,
+    "content": "fictional QA only; Amber contract/first newsletter still missing"
+  },
+  "productionMutations": "No customer, order, agreement, campaign, invoice, email, charge, or webhook configuration mutation performed during verification."
+}

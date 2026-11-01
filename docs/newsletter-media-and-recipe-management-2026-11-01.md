@@ -1,6 +1,6 @@
 # Newsletter images and recipe management - November 1, 2026
 
-Implemented locally for the [October 31 meeting checklist](meeting-notes-website-planning-2026-10-31.md). The website code has not been deployed in this work. Amber's own sign-in, CMS editing permissions, first newsletter, received test email, and independent walkthrough remain acceptance checks.
+Implemented for the [October 31 meeting checklist](meeting-notes-website-planning-2026-10-31.md), then pushed and automatically deployed on November 1. Production API/recipe access checks passed; see the [post-push audit](post-push-meeting-audit-2026-11-01.md). Amber's own sign-in, CMS editing permissions, first newsletter, received test email, and independent walkthrough remain acceptance checks.
 
 ## Newsletter authoring
 

@@ -6,6 +6,8 @@ Source: [Original meeting transcript](meeting-raw/meeting-with-amber-2026-10-31.
 
 This checklist records the requested updates and follow-ups from the meeting. Checked items have the local implementation/test evidence described below; they do not imply production deployment or Amber's final acceptance. Unchecked items retain any remaining implementation or external verification work.
 
+November 1 post-push update: all project changes were pushed in `debe1cb`, and Vercel's automatic deployment succeeded. All 124 automated tests, the local build/type/lint checks, and the production form/access checks passed. The preview restriction and disabled public-class enrollment remain in place. See the [full audit and remaining requirements](post-push-meeting-audit-2026-11-01.md); real inbox/card tests and Amber's missing content remain open.
+
 Amber's [October 31 written recap](amber-written-recap-2026-10-31.md) was retrieved from connected Gmail on November 1. It supplies the exact inquiry wording, extends the copy update to Cooking Class inquiries, and confirms `admin@waistlessfoods.com`. Use that written wording where it clarifies the transcript.
 
 ## Active goal
@@ -67,7 +69,7 @@ For the two form-copy changes, direct code updates were accepted for now. Making
 - [ ] **Connect service requests, contracts, and custom invoices into a clear workflow.** The existing invoice feature was demonstrated, but its connection to the wider process was not complete. Reference: 01:19:04–01:25:56.
   - [x] Create a customized invoice from a signed agreement. Customer/service/date are checked; deposit/balance invoice totals are bounded by the signed total.
   - [x] Provide explicit invoice email/share actions and a Stripe payment link. Browser/handler tests used a Stripe fixture; actual email delivery remains unverified.
-  - [x] Implement website invoice/payment synchronization from current Stripe state, with verified-signature webhook and replay tests. Live event configuration/deployment remain pending.
+  - [x] Implement website invoice/payment synchronization from current Stripe state, with verified-signature webhook and replay tests. Code deployment is verified; live invoice event configuration remains pending.
   - [x] Implement a deduplicated business payment notification to `info@waistlessfoods.com`, with visible uncertainty and an explicit reviewed retry. Mocked delivery passed; live inbox delivery remains pending.
   - [x] Add member agreements alongside the existing member invoices. APIs use the account's verified primary email; ordinary shop orders stay in My Orders.
   - Reference: 01:19:34–01:22:56; 01:26:32–01:27:37; 01:33:21–01:33:56.
@@ -80,11 +82,11 @@ For the two form-copy changes, direct code updates were accepted for now. Making
 
 Contract delivery/open tracking was discussed as potentially useful, but Amber identified collecting the digital signature as the most important requirement. The final tracking scope remains undecided. Reference: 01:27:41–01:28:26.
 
-The [agreement/invoice implementation and runbook](service-agreements-2026-11-01.md) records local verification and remaining acceptance checks. The overall contract/invoice items remain open because Amber's actual PDF, production deployment, live webhook setup, and real delivery/payment walkthroughs are not complete.
+The [agreement/invoice implementation and runbook](service-agreements-2026-11-01.md) records verification and remaining acceptance checks. Code deployment and production protected reads passed. The overall contract/invoice items remain open because Amber's actual PDF, live webhook setup, and real delivery/payment walkthroughs are not complete.
 
 A read-only Stripe account inspection found that the live website webhook currently has **no invoice events enabled**, and the test account has no registered endpoints. A guarded configuration script prepares the exact additions; live settings were not changed. See [inspection evidence](audit-screenshots/service-agreements-2026-11-01/readiness.json).
 
-The [shop/class payment handoff](shop-payment-readiness-2026-11-01.md) records corrected date/mode-specific seat holds, matching-checkout reuse, safe resumption, verified totals, and truthful customer status. The published Shop has no public classes and enrollment remains disabled. A concrete joint test sequence is prepared; no hosted test/live payment or real email was performed. The user confirmed on November 1 that paid shop/public-class order notifications should also go to `info@waistlessfoods.com`; that routing is implemented locally independently of the old `ADMIN_EMAIL`, alongside the already corrected booking/consultation and service-invoice routes. Customer receipts retain the purchaser's address. Deployment and inbox delivery remain unverified.
+The [shop/class payment handoff](shop-payment-readiness-2026-11-01.md) records corrected date/mode-specific seat holds, matching-checkout reuse, safe resumption, verified totals, and truthful customer status. The published Shop has no public classes and enrollment remains disabled. A concrete joint test sequence is prepared; no hosted test/live payment or real email was performed. The user confirmed on November 1 that paid shop/public-class order notifications should also go to `info@waistlessfoods.com`; that routing is deployed independently of the old `ADMIN_EMAIL`, alongside the already corrected booking/consultation and service-invoice routes. Customer receipts retain the purchaser's address. Code deployment is verified; inbox delivery remains unverified.
 
 ## Newsletter — can continue after launch
 
@@ -95,7 +97,7 @@ The [shop/class payment handoff](shop-payment-readiness-2026-11-01.md) records c
 
 Scheduling and more advanced automation were discussed as future improvements. The previously supplied welcome email was described as already automated; it is separate from the first newsletter. Reference: 45:10–46:06; 01:11:43–01:12:39.
 
-See the [current newsletter authoring and recipe-management handoff](newsletter-media-and-recipe-management-2026-11-01.md). Newsletter previews now use the confirmed administrator identity, rather than the old generic notification setting. The additive image-storage migration is applied to the locally configured database; deployment remains pending.
+See the [current newsletter authoring and recipe-management handoff](newsletter-media-and-recipe-management-2026-11-01.md). Newsletter previews now use the confirmed administrator identity, rather than the old generic notification setting. The additive image-storage migration and code deployment are verified; production protected reads passed. Amber's content/inbox walkthrough remains pending.
 
 ## Content and information needed from Amber
 
@@ -144,17 +146,18 @@ Reference: 01:08:33–01:09:35; 01:34:31–01:34:59.
 - Agreement/invoice continuation: `node --env-file=.env scripts/test-service-workflow.mjs --integration` passed 14 tests; actual UI/route/service browser walkthrough against a local production build passed with temporary SQL records and mocked Stripe/SMTP. A final two-page printed agreement was visually verified. The production build and TypeScript passed again, and lint retained 0 errors / 25 existing warnings. See [evidence](audit-screenshots/service-agreements-2026-11-01/README.md).
 - Newsletter/recipe continuation: actual UI/handler/temporary SQL walkthrough passed, with local image fixtures and mocked SMTP. Saved-image placement, mobile/light/dark email previews, archive publication independent of sending, frozen campaign media, and the final rendered PDF were verified. Read-only browser checks confirmed paid admin previews and protected public responses. See [newsletter evidence](audit-screenshots/newsletter-media-2026-11-01/README.md) and [recipe evidence](audit-screenshots/recipe-administration-2026-11-01/README.md).
 - Shop/class continuation: actual checkout/resume/reconciliation/webhook/roster code passed isolated SQL tests; the production Orders React UI passed a fictional browser walkthrough at desktop/mobile widths. Checkout retries reuse a payable session, unknown provider outcomes do not create a second link, and the return URL alone cannot show a confirmed payment. Contract/invoice regression tests remain 14 passed. See [evidence and release guards](audit-screenshots/shop-payment-flow-2026-11-01/README.md).
-- Paid-order recipient clarification: after the user confirmed `info@waistlessfoods.com`, the 19 notification tests and 13 checkout tests passed again with that address asserted. TypeScript, targeted lint, and production build passed. See [recipient evidence](audit-screenshots/shop-payment-flow-2026-11-01/paid-order-recipient.json). SMTP was mocked; deployment and inbox delivery are still pending.
+- Paid-order recipient clarification: after the user confirmed `info@waistlessfoods.com`, the 19 notification tests and 13 checkout tests passed again with that address asserted. TypeScript, targeted lint, and production build passed. See [recipient evidence](audit-screenshots/shop-payment-flow-2026-11-01/paid-order-recipient.json). SMTP was mocked; the subsequent deployment is verified, while inbox delivery remains pending.
+- Post-push audit: all 124 tests across 11 suites passed again on `debe1cb`, together with seven browser harness runs, additional production recipe/access/release checks, TypeScript, full lint, and production build. Vercel deployment succeeded. Required schema fields and production protected reads passed; real payments/email and missing content remain open. See [results](audit-screenshots/post-push-2026-11-01/results.json).
 
 The browser harness initially used a guessed Private Chef slug, then encountered the existing client preview gate. It was corrected to the actual `/services/private` route and given the existing test-only session-storage unlock. The final run passed. The application's preview restriction was left enabled.
 
 ## Remaining implementation and external dependencies
 
 - Contract signing and request-to-contract-to-invoice linkage are implemented and locally verified. The actual agreement PDF is still missing: Amber's recap mentions it, but its available attachments contain only inline checkbox images, and a targeted follow-up search found no separate agreement attachment. The user also confirmed on November 1 that they do not think they have a copy. No real agreement has been prepared or sent.
-- The paid-service-invoice notification/webhook path is implemented and tested with verified webhook signatures and mocked delivery. Production deployment, enabling invoice events on the live Stripe webhook, and approved real-inbox verification remain outstanding.
-- The newsletter now supports editable header/footer/body images and links alongside text, test sends, manual campaigns, archive, and PDFs. First newsletter content, real received-email inspection, production deployment, and Amber's independent walkthrough remain pending.
+- The paid-service-invoice notification/webhook path is deployed and tested with verified webhook signatures and mocked delivery. Enabling invoice events on the live Stripe webhook and approved real-inbox verification remain outstanding.
+- The newsletter now supports deployed header/footer/body image and link editing alongside text, test sends, manual campaigns, archive, and PDFs. First newsletter content, real received-email inspection, and Amber's independent walkthrough remain pending.
 - Paid-recipe management now links to the existing Contentful editor and refreshes published content; admin full previews and ordinary storefront access boundaries passed local checks. Amber's own CMS permissions and edit/publish walkthrough remain pending. Public purchase previews no longer serialize full ingredients/instructions into client props.
-- No production deployment, live inbox confirmation, live-card payment, external email, or customer content publication was performed in this work.
+- The requested Git push triggered a successful automatic production deployment. Verification did not send external email, make live-card payments, confirm real inbox delivery, publish customer content, or change Stripe webhook settings. The site preview restriction and disabled public classes were retained.
 - The [written follow-up](amber-written-recap-2026-10-31.md) also reports a service-gallery/Contentful issue and requests more photos. Track that separately from the transcript's original checklist.
 
 ## Future possibilities, not confirmed launch requirements

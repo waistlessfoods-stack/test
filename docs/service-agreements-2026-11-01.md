@@ -1,6 +1,6 @@
 # Service agreements and linked invoices — November 1, 2026
 
-The application now supports booking request → reviewed agreement → private-link signature → linked invoice → Stripe payment-status synchronization and a business payment notification. This is implemented and locally verified. Amber's actual contract PDF, production deployment, webhook-event setup, and live customer/payment walkthroughs are still pending.
+The application now supports booking request → reviewed agreement → private-link signature → linked invoice → Stripe payment-status synchronization and a business payment notification. The code was pushed and automatically deployed on November 1; production protected API reads passed. Amber's actual contract PDF, webhook-event setup, and live customer/payment walkthroughs are still pending. See the [post-push audit](post-push-meeting-audit-2026-11-01.md).
 
 ## Administrator workflow
 
