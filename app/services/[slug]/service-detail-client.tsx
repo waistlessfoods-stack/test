@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { ArrowUp, Star } from "lucide-react";
 import ReviewDialog from "@/components/review-dialog";
+import ServiceGallery from "@/components/service-gallery";
 import type {
   ServiceDetailSection,
   ServiceDetailSectionsData,
@@ -71,7 +71,6 @@ export default function ServiceDetailClient({
 
 function ServiceDetailContent({ service }: ServiceDetailClientProps) {
   const [visibleCount, setVisibleCount] = useState(2);
-  const [mainImage, setMainImage] = useState(service.images.main);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [publicClassesNoticeOpen, setPublicClassesNoticeOpen] = useState(false);
   const reviewsHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -98,44 +97,7 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
 
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-start">
         <section className="w-full lg:w-[520px] flex flex-col gap-4">
-          <div className="relative w-full lg:w-[520px] aspect-[5/6] rounded-none overflow-hidden">
-            {mainImage ? (
-              <Image
-                src={mainImage}
-                alt={`${service.title} main image`}
-                fill
-                sizes="(max-width: 1024px) 100vw, 520px"
-                className="object-cover"
-                priority
-              />
-            ) : (
-              <div className="w-full h-full bg-gray-200" />
-            )}
-          </div>
-
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 lg:gap-3 w-full lg:w-[520px]">
-            {service.images.gallery.map((image, index) => (
-              <div
-                key={`${image}-${index}`}
-                onClick={() => image && setMainImage(image)}
-                className={`relative aspect-square rounded-none overflow-hidden cursor-pointer transition-all group hover:ring-2 hover:ring-primary ${
-                  mainImage === image ? "ring-2 ring-primary" : ""
-                }`}
-              >
-                {image ? (
-                  <Image
-                    src={image}
-                    alt={`${service.title} gallery image ${index + 1}`}
-                    fill
-                    sizes="(max-width: 768px) 25vw, 97px"
-                    className="object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-200" />
-                )}
-              </div>
-            ))}
-          </div>
+          <ServiceGallery title={service.title} mainImage={service.images.main} gallery={service.images.gallery} />
 
           <div className="mt-6 pt-6 border-t border-gray-100 w-full lg:w-[520px]">
             <h2

@@ -37,7 +37,7 @@ Amber's message says the contractual agreement is attached. The retrieved MIME t
 
 ## Additional gallery report
 
-Amber reported that photos added beneath the Private Chef/Catering thumbnail in Contentful did not appear on the website. She also requested the ability to add several additional photos. This is a written follow-up beyond the transcript checklist and needs its own implementation/Contentful verification.
+Amber reported that photos added beneath the Private Chef/Catering thumbnail in Contentful did not appear on the website. She also requested the ability to add several additional photos. The user explicitly requested this follow-up on November 1. Current published photos were verified, and [multi-photo gallery controls plus an immediate admin refresh](service-gallery-2026-11-01.md) were implemented and locally tested. No new photos or CMS content were invented/published; production rollout remains to be verified.
 
 ## Remaining Amber work
 

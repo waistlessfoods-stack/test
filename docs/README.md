@@ -35,6 +35,7 @@ Do not send documents from the internal or archive sections to the client.
 
 ## Implementation and Technical Reference
 
+- [Service Photo Galleries](service-gallery-2026-11-01.md)
 - [Shop and Public-Class Payment Readiness](shop-payment-readiness-2026-11-01.md)
 - [Newsletter Images and Recipe Management](newsletter-media-and-recipe-management-2026-11-01.md)
 - [Service Agreements and Linked Invoice Workflow](service-agreements-2026-11-01.md)

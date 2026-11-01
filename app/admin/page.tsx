@@ -5,6 +5,12 @@ import { useAdminAuth } from '@/components/admin/admin-auth';
 
 const NAV_ITEMS = [
   {
+    href: '/admin/services',
+    label: 'Service Photos & Content',
+    description: 'Edit service photos in Contentful and refresh published galleries immediately',
+    icon: <span aria-hidden="true" className="text-xl">▧</span>,
+  },
+  {
     href: '/admin/service-agreements',
     label: 'Service Agreements',
     description: 'Prepare agreements from booking requests, collect signatures, and continue to invoicing',

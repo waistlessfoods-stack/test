@@ -12,6 +12,7 @@ const links = [
   ["/admin/service-agreements", "Agreements"],
   ["/admin/newsletters", "Newsletters"],
   ["/admin/recipes", "Recipe management"],
+  ["/admin/services", "Service photos"],
   ["/admin/reviews", "Reviews"],
   ["/admin/accounts", "Accounts"],
   ["/admin/settings", "Settings"],

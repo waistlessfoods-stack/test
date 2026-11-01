@@ -1,6 +1,7 @@
 import { createClient } from "contentful";
 import type { Document } from "@contentful/rich-text-types";
 import { unstable_cache } from "next/cache";
+import { serviceGalleryImagePaths } from "@/lib/service-gallery";
 
 // --- Config ---
 
@@ -552,8 +553,6 @@ function mapServiceFields(entry: unknown) {
   const assetImagePath = getAssetUrl(f.image);
   const assetMainImagePath = getAssetUrl(f.mainImage);
   const thumbnailImagePath = getAssetUrl(f.thumbnailsImage);
-  const assetGalleryImagePaths = getAssetUrls(f.galleryImages);
-  const subImagePaths = getAssetUrls(f.subImages);
   const resolvedImagePath =
     assetImagePath ||
     thumbnailImagePath ||
@@ -582,12 +581,7 @@ function mapServiceFields(entry: unknown) {
       assetImagePath ||
       legacyMainImagePath ||
       legacyImagePath,
-    galleryImagePaths:
-      assetGalleryImagePaths.length > 0
-        ? assetGalleryImagePaths
-        : subImagePaths.length > 0
-          ? subImagePaths
-        : (f.galleryImagePaths as string[]) || [],
+    galleryImagePaths: serviceGalleryImagePaths(f),
     reviews: (f.reviews as ServiceReviews) ?? null,
   };
 }
@@ -1245,6 +1239,6 @@ export const fetchShopPageFromContentful = unstable_cache(
 
 export const fetchServiceDetailFromContentful = unstable_cache(
   fetchServiceDetailFromContentfulRaw,
-  ["contentful-service-detail-v2"],
+  ["contentful-service-detail-v3"],
   { revalidate: 300, tags: ["services"] }
 );

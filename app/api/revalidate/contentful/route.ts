@@ -16,6 +16,7 @@ type ContentfulWebhookBody = {
   paths?: unknown;
   contentType?: string;
   sys?: {
+    type?: string;
     contentType?: {
       sys?: {
         id?: string;
@@ -89,6 +90,8 @@ export async function POST(request: Request) {
     }
   }
 
+  if (body.sys?.type === 'Asset') tags.add('services');
+
   if (tags.size === 0 && paths.size === 0) {
     return NextResponse.json(
       {
@@ -100,7 +103,7 @@ export async function POST(request: Request) {
   }
 
   for (const tag of tags) {
-    revalidateTag(tag, "max");
+    revalidateTag(tag, tag === 'services' ? { expire: 0 } : "max");
   }
 
   for (const path of paths) {

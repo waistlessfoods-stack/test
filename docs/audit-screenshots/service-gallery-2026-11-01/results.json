@@ -1,0 +1,29 @@
+{
+  "base": "http://localhost:3010",
+  "contentful": {
+    "publishedPhotoCounts": [
+      {
+        "slug": "cooking-classes",
+        "count": 3
+      },
+      {
+        "slug": "private",
+        "count": 3
+      },
+      {
+        "slug": "catering",
+        "count": 3
+      }
+    ],
+    "multiAssetField": true,
+    "contentMutations": false
+  },
+  "checks": [
+    "Nine additional photos plus the main image render without truncation; Enter/Space select and restore the original; changed photo lists reset stale selection; 1440/768/390/320px fit.",
+    "Actual signed-admin page exposes the service CMS links and instructions; its refresh button successfully calls the protected real cache endpoint.",
+    "cooking-classes: every published gallery image loads and selects correctly; original main thumbnail remains available.",
+    "private: every published gallery image loads and selects correctly; original main thumbnail remains available.",
+    "catering: every published gallery image loads and selects correctly; original main thumbnail remains available."
+  ],
+  "passed": true
+}
