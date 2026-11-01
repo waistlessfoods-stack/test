@@ -1,0 +1,101 @@
+{
+  "inspectedAt": "2026-11-01T05:27:54.693Z",
+  "source": "Published Contentful delivery entries",
+  "noMutations": true,
+  "note": "Structural checks only. Existing text, titles, and photos still require Amber’s editorial approval.",
+  "publishedRecipes": 5,
+  "categories": [
+    {
+      "name": "BEEF",
+      "publishedRecipes": 0,
+      "withIngredientsAndInstructions": 0
+    },
+    {
+      "name": "FISH & SEAFOOD",
+      "publishedRecipes": 0,
+      "withIngredientsAndInstructions": 0
+    },
+    {
+      "name": "PASTA",
+      "publishedRecipes": 1,
+      "withIngredientsAndInstructions": 1
+    },
+    {
+      "name": "HEALTHY MEALS",
+      "publishedRecipes": 1,
+      "withIngredientsAndInstructions": 1
+    },
+    {
+      "name": "DESSERT",
+      "publishedRecipes": 1,
+      "withIngredientsAndInstructions": 1
+    },
+    {
+      "name": "VEGAN",
+      "publishedRecipes": 2,
+      "withIngredientsAndInstructions": 2
+    },
+    {
+      "name": "CHEF SPOTLIGHT",
+      "publishedRecipes": 0,
+      "withIngredientsAndInstructions": 0
+    },
+    {
+      "name": "BREAKFAST",
+      "publishedRecipes": 1,
+      "withIngredientsAndInstructions": 1
+    },
+    {
+      "name": "POULTRY",
+      "publishedRecipes": 0,
+      "withIngredientsAndInstructions": 0
+    }
+  ],
+  "recipeReview": [
+    {
+      "title": "Triple Berry French Toast",
+      "slug": "triple-berry-french-toast",
+      "missing": []
+    },
+    {
+      "title": "Harvest-Stuffed Mushrooms",
+      "slug": "harvest-stuffed-mushrooms",
+      "missing": []
+    },
+    {
+      "title": "Thai Red Vegetable Curry",
+      "slug": "thai-red-vegetable-curry",
+      "missing": []
+    },
+    {
+      "title": "Mango Mint Chia Parfait",
+      "slug": "mango-mint-chia-parfait",
+      "missing": []
+    },
+    {
+      "title": "Herby Pasta Primavera",
+      "slug": "herby-pasta-primavera",
+      "missing": []
+    }
+  ],
+  "serviceInstructions": [
+    {
+      "slug": "cooking-classes",
+      "title": "Cooking Classes",
+      "howToBookSteps": 6,
+      "sectionCount": 2
+    },
+    {
+      "slug": "private",
+      "title": "Private Chef",
+      "howToBookSteps": 6,
+      "sectionCount": 2
+    },
+    {
+      "slug": "catering",
+      "title": "Catering",
+      "howToBookSteps": 6,
+      "sectionCount": 2
+    }
+  ]
+}

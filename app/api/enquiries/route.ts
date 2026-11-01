@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { enquiries } from "@/lib/db/schema";
-import { sendEmail, fromEmail } from "@/lib/email/mailer";
+import { sendEmail } from "@/lib/email/mailer";
+import { businessInquiryEmail } from "@/lib/email/notification-recipients";
 import {
   enquiryConfirmationTemplate,
   enquiryNotificationTemplate,
@@ -136,7 +137,6 @@ export async function POST(request: NextRequest) {
     );
 
     const enquiry = result[0];
-    const adminEmail = process.env.ADMIN_EMAIL || fromEmail;
 
     const [confirmationEmail, notificationEmail] = await Promise.all([
       sendEmail({
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
         }),
       }),
       sendEmail({
-        to: adminEmail,
+        to: businessInquiryEmail,
         subject: `New ${String(type).replaceAll("_", " ")} enquiry`,
         replyTo: normalizedEmail,
         html: enquiryNotificationTemplate({

@@ -54,7 +54,7 @@ export default function BookingPageClient({
   const handleIncrement = () =>
     setGuests((prev) => Math.min(prev + 1, MAX_BOOKING_GUESTS));
   const handleDecrement = () =>
-    setGuests((prev) => Math.max(prev - 1, 0));
+    setGuests((prev) => Math.max(prev - 1, MIN_BOOKING_GUESTS));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,9 +167,12 @@ export default function BookingPageClient({
             {requestTitle}
           </h1>
           <p className="text-base md:text-lg font-normal leading-relaxed tracking-tight text-[#878787]">
-            Tell us about your event. This is a request for a quote and
-            availability; your date is not confirmed until we contact you and
-            the required agreement and payment are complete.
+            Tell us about your special occasion! We&apos;ll review your request and
+            contact you regarding availability and next steps.
+          </p>
+          <p className="mt-3 text-base md:text-lg font-normal leading-relaxed tracking-tight text-[#878787]">
+            Please note: Your date is not confirmed until the agreement is signed
+            and payment is received.
           </p>
         </header>
 
@@ -265,13 +268,15 @@ export default function BookingPageClient({
             </div>
 
             <div className="flex flex-col gap-3 md:gap-3.5">
-              <Label className="text-base md:text-lg font-medium tracking-tight text-black">
+              <Label htmlFor="booking-guests" className="text-base md:text-lg font-medium tracking-tight text-black">
                 Expected Number of Guests <span className="text-red-500">*</span>
               </Label>
               <div className="relative">
                 <Input
+                  id="booking-guests"
                   type="number"
-                  value={guests}
+                  value={guests || ""}
+                  required
                   min={MIN_BOOKING_GUESTS}
                   max={MAX_BOOKING_GUESTS}
                   step={1}
@@ -285,18 +290,28 @@ export default function BookingPageClient({
                     const nextGuests = Number(value);
                     setGuests(Number.isFinite(nextGuests) ? nextGuests : 0);
                   }}
-                  className="h-12 md:h-14 bg-[#F4F4F4] border-none rounded-lg px-4 text-base md:text-lg focus-visible:ring-1 focus-visible:ring-[#388082] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="booking-guest-count h-12 md:h-14 bg-[#F4F4F4] text-black selection:bg-[#dcebea] selection:text-black border-none rounded-lg pl-4 pr-14 text-base md:text-lg focus-visible:ring-1 focus-visible:ring-[#388082] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="1"
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 z-20">
-                  <ChevronUp
+                  <button
+                    type="button"
+                    aria-label="Increase guest count"
                     onClick={handleIncrement}
-                    className="w-5 h-5 cursor-pointer text-gray-400 hover:text-black transition-colors"
-                  />
-                  <ChevronDown
+                    disabled={guests >= MAX_BOOKING_GUESTS}
+                    className="select-none rounded text-gray-500 hover:text-black focus-visible:outline-2 focus-visible:outline-[#388082] disabled:opacity-40"
+                  >
+                    <ChevronUp className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Decrease guest count"
                     onClick={handleDecrement}
-                    className="w-5 h-5 cursor-pointer text-gray-400 hover:text-black transition-colors"
-                  />
+                    disabled={guests <= MIN_BOOKING_GUESTS}
+                    className="select-none rounded text-gray-500 hover:text-black focus-visible:outline-2 focus-visible:outline-[#388082] disabled:opacity-40"
+                  >
+                    <ChevronDown className="h-5 w-5" aria-hidden="true" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -397,7 +412,9 @@ export default function BookingPageClient({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 className="min-h-[130px] md:min-h-[165px] bg-[#F4F4F4] border-none rounded-lg p-4 md:p-5 text-base md:text-lg placeholder:text-[#878787] focus-visible:ring-1 focus-visible:ring-[#388082] resize-none"
-                placeholder="Tell us about the occasion, menu ideas, location, and any other details that will help us prepare your quote."
+                placeholder={serviceSlug === "cooking-classes"
+                  ? "Tell us about your preferred date, number of participants, cooking interests, skill levels, or any other details that will help us tailor the class to your group."
+                  : "Tell us about the occasion, menu ideas, location, or any other details that will help us better understand your event and preferences."}
               />
             </div>
 

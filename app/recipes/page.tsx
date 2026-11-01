@@ -4,6 +4,7 @@ import {
 } from "@/lib/contentful-management";
 import { buildMetadata } from "@/lib/seo";
 import RecipesPageClient from "./recipes-page-client";
+import { recipePurchasePreview } from "@/lib/recipe-content-access";
 
 export const revalidate = 300;
 
@@ -36,5 +37,5 @@ export default async function Recipes({ searchParams }: RecipesPageProps) {
   const data = getRecipeOnlyPageData(await fetchRecipesPageFromContentful());
   const { category } = await searchParams;
 
-  return <RecipesPageClient data={data} initialCategorySlug={category} />;
+  return <RecipesPageClient data={{ ...data, recipes: data.recipes.map(recipePurchasePreview) }} initialCategorySlug={category} />;
 }

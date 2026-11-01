@@ -9,6 +9,8 @@ import pg from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { sourceLoader } from './lib/load-typescript.mjs';
 
+const businessRecipient = 'info@waistlessfoods.com';
+
 test('admin template renders escaped order details, totals and test warning', async () => {
   const Template = sourceLoader()('lib/email/templates/admin-order-notification-email.tsx').default;
   const props = {
@@ -67,6 +69,9 @@ test('order emails and webhook with real SQL, isolated temporary orders', {
   let throwInstead = false;
   let event;
   const load = sourceLoader({
+    'server-only': {},
+    '@/lib/service-invoice-workflow-store': { invoiceWorkflow: new Proxy({}, { get() { throw new Error('Checkout tests must not enter service-invoice storage.'); } }) },
+    '@/lib/email/service-invoice-payment': { sendServiceInvoicePayment: async () => { throw new Error('Checkout tests must not send a service-invoice email.'); } },
     '@/lib/db': { db: drizzle(client) },
     '@/lib/email/mailer': {
       fromEmail: 'sender@example.com',
@@ -87,7 +92,7 @@ test('order emails and webhook with real SQL, isolated temporary orders', {
       webhooks = { constructEvent: () => event };
       checkout = { sessions: { retrieve: async () => ({
         id: 'cs_test_qa', payment_status: 'paid', payment_intent: 'pi_qa',
-        amount_total: 1080, customer_details: { name: 'QA Checkout' },
+        amount_total: 1080, currency: 'usd', livemode: false, customer_details: { name: 'QA Checkout' },
       }) } };
     },
   });
@@ -109,10 +114,10 @@ test('order emails and webhook with real SQL, isolated temporary orders', {
   }
   const metadata = async () => (await client.query('SELECT metadata FROM pg_temp.orders WHERE id = 900001')).rows[0].metadata;
   const sendOrder = () => send({ orderId: 900001 });
-  function postEvent(type, paymentStatus) {
+  function postEvent(type, paymentStatus, changes = {}) {
     event = { type, data: { object: {
       id: 'cs_test_qa', payment_status: paymentStatus, payment_intent: 'pi_qa',
-      amount_total: 1080, customer_details: { name: 'QA Checkout' }, metadata: { orderId: '900001' },
+      amount_total: 1080, currency: 'usd', livemode: false, customer_details: { name: 'QA Checkout' }, metadata: { orderId: '900001', userId: 'qa' }, ...changes,
     } } };
     return webhook(new Request('http://localhost/api/stripe/webhook', {
       method: 'POST', headers: { 'stripe-signature': 'mock' }, body: '{}',
@@ -122,8 +127,8 @@ test('order emails and webhook with real SQL, isolated temporary orders', {
   await t.test('sends both audiences with customer reply-to and independent markers', async () => {
     await reset();
     assert.equal(await sendOrder(), true);
-    assert.deepEqual(deliveries.map((m) => m.to).sort(), ['admin@example.com', 'customer@example.com']);
-    const admin = deliveries.find((m) => m.to === 'admin@example.com');
+    assert.deepEqual(deliveries.map((m) => m.to).sort(), ['customer@example.com', businessRecipient]);
+    const admin = deliveries.find((m) => m.to === businessRecipient);
     assert.equal(admin.replyTo, 'customer@example.com');
     assert.match(admin.subject, /^\[TEST\]/);
     assert.equal(admin.react.props.customerName, 'Stored Customer Name');
@@ -140,13 +145,13 @@ test('order emails and webhook with real SQL, isolated temporary orders', {
     assert.equal(await sendOrder(), false);
     assert.equal(deliveries.length, 2);
   });
-  for (const failed of ['admin@example.com', 'customer@example.com']) {
+  for (const failed of [businessRecipient, 'customer@example.com']) {
     await t.test(`failure of ${failed} retries only that recipient`, async () => {
       await reset();
       failureRecipient = failed;
       await assert.rejects(sendOrder, /One or more/);
       assert.equal(deliveries.length, 1);
-      const errorKey = failed.startsWith('admin') ? 'orderAdminNotificationError' : 'orderConfirmationError';
+      const errorKey = failed === businessRecipient ? 'orderAdminNotificationError' : 'orderConfirmationError';
       assert.ok((await metadata())[errorKey]);
       failureRecipient = null;
       await sendOrder();
@@ -157,7 +162,7 @@ test('order emails and webhook with real SQL, isolated temporary orders', {
   }
   await t.test('thrown mail errors release the claim for retry', async () => {
     await reset();
-    failureRecipient = 'admin@example.com';
+    failureRecipient = businessRecipient;
     throwInstead = true;
     await assert.rejects(sendOrder);
     assert.ok(!(await metadata()).orderAdminNotificationClaimedAt);
@@ -168,7 +173,7 @@ test('order emails and webhook with real SQL, isolated temporary orders', {
   await t.test('existing customer sent marker does not suppress the new admin email', async () => {
     await reset({ metadata: { orderConfirmationSentAt: new Date().toISOString() } });
     await sendOrder();
-    assert.deepEqual(deliveries.map((m) => m.to), ['admin@example.com']);
+    assert.deepEqual(deliveries.map((m) => m.to), [businessRecipient]);
   });
   await t.test('pending, failed and refunded orders send nothing', async () => {
     for (const status of ['pending', 'failed', 'refunded']) {
@@ -193,14 +198,15 @@ test('order emails and webhook with real SQL, isolated temporary orders', {
     const state = await metadata();
     assert.ok(state.orderConfirmationError && state.orderAdminNotificationError);
   });
-  await t.test('missing admin configuration falls back to sender and live orders omit test label', async () => {
+  await t.test('missing legacy admin setting still routes to the business inbox and live orders omit test label', async () => {
     await reset({ sessionId: 'cs_live_qa' });
     delete process.env.ADMIN_EMAIL;
     try {
       await sendOrder();
-      const admin = deliveries.find((m) => m.to === 'sender@example.com');
+      const admin = deliveries.find((m) => m.to === businessRecipient);
       assert.ok(admin);
       assert.ok(!admin.subject.includes('[TEST]'));
+      assert.ok(!deliveries.some(message => message.to === 'sender@example.com'));
     } finally { process.env.ADMIN_EMAIL = 'admin@example.com'; }
   });
   await t.test('unpaid checkout sends nothing; delayed success sends both; replay sends neither', async () => {
@@ -215,7 +221,7 @@ test('order emails and webhook with real SQL, isolated temporary orders', {
   });
   await t.test('webhook returns retryable failure and recovers only the missing admin notification', async () => {
     await reset({ status: 'pending' });
-    failureRecipient = 'admin@example.com';
+    failureRecipient = businessRecipient;
     assert.equal((await postEvent('checkout.session.completed', 'paid')).status, 500);
     assert.equal(deliveries.length, 1);
     failureRecipient = null;
@@ -228,6 +234,22 @@ test('order emails and webhook with real SQL, isolated temporary orders', {
     assert.equal(deliveries.length, 0);
     assert.equal((await client.query('SELECT status FROM pg_temp.orders')).rows[0].status, 'refunded');
   });
+  await t.test('different amounts, currencies, environments, and unrelated order metadata cannot confirm payment', async () => {
+    for (const changes of [{ amount_total: 1 }, { currency: 'eur' }, { livemode: true }, { id: 'cs_test_unrelated', metadata: { orderId: '900001', userId: 'qa' } }]) {
+      await reset({ status: 'pending' });
+      await postEvent('checkout.session.completed', 'paid', changes);
+      assert.equal((await client.query('SELECT status FROM pg_temp.orders')).rows[0].status, 'pending');
+      assert.equal(deliveries.length, 0);
+    }
+  });
+  await t.test('a stale payment-failed event cannot demote a completed or refunded order', async () => {
+    for (const status of ['completed', 'refunded']) {
+      await reset({ status });
+      await client.query("UPDATE pg_temp.orders SET stripe_payment_intent_id='pi_qa'");
+      await postEvent('payment_intent.payment_failed', 'unpaid', { id: 'pi_qa' });
+      assert.equal((await client.query('SELECT status FROM pg_temp.orders')).rows[0].status, status);
+    }
+  });
   await t.test('reconciliation retries an admin failure without resending the customer receipt', async () => {
     await reset({ metadata: {
       orderConfirmationSentAt: new Date().toISOString(),
@@ -236,7 +258,7 @@ test('order emails and webhook with real SQL, isolated temporary orders', {
     const response = await reconcile();
     assert.equal(response.status, 200);
     assert.equal((await response.json()).confirmationFailures, 0);
-    assert.deepEqual(deliveries.map((m) => m.to), ['admin@example.com']);
+    assert.deepEqual(deliveries.map((m) => m.to), [businessRecipient]);
   });
   await t.test('paid reconciliation sends both emails and preserves unrelated metadata', async () => {
     await reset({ status: 'pending' });

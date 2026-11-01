@@ -1,6 +1,6 @@
 import { Body, Button, Container, Head, Heading, Html, Img, Link, Preview, Section, Text } from '@react-email/components';
-import type { CSSProperties } from 'react';
-import type { NewsletterContent } from '@/lib/newsletter-content';
+import { Fragment, type CSSProperties } from 'react';
+import { newsletterBlocks, newsletterPreviewImage, type NewsletterContent, type NewsletterImage } from '@/lib/newsletter-content';
 import { isNewsletterAddressReady } from '@/lib/newsletter-address';
 
 const siteUrl = 'https://www.waistlessfoods.com';
@@ -62,6 +62,7 @@ export default function NewsletterIssueEmail({ issue, campaign }: {
             <Text className="newsletter-accent" style={styles.publication}>The WaistLess Table</Text>
             <Text className="newsletter-muted" style={styles.byline}>FROM CHEF AMBER’S KITCHEN</Text>
           </Section>
+          {issue.media?.header && <EmailImage image={issue.media.header} width={600} />}
           <Section className="newsletter-content" style={styles.content}>
             {!campaign && (
               <Text className="newsletter-preview" style={styles.preview}>
@@ -71,9 +72,9 @@ export default function NewsletterIssueEmail({ issue, campaign }: {
             <Text className="newsletter-accent" style={styles.eyebrow}>A NOTE FROM THE TABLE</Text>
             <Heading as="h1" className="newsletter-title" style={styles.title}>{issue.title}</Heading>
             {issue.previewText && <Text className="newsletter-muted newsletter-rule" style={styles.intro}>{issue.previewText}</Text>}
-            {issue.body.split(/\n\s*\n/).map((paragraph, index) => (
-              <Text className="newsletter-copy" key={index} style={styles.paragraph}>{paragraph}</Text>
-            ))}
+            {newsletterBlocks(issue).map((block, index) => <Fragment key={index}>{block.kind === 'text'
+              ? <Text className="newsletter-copy" style={styles.paragraph}>{block.text}</Text>
+              : <EmailImage image={block.image} />}</Fragment>)}
             {issue.ctaUrl && (
               <Section style={{ paddingTop: '8px' }}>
                 <Button className="newsletter-button" href={issue.ctaUrl} style={styles.button}>{issue.ctaLabel}</Button>
@@ -81,6 +82,7 @@ export default function NewsletterIssueEmail({ issue, campaign }: {
             )}
           </Section>
           <Section className="newsletter-footer newsletter-rule" style={styles.footer}>
+            {issue.media?.footer && <EmailImage image={issue.media.footer} />}
             <Text className="newsletter-accent" style={styles.footerBrand}>Waste less. Taste more.</Text>
             <Text className="newsletter-muted" style={styles.footerText}>
               <Link className="newsletter-link" href={siteUrl} style={styles.footerLink}>waistlessfoods.com</Link>
@@ -97,6 +99,13 @@ export default function NewsletterIssueEmail({ issue, campaign }: {
       </Body>
     </Html>
   );
+}
+
+function EmailImage({ image, width = 512 }: { image: NewsletterImage; width?: number }) {
+  const safe = newsletterPreviewImage(image);
+  if (!safe) return null;
+  const picture = <Img src={safe.url} alt={safe.alt} width={width} style={{ display: 'block', width: '100%', maxWidth: `${width}px`, height: 'auto', margin: '0 auto' }} />;
+  return <Section style={{ margin: '0 0 20px' }}>{safe.linkUrl ? <Link href={safe.linkUrl}>{picture}</Link> : picture}</Section>;
 }
 
 const styles: Record<string, CSSProperties> = {

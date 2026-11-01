@@ -1,0 +1,17 @@
+{
+  "inspectedAt": "2026-11-01T06:25:39.757Z",
+  "noMutations": true,
+  "scope": "locally configured environment and published CMS",
+  "localConfiguration": {
+    "configuredStripeMode": "test",
+    "actualKeyMode": "test",
+    "modeMatches": true,
+    "webhookSecretConfigured": true,
+    "publicClassEnrollmentEnabled": false,
+    "shopAdminNotificationRecipientIsBusinessInbox": true
+  },
+  "publishedClasses": [],
+  "orderCounts": [],
+  "unclassifiedClassLines": 0,
+  "qaSchemasPresent": 0
+}

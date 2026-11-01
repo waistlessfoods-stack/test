@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { bookings } from "@/lib/db/schema";
-import { sendEmail, fromEmail } from "@/lib/email/mailer";
+import { sendEmail } from "@/lib/email/mailer";
+import { businessInquiryEmail } from "@/lib/email/notification-recipients";
 import { bookingConfirmationTemplate, bookingNotificationTemplate } from "@/lib/email/templates";
 import {
   checkRateLimit,
@@ -181,8 +182,6 @@ export async function POST(request: NextRequest) {
 
     const booking = result[0];
 
-    const adminEmail = process.env.ADMIN_EMAIL || fromEmail;
-
     const [confirmationEmail, notificationEmail] = await Promise.all([
       sendEmail({
         to: normalizedEmail,
@@ -197,7 +196,7 @@ export async function POST(request: NextRequest) {
         }),
       }),
       sendEmail({
-        to: adminEmail,
+        to: businessInquiryEmail,
         subject: `New Booking Request - ${serviceTitle}`,
         replyTo: normalizedEmail,
         html: bookingNotificationTemplate({

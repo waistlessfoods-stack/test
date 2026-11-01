@@ -22,6 +22,7 @@ function isPublicPath(pathname: string): boolean {
   return (
     pathname === "/" ||
     pathname === "/unsubscribe" ||
+    pathname === "/agreements/sign" ||
     pathname === "/admin" ||
     pathname.startsWith("/admin/")
   );

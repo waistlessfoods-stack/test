@@ -1,0 +1,30 @@
+{
+  "inspectedAt": "2026-11-01T05:11:59.684Z",
+  "database": {
+    "tablesAvailable": true,
+    "agreements": 0,
+    "invoiceRecords": 0
+  },
+  "stripe": {
+    "test": {
+      "keyConfigured": true,
+      "endpoints": [],
+      "moreEndpoints": false
+    },
+    "live": {
+      "keyConfigured": true,
+      "endpoints": [
+        {
+          "url": "https://www.waistlessfoods.com/api/stripe/webhook",
+          "status": "enabled",
+          "apiVersion": "2025-12-15.clover",
+          "checkoutEvents": true,
+          "invoicePaidEvent": false,
+          "invoiceLifecycleEvents": []
+        }
+      ],
+      "moreEndpoints": false
+    }
+  },
+  "noMutations": true
+}

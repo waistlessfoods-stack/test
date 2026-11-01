@@ -1,0 +1,12 @@
+{
+  "database": "TEMP orders; transaction rolled back",
+  "stripe": "fixture only",
+  "smtp": "mocked",
+  "browserIdentity": "fictional QA account adapter",
+  "checks": [
+    "Return URL alone never shows payment confirmed; actual SQL order is pending and shows two seats, booked date, stored total, and Continue Payment.",
+    "A Stripe lookup interruption appears in the real Orders UI; Continue Payment returns an actionable error and creates no second payable link.",
+    "Actual reconciliation marks the returned order paid, renders class details at 1440/390/320px, sends one mocked message per audience, and records two confirmed seats. A signed webhook replay adds no emails."
+  ],
+  "passed": true
+}

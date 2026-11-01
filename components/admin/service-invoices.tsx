@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ServiceInvoiceCard } from "@/components/service-invoice-card";
 import { parseServiceInvoice, serviceMoney, type ServiceInvoiceView } from "@/lib/service-invoice-content";
+import type { AgreementView } from "@/lib/service-agreement-content";
+import type { InvoiceNotification } from "@/lib/service-invoice-workflow";
 
 const inputClass = "mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-[#086b70] focus:outline-none focus:ring-2 focus:ring-[#086b70]/15 disabled:bg-slate-100";
 const buttonClass = "rounded-lg bg-[#086b70] px-5 py-3 text-sm font-semibold text-white hover:bg-[#07585c] disabled:cursor-wait disabled:opacity-50";
@@ -17,7 +19,7 @@ async function api(url: string, options?: RequestInit) {
   return data;
 }
 
-export default function AdminServiceInvoices() {
+export default function AdminServiceInvoices({ initialAgreementId = "" }: { initialAgreementId?: string }) {
   const [invoices, setInvoices] = useState<ServiceInvoiceView[]>([]);
   const [next, setNext] = useState<string | null>(null);
   const [selected, setSelected] = useState<ServiceInvoiceView | null>(null);
@@ -29,6 +31,8 @@ export default function AdminServiceInvoices() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [locked, setLocked] = useState(false);
+  const [linkedAgreement, setLinkedAgreement] = useState<AgreementView | null>(null);
+  const [notification, setNotification] = useState<InvoiceNotification | null>(null);
   const pending = useRef<{ key: string; body: string } | null>(null);
   const detailRef = useRef<HTMLDivElement>(null);
   const total = lines.reduce((sum, line) => sum + Math.round(Number(line.price) * 100) * Number(line.quantity), 0);
@@ -39,6 +43,20 @@ export default function AdminServiceInvoices() {
     catch (e) { setError(e instanceof Error ? e.message : "Unable to load invoices."); }
     finally { setLoading(false); }
   }, []);
+  useEffect(() => {
+    if (!initialAgreementId) return;
+    let active = true;
+    void api(`/api/admin/service-agreements/${encodeURIComponent(initialAgreementId)}`).then(data => {
+      if (!active) return;
+      const agreement = data.agreement as AgreementView;
+      if (agreement.status !== "signed") throw new Error("Sign the agreement before preparing its invoice.");
+      setLinkedAgreement(agreement);
+      setForm({ ...blank, name: agreement.content.name, email: agreement.content.email, service: agreement.content.service, title: agreement.content.title.replace(/Agreement$/i, "Invoice"), eventDate: agreement.content.eventDate, notes: `Agreement reference: ${agreement.id}` });
+      setLines([{ description: agreement.content.title, quantity: "1", price: (agreement.content.amount / 100).toFixed(2) }]);
+      setCreating(true); setSelected(null);
+    }).catch(error => { if (active) setError(error.message); });
+    return () => { active = false; };
+  }, [initialAgreementId]);
   useEffect(() => {
     let active = true;
     void api("/api/admin/service-invoices").then(data => { if (active) { setInvoices(data.invoices); setNext(data.next); } }).catch(e => { if (active) setError(e instanceof Error ? e.message : "Unable to load invoices."); }).finally(() => { if (active) setLoading(false); });
@@ -56,20 +74,20 @@ export default function AdminServiceInvoices() {
     if (!pending.current) {
       if (lines.some(line => !/^\d+(\.\d{1,2})?$/.test(line.price))) { setError("Enter prices with no more than two decimal places."); return; }
       try {
-        const validated = parseServiceInvoice({ ...form, items: lines.map(line => ({ description: line.description, quantity: Number(line.quantity), unitAmount: Math.round(Number(line.price) * 100) })) });
+        const validated = parseServiceInvoice({ ...form, ...(linkedAgreement ? { agreementId: linkedAgreement.id } : {}), items: lines.map(line => ({ description: line.description, quantity: Number(line.quantity), unitAmount: Math.round(Number(line.price) * 100) })) });
         pending.current = { key: `${Date.now()}-${crypto.randomUUID()}`, body: JSON.stringify(validated) };
       } catch (e) { setError(e instanceof Error ? e.message : "Check the invoice details."); return; }
     }
     setBusy(true); setLocked(true);
     try {
       const data = await api("/api/admin/service-invoices", { method: "POST", headers: { "Content-Type": "application/json", "Idempotency-Key": pending.current.key }, body: pending.current.body });
-      setSelected(data.invoice); setCreating(false); pending.current = null; setLocked(false); setForm(blank); setLines([{ description: "", quantity: "1", price: "" }]); setNotice("Draft saved in Stripe. Nothing was emailed or charged."); await load();
+      setSelected(data.invoice); setCreating(false); pending.current = null; setLocked(false); setLinkedAgreement(null); setNotification(null); setForm(blank); setLines([{ description: "", quantity: "1", price: "" }]); setNotice("Draft saved in Stripe. Nothing was emailed or charged."); await load();
     } catch (e) { setError(`${e instanceof Error ? e.message : "Unable to save."} Retry keeps the same submission to avoid duplicates. To change details, first check the invoice list.`); }
     finally { setBusy(false); }
   }
   async function review(id: string) {
     setBusy(true); setError(""); setNotice("");
-    try { const data = await api(`/api/admin/service-invoices/${id}`); setSelected(data.invoice); setInvoices(previous => previous.map(invoice => invoice.id === id ? data.invoice : invoice)); setTimeout(() => detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); }
+    try { const data = await api(`/api/admin/service-invoices/${id}`); setSelected(data.invoice); setNotification(data.notification || null); setInvoices(previous => previous.map(invoice => invoice.id === id ? data.invoice : invoice)); setTimeout(() => detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); }
     catch (e) { setError(e instanceof Error ? e.message : "Unable to load invoice."); }
     finally { setBusy(false); }
   }
@@ -80,19 +98,31 @@ export default function AdminServiceInvoices() {
     setBusy(true); setError(""); setNotice("");
     try {
       const data = await api(`/api/admin/service-invoices/${selected.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, expectedTotal: selected.total }) });
-      setSelected(data.invoice);
+      setSelected(data.invoice); setNotification(data.notification || null);
       setNotice(action === "finalize" ? "Invoice issued. You can copy its payment link or explicitly email it below." : action === "send" ? (data.invoice.live ? "Stripe accepted the email request. Check Stripe for delivery information." : "Test send accepted. Stripe does not deliver invoice emails in test mode.") : "Invoice voided. No refund was issued."); await load();
     } catch (e) { setError(e instanceof Error ? e.message : "Action failed."); }
     finally { setBusy(false); }
   }
 
+  async function retryNotification() {
+    if (!selected || !window.confirm("Check info@waistlessfoods.com first. If this notification already arrived, do not resend it. Send a payment notification now?")) return;
+    setBusy(true); setError("");
+    try {
+      const data = await api(`/api/admin/service-invoices/${selected.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "retry_notification", inboxReviewed: true }) });
+      setSelected(data.invoice); setNotification(data.notification);
+      setNotice(data.notification.status === "sent" ? "The mail server accepted the payment notification. Inbox delivery is not confirmed." : "Delivery is pending or uncertain. Review the business inbox before another attempt.");
+    } catch (error) { setError(error instanceof Error ? error.message : "Unable to send notification."); }
+    finally { setBusy(false); }
+  }
+
   return <main className="min-h-screen bg-[#f3f7f5] px-4 py-9 sm:px-8"><div className="mx-auto max-w-6xl">
     <Link href="/admin" className="text-sm text-[#367577] hover:underline">← Admin portal</Link>
-    <header className="mb-7 mt-6 flex flex-wrap items-end justify-between gap-5"><div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#367577]">Private Chef · Catering</p><h1 className="mt-3 font-serif text-4xl text-[#173d40]">Service invoices</h1><p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">A personal service deserves a personal invoice. Prepare the details, review together, and give your customer one secure place to pay.</p></div><button className={buttonClass} disabled={busy || creating} onClick={() => { setCreating(true); setSelected(null); setError(""); setNotice(""); }}>New invoice draft</button></header>
-    <div className="mb-7 rounded-xl border border-[#d6e4df] bg-white px-5 py-4 text-sm leading-6 text-slate-600"><strong className="text-[#173d40]">Draft → Issue → Email or share → Track payment.</strong> Drafts never charge or email customers. Amounts are USD; taxes, discounts, deposits, and remaining contract balances are not calculated automatically. Enter the agreed amount for this invoice. Contracts and date confirmation stay with Amber.</div>
+    <header className="mb-7 mt-6 flex flex-wrap items-end justify-between gap-5"><div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#367577]">Private Chef · Catering</p><h1 className="mt-3 font-serif text-4xl text-[#173d40]">Service invoices</h1><p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">A personal service deserves a personal invoice. Prepare the details, review together, and give your customer one secure place to pay.</p></div><button className={buttonClass} disabled={busy || creating} onClick={() => { setCreating(true); setSelected(null); setLinkedAgreement(null); setNotification(null); setForm(blank); setLines([{ description: "", quantity: "1", price: "" }]); setError(""); setNotice(""); }}>New invoice draft</button></header>
+    <div className="mb-7 rounded-xl border border-[#d6e4df] bg-white px-5 py-4 text-sm leading-6 text-slate-600"><strong className="text-[#173d40]">Agreement → Draft invoice → Issue → Email or share → Track payment.</strong> Start from <Link href="/admin/service-agreements" className="text-[#086b70] underline">service agreements</Link> to carry a signed agreement into its invoice. Drafts never charge or email customers. Enter the amount due for this invoice in USD; payment schedules and taxes are not calculated automatically.</div>
     {error && <p role="alert" className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-800">{error}</p>}
     {notice && <p role="status" className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-800">{notice}</p>}
     {creating && <form onSubmit={save} className="mb-8 rounded-2xl border border-[#d6e4df] bg-white p-6 shadow-sm sm:p-8"><h2 className="text-xl font-semibold text-[#173d40]">Prepare a draft</h2><p className="mt-2 text-sm text-slate-500">Review before saving. Saved draft revisions are managed in Stripe; issuing requires a separate confirmation.</p>
+      {linkedAgreement && <p className="mt-4 rounded-lg bg-teal-50 p-4 text-sm leading-6 text-teal-900">Linked to the signed agreement for request #{linkedAgreement.bookingId}. Keep its customer email, service, and event date unchanged. For a deposit, enter the agreed amount due now; active invoice totals cannot exceed the signed total of {serviceMoney(linkedAgreement.content.amount)}.</p>}
       <fieldset disabled={busy || locked} className="mt-6 space-y-5 disabled:opacity-70"><legend className="sr-only">Invoice details</legend><div className="grid gap-5 sm:grid-cols-2">
         <label className="text-sm font-medium">Customer name<input required maxLength={100} className={inputClass} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></label>
         <label className="text-sm font-medium">Customer email<input required type="email" maxLength={254} className={inputClass} value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></label>
@@ -111,6 +141,8 @@ export default function AdminServiceInvoices() {
     </form>}
     {selected && <div ref={detailRef} className="mb-9 grid scroll-mt-8 gap-5 lg:grid-cols-[1fr_300px]"><ServiceInvoiceCard invoice={selected} /><aside className="h-fit rounded-2xl border border-[#d6e4df] bg-white p-6"><h3 className="font-semibold text-[#173d40]">Invoice actions</h3><p className="mt-3 text-sm leading-6 text-slate-500">Status and balances are read directly from Stripe. Refresh after the customer pays.</p><div className="mt-5 flex flex-col gap-3">
       <button disabled={busy} className="rounded-lg border border-slate-300 px-4 py-3 text-sm" onClick={() => review(selected.id)}>Refresh payment status</button>
+      {selected.agreementId && <Link href={`/admin/service-agreements?agreement=${selected.agreementId}`} className="rounded-lg border border-[#367577] px-4 py-3 text-center text-sm text-[#086b70]">View linked agreement</Link>}
+      {selected.status === "paid" && notification && <div className="rounded-lg bg-[#f3f7f5] p-4 text-sm leading-6"><p>Business payment notification: {notification.status === "sent" ? "accepted by mail server" : notification.status === "needs_review" ? "delivery uncertain — review inbox" : notification.status}.</p>{(notification.status === "needs_review" || notification.status === "pending") && <button type="button" disabled={busy} onClick={retryNotification} className="mt-3 text-left font-medium text-[#086b70] underline">Review inbox and send notification</button>}</div>}
       {selected.status === "draft" && <button disabled={busy || !selected.ready} className={buttonClass} onClick={() => act("finalize")}>Issue invoice & payment link</button>}
       {selected.status === "draft" && !selected.ready && <p className="text-sm text-amber-800">Incomplete draft. Retry the original submission or review it in Stripe. Do not issue it manually until all lines are verified.</p>}
       {selected.status === "open" && <><button disabled={busy} className={buttonClass} onClick={() => act("send")}>Email invoice to customer</button><button disabled={busy} className="rounded-lg border border-red-200 px-4 py-3 text-sm text-red-700" onClick={() => act("void")}>Void unpaid invoice</button></>}

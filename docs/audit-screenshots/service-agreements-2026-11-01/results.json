@@ -1,0 +1,13 @@
+{
+  "browser": "http://localhost:3010",
+  "database": "TEMP tables, rolled-back transaction",
+  "stripe": "in-memory fixture",
+  "smtp": "mocked",
+  "checks": [
+    "Real admin UI creates a draft from the inquiry, edits approved-text fixture, freezes the preview, and sends only through mocked SMTP.",
+    "Anonymous private-link review/signing saves immutable proof, fits 390px, and prints a multi-page signed copy without navigation or action controls.",
+    "Signed agreement prefills the invoice; a $50 deposit is issued/sent through the Stripe fixture and payment refresh shows paid status plus a deduplicated mocked business notification."
+  ],
+  "pdfPages": 2,
+  "passed": true
+}

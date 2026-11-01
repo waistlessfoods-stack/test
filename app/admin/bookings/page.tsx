@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useAdminAuth } from "@/components/admin/admin-auth";
 
 type Booking = {
@@ -475,6 +476,7 @@ export default function AdminBookingsPage() {
                             </p>
                           </div>
                         )}
+                        {["private", "private-chef", "catering"].includes(booking.serviceSlug) && <div className="sm:col-span-2"><Link href={`/admin/service-agreements?booking=${booking.id}`} className="inline-block rounded-lg bg-[#086b70] px-4 py-3 text-sm font-medium text-white">Prepare service agreement</Link></div>}
                       </div>
                     </div>
                   )}

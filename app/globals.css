@@ -126,6 +126,32 @@ body {
   }
 }
 
+/* Keep guest counts readable when selected, invalid, or browser-autofilled. */
+.booking-guest-count {
+  color-scheme: light;
+  -webkit-text-fill-color: #000000;
+}
+
+.booking-guest-count:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #f4f4f4 inset;
+}
+
+@media print {
+  body:has(.agreement-document) header,
+  body:has(.agreement-document) footer:not(.agreement-document footer),
+  body:has(.agreement-document) nav,
+  body:has(.agreement-document) [data-radix-portal],
+  .agreement-controls { display: none !important; }
+  .agreement-page { background: white !important; padding: 0 !important; }
+  .agreement-document { border: 0 !important; border-radius: 0 !important; box-shadow: none !important; padding: 0 !important; }
+  .agreement-document section { break-inside: auto; }
+  .agreement-document p { line-height: 1.5 !important; }
+  .agreement-document dl,
+  .agreement-document footer,
+  .agreement-document .agreement-signature { break-inside: avoid; }
+  .agreement-document h1, .agreement-document h2 { break-after: avoid; }
+}
+
 /* Keep Clerk profile visually transparent inside our custom modal shell. */
 .clerk-profile-modal .cl-card,
 .clerk-profile-modal .cl-cardBox,

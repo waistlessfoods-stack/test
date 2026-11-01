@@ -6,7 +6,8 @@ import { isStoredOrderItems } from "@/lib/order-checkout-snapshot";
 import { logError, logInfo, maskEmail } from "@/lib/structured-log";
 import OrderConfirmationEmail from "@/lib/email/templates/order-confirmation-email";
 import AdminOrderNotificationEmail from "@/lib/email/templates/admin-order-notification-email";
-import { fromEmail, sendEmail } from "@/lib/email/mailer";
+import { sendEmail } from "@/lib/email/mailer";
+import { businessOrderEmail } from "@/lib/email/notification-recipients";
 
 type SendOrderConfirmationOptions = {
   orderId: number;
@@ -63,7 +64,7 @@ async function sendOrderEmailOnce(
   );
   const email = claimedOrder.customerEmail;
   const recipient = audience === "admin"
-    ? process.env.ADMIN_EMAIL?.trim() || fromEmail
+    ? businessOrderEmail
     : email;
 
   try {

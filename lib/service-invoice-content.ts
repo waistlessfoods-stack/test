@@ -8,6 +8,8 @@ export type ServiceInvoiceInput = {
   name: string; email: string; service: "private_chef" | "catering";
   title: string; eventDate: string; notes: string; daysUntilDue: number;
   items: { description: string; quantity: number; unitAmount: number }[];
+  agreementId?: string;
+  bookingId?: number;
 };
 
 export type ServiceInvoiceView = {
@@ -17,6 +19,8 @@ export type ServiceInvoiceView = {
   created: number; dueDate: number | null; paidAt: number | null;
   hostedUrl: string | null; pdfUrl: string | null; live: boolean; ready: boolean; overdue: boolean;
   items: { description: string; quantity: number; amount: number }[];
+  agreementId?: string;
+  bookingId?: number;
 };
 
 function text(value: unknown, field: string, max: number, required = true, multiline = false) {
@@ -51,7 +55,12 @@ export function parseServiceInvoice(value: unknown): ServiceInvoiceInput {
   });
   const total = invoiceInputTotal({ items });
   if (!Number.isSafeInteger(total) || total < 50 || total > 9999999) throw new ServiceInvoiceError("Invoice total must be between $0.50 and $99,999.99 USD.");
-  return { name, email, service: data.service, title, eventDate, notes, daysUntilDue: Number(daysUntilDue), items };
+  let agreementId: string | undefined;
+  if (data.agreementId !== undefined) {
+    if (typeof data.agreementId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(data.agreementId)) throw new ServiceInvoiceError("Invalid linked agreement.");
+    agreementId = data.agreementId.toLowerCase();
+  }
+  return { name, email, service: data.service, title, eventDate, notes, daysUntilDue: Number(daysUntilDue), items, ...(agreementId ? { agreementId } : {}) };
 }
 
 export function invoiceInputTotal(input: Pick<ServiceInvoiceInput, "items">) {

@@ -7,6 +7,8 @@ import {
   isCookingClassProduct,
 } from "@/lib/contentful-management";
 import { requireAdminPageSession } from "@/lib/admin-page-session";
+import { contentfulEntryEditorUrl } from "@/lib/contentful-editor-links";
+import RefreshRecipeContent from "@/components/admin/refresh-recipe-content";
 
 export default async function AdminRecipePreviewPage({
   params,
@@ -33,12 +35,16 @@ export default async function AdminRecipePreviewPage({
               This is the full post-purchase recipe layout.
             </p>
           </div>
+          <div className="flex flex-wrap items-center gap-4">
+          {contentfulEntryEditorUrl(recipe.id) && <a href={contentfulEntryEditorUrl(recipe.id)!} target="_blank" rel="noopener noreferrer" className="text-sm font-medium underline underline-offset-4">Edit in Contentful ↗</a>}
+          <RefreshRecipeContent />
           <Link
             href="/admin/recipes"
             className="text-sm font-medium text-white underline underline-offset-4"
           >
             Back to paid recipes
           </Link>
+          </div>
         </div>
       </div>
       <RecipeFullClient recipe={recipe} isFreeRecipe={false} />

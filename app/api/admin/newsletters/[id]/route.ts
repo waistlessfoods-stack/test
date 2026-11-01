@@ -7,10 +7,12 @@ import { newsletterIssues } from "@/lib/db/schema";
 import { assertNewsletterReady, NewsletterInputError, parseNewsletterContent, parsePositiveInteger } from "@/lib/newsletter-content";
 import { newsletterAdminGuard, newsletterError, newsletterJson, privateHeaders } from "@/lib/newsletter-http";
 import { createNewsletterPdf } from "@/lib/newsletter-pdf";
-import { fromEmail, sendEmail } from "@/lib/email/mailer";
+import { sendEmail } from "@/lib/email/mailer";
+import { administratorAccountEmail } from "@/lib/admin-identity";
 import NewsletterIssueEmail from "@/lib/email/templates/newsletter-issue-email";
 
 type Context = { params: Promise<{ id: string }> };
+export const maxDuration = 60;
 const missing = () => NextResponse.json({ error: "Issue not found." }, { status: 404, headers: privateHeaders });
 
 export async function GET(request: NextRequest, context: Context) {
@@ -70,7 +72,7 @@ export async function POST(request: NextRequest, context: Context) {
       sql`(${newsletterIssues.lastTestAt} is null or ${newsletterIssues.lastTestAt} < now() - interval '60 seconds')`,
     )).returning();
     if (!claimed) return NextResponse.json({ error: "Wait one minute between tests, or reload if the issue changed." }, { status: 429, headers: { ...privateHeaders, "Retry-After": "60" } });
-    const result = await sendEmail({ to: process.env.ADMIN_EMAIL?.trim() || fromEmail, subject: `[PREVIEW] ${claimed.subject}`, react: React.createElement(NewsletterIssueEmail, { issue: claimed }) });
+    const result = await sendEmail({ to: administratorAccountEmail(), subject: `[PREVIEW] ${claimed.subject}`, react: React.createElement(NewsletterIssueEmail, { issue: claimed }) });
     if (result.error) return NextResponse.json({ error: "The mail service could not send the preview. Check email configuration and retry in one minute." }, { status: 502, headers: privateHeaders });
     return NextResponse.json({ message: "Preview sent to the configured administrator address. No subscribers were emailed." }, { headers: privateHeaders });
   } catch (error) { return newsletterError(error); }

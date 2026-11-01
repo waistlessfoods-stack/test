@@ -5,6 +5,7 @@ import {
 import { arePublicCookingClassesEnabled } from "@/lib/public-cooking-classes";
 import { buildMetadata } from "@/lib/seo";
 import ShopPageClient from "./shop-page-client";
+import { recipePurchasePreview } from "@/lib/recipe-content-access";
 
 export const revalidate = 300;
 
@@ -38,5 +39,5 @@ export default async function Shop({ searchParams }: ShopPageProps) {
     ? resolvedSearchParams.category[0]
     : resolvedSearchParams.category;
 
-  return <ShopPageClient key={initialCategory ?? 'all'} data={visibleData} initialCategory={initialCategory} />;
+  return <ShopPageClient key={initialCategory ?? 'all'} data={{ ...visibleData, recipes: visibleData.recipes.map(recipePurchasePreview) }} initialCategory={initialCategory} />;
 }

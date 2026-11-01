@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
 import { invoiceAdminGuard, invoiceBody, invoiceError, invoiceJson } from "@/lib/service-invoice-http";
 import { parseInvoiceId, parseInvoiceRequestKey, parseServiceInvoice } from "@/lib/service-invoice-content";
-import { createServiceInvoice, listServiceInvoices, serviceStripe, serviceStripeMode } from "@/lib/service-invoices";
+import { listServiceInvoices, serviceStripe, serviceStripeMode } from "@/lib/service-invoices";
+import { invoiceWorkflow } from "@/lib/service-invoice-workflow-store";
 
 export const maxDuration = 60;
 
@@ -17,6 +18,6 @@ export async function POST(request: NextRequest) {
   try {
     const key = parseInvoiceRequestKey(request.headers.get("idempotency-key"));
     const input = parseServiceInvoice(await invoiceBody(request));
-    return invoiceJson({ invoice: await createServiceInvoice(serviceStripe(), input, key) }, 201);
+    return invoiceJson({ invoice: await invoiceWorkflow.create(serviceStripe(), input, key) }, 201);
   } catch (error) { return invoiceError(error); }
 }

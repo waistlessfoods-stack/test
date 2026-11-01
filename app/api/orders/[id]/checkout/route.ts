@@ -1,149 +1,34 @@
-import Stripe from "stripe";
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { and, eq, inArray } from "drizzle-orm";
-import { db } from "@/lib/db";
-import { orders } from "@/lib/db/schema";
-import {
-  getClerkUserIdentityIds,
-  syncCurrentClerkUser,
-} from "@/lib/clerk-user-sync";
-import { getCanonicalAppUrl } from "@/lib/app-url";
-import {
-  buildStripeLineItemsFromSnapshot,
-  resolveOrderCheckoutSnapshot,
-} from "@/lib/order-checkout-snapshot";
-import { arePublicCookingClassesEnabled } from "@/lib/public-cooking-classes";
-import { getStripeSecretKey } from "@/lib/stripe-config";
+import Stripe from 'stripe';
+import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { getClerkUserIdentityIds, syncCurrentClerkUser } from '@/lib/clerk-user-sync';
+import { getCanonicalAppUrl } from '@/lib/app-url';
+import { fetchShopPageFromContentful } from '@/lib/contentful-management';
+import { arePublicCookingClassesEnabled } from '@/lib/public-cooking-classes';
+import { getStripeSecretKey } from '@/lib/stripe-config';
+import { CheckoutError, checkoutKeyMode } from '@/lib/checkout-content';
+import { shopCheckout } from '@/lib/shop-checkout-store';
 
-const stripeSecretKey = getStripeSecretKey();
+export const maxDuration = 60;
+const key = getStripeSecretKey();
+const stripe = key ? new Stripe(key, { apiVersion: '2024-06-20', timeout: 8000, maxNetworkRetries: 0 }) : null;
+const headers = { 'Cache-Control': 'private, no-store' };
 
-const stripe = stripeSecretKey
-  ? new Stripe(stripeSecretKey, { apiVersion: "2024-06-20" })
-  : null;
-
-export async function POST(
-  request: Request,
-  context: { params: Promise<{ id: string }> }
-) {
-  if (!stripe) {
-    return NextResponse.json(
-      { error: "Stripe secret key is not configured." },
-      { status: 500 }
-    );
-  }
-
+export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
+  if (!stripe || !key) return NextResponse.json({ error: 'Stripe is not configured.' }, { status: 503, headers });
+  if (request.headers.get('origin') !== new URL(request.url).origin) return NextResponse.json({ error: 'A same-origin request is required.' }, { status: 403, headers });
   try {
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized. Please sign in." },
-        { status: 401 }
-      );
-    }
-
-    const syncResult = await syncCurrentClerkUser();
-    const ownerIds = getClerkUserIdentityIds(userId, syncResult);
-    const appUrl = getCanonicalAppUrl();
-
+    if (!userId) throw new CheckoutError('Please sign in to continue.', 401);
     const { id } = await context.params;
-    const orderId = Number(id);
-
-    if (!Number.isInteger(orderId) || orderId <= 0) {
-      return NextResponse.json({ error: "Invalid order id." }, { status: 400 });
-    }
-
-    const existingOrder = await db.query.orders.findFirst({
-      where: and(eq(orders.id, orderId), inArray(orders.userId, ownerIds)),
-    });
-
-    if (!existingOrder) {
-      return NextResponse.json({ error: "Order not found." }, { status: 404 });
-    }
-
-    if (existingOrder.status !== "pending") {
-      return NextResponse.json(
-        { error: "Only pending orders can be paid." },
-        { status: 400 }
-      );
-    }
-
-    const checkoutSnapshot = resolveOrderCheckoutSnapshot({
-      amount: existingOrder.amount,
-      currency: existingOrder.currency,
-      items: existingOrder.items,
-      metadata: existingOrder.metadata,
-    });
-
-    if (!checkoutSnapshot) {
-      return NextResponse.json(
-        { error: "Order checkout data is invalid. Please contact support." },
-        { status: 400 }
-      );
-    }
-
-    if (
-      !arePublicCookingClassesEnabled() &&
-      checkoutSnapshot.items.some((item) => item.kind === "cooking_class")
-    ) {
-      return NextResponse.json(
-        { error: "Public cooking classes are not currently available." },
-        { status: 400 }
-      );
-    }
-
-    // Reuse existing open checkout session if Stripe still has a valid URL.
-    try {
-      const existingSession = await stripe.checkout.sessions.retrieve(
-        existingOrder.stripeSessionId
-      );
-      if (existingSession.status === "open" && existingSession.url) {
-        return NextResponse.json({ url: existingSession.url, reused: true });
-      }
-    } catch {
-      // If retrieval fails, we create a new session below.
-    }
-
-    const lineItems = buildStripeLineItemsFromSnapshot(checkoutSnapshot);
-
-    const stripeSession = await stripe.checkout.sessions.create({
-      mode: "payment",
-      payment_method_types: ["card"],
-      line_items: lineItems,
-      customer_email: existingOrder.customerEmail || undefined,
-      metadata: {
-        userId: existingOrder.userId,
-        orderId: String(existingOrder.id),
-      },
-      success_url: `${appUrl}/orders?success=1`,
-      cancel_url: `${appUrl}/orders?resume=1`,
-    });
-
-    const previousMetadata =
-      typeof existingOrder.metadata === "object" && existingOrder.metadata !== null
-        ? (existingOrder.metadata as Record<string, unknown>)
-        : {};
-
-    await db
-      .update(orders)
-      .set({
-        stripeSessionId: stripeSession.id,
-        updatedAt: new Date(),
-        metadata: {
-          ...previousMetadata,
-          checkoutSnapshot,
-          previousStripeSessionId: existingOrder.stripeSessionId,
-          sessionUrl: stripeSession.url,
-          resumedAt: new Date().toISOString(),
-        },
-      })
-      .where(eq(orders.id, existingOrder.id));
-
-    return NextResponse.json({ url: stripeSession.url, reused: false });
+    if (!/^\d+$/.test(id) || !Number.isSafeInteger(Number(id)) || Number(id) < 1) throw new CheckoutError('Invalid order ID.');
+    const identity = await syncCurrentClerkUser();
+    const catalogue = await fetchShopPageFromContentful();
+    const result = await shopCheckout.resume({ stripe, mode: checkoutKeyMode(key), appUrl: getCanonicalAppUrl(), orderId: Number(id), ownerIds: getClerkUserIdentityIds(userId, identity), catalogue: catalogue.recipes, classesEnabled: arePublicCookingClassesEnabled() });
+    return NextResponse.json(result, { headers });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unable to resume checkout.";
-    console.error("Resume checkout error:", message);
-    return NextResponse.json({ error: message }, { status: 500 });
+    if (error instanceof CheckoutError) return NextResponse.json({ error: error.message }, { status: error.status, headers });
+    console.error('[Checkout] Could not resume checkout', error instanceof Error ? error.message : 'Unknown error');
+    return NextResponse.json({ error: 'The payment could not be checked. Refresh your orders and retry shortly.' }, { status: 503, headers });
   }
 }

@@ -10,6 +10,7 @@ import {
 } from "@/lib/clerk-user-sync";
 import { sendOrderConfirmationOnce } from "@/lib/email/send-order-confirmation";
 import { getStripeSecretKey } from "@/lib/stripe-config";
+import { checkoutKeyMode } from "@/lib/checkout-content";
 
 const stripeSecretKey = getStripeSecretKey();
 
@@ -47,10 +48,19 @@ export async function POST() {
 
     let updatedCount = 0;
     let confirmationFailures = 0;
+    let unverified = 0;
+    const mode = checkoutKeyMode(stripeSecretKey!);
 
     for (const order of pendingOrders) {
+      if (!order.stripeSessionId.startsWith(`cs_${mode}_`)) continue;
       try {
         const session = await stripe.checkout.sessions.retrieve(order.stripeSessionId);
+
+        if (session.id !== order.stripeSessionId || session.livemode !== (mode === "live") ||
+          session.amount_total !== order.amount || session.currency !== order.currency) {
+          unverified += 1;
+          continue;
+        }
 
         if (session.payment_status === "paid") {
           const updated = await db
@@ -95,6 +105,7 @@ export async function POST() {
           }
         }
       } catch (error) {
+        unverified += 1;
         console.warn("[Orders Reconcile] Could not verify Stripe session", {
           orderId: order.id,
           stripeSessionId: order.stripeSessionId,
@@ -110,6 +121,7 @@ export async function POST() {
         and(
           inArray(orders.userId, ownerIds),
           eq(orders.status, "completed"),
+          sql`left(${orders.stripeSessionId},8) = ${`cs_${mode}_`}`,
           or(
             sql`${orders.metadata}->>'orderConfirmationError' is not null`,
             sql`${orders.metadata}->>'orderAdminNotificationError' is not null`,
@@ -131,12 +143,14 @@ export async function POST() {
       pendingChecked: pendingOrders.length,
       updatedCount,
       confirmationFailures,
+      unverified,
     });
 
     return NextResponse.json({
       checked: pendingOrders.length,
       updated: updatedCount,
       confirmationFailures,
+      unverified,
     });
   } catch (error) {
     const message =

@@ -5,7 +5,7 @@ import test from 'node:test';
 import { readFile } from 'node:fs/promises';
 import React from 'react';
 import { render } from '@react-email/render';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, PDFName } from 'pdf-lib';
 import pg from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { NextRequest } from 'next/server.js';
@@ -61,16 +61,23 @@ test('newsletter APIs, authorization, publication and subscriber controls', { sk
   await client.query('SET LOCAL search_path TO pg_temp');
   const migration = await readFile(new URL('../drizzle/0011_newsletter_issues.sql', import.meta.url), 'utf8');
   await client.query(migration.replace('CREATE TABLE IF NOT EXISTS', 'CREATE TEMP TABLE'));
+  await client.query(await readFile(new URL('../drizzle/0014_newsletter_media.sql', import.meta.url), 'utf8'));
   await client.query('CREATE TEMP TABLE subscribers (id serial primary key, email text not null unique, active boolean not null default true, created_at timestamp not null default now(), updated_at timestamp not null default now(), unsubscribed_at timestamp)');
   const { rows: tables } = await client.query("SELECT relname, relnamespace = pg_my_temp_schema() AS isolated FROM pg_class WHERE oid IN ('newsletter_issues'::regclass, 'subscribers'::regclass)");
   assert.equal(tables.length, 2);
   assert.ok(tables.every(table => table.isolated));
   let userId = null;
   let sendFailure = false;
+  let imageFailure = false;
+  const imageBytes = await readFile(new URL('../public/recipes/pasta.png', import.meta.url));
   const sends = [];
   const modules = sourceLoader({
     'server-only': {},
     '@/lib/db': { db: drizzle(client) },
+    '@/lib/newsletter-image-resource': { loadNewsletterImage: async () => {
+      if (imageFailure) throw new (modules('lib/newsletter-content.ts').NewsletterInputError)('QA unavailable image');
+      return { bytes: imageBytes, format: 'png' };
+    } },
     '@clerk/nextjs/server': { auth: async () => ({ userId }) },
     '@/lib/email/mailer': { fromEmail: 'sender@example.com', sendEmail: async message => {
       if (sendFailure) return { error: { message: 'Simulated SMTP failure' }, data: null };
@@ -144,7 +151,7 @@ test('newsletter APIs, authorization, publication and subscriber controls', { sk
     const first = await detail.POST(request('/test', 'POST', { version: issue.version, to: 'not-allowed@example.com' }), context(issue.id));
     assert.equal(first.status, 200);
     assert.equal(sends.length, 1);
-    assert.equal(sends[0].to, process.env.ADMIN_EMAIL?.trim() || 'sender@example.com');
+    assert.equal(sends[0].to, process.env.ADMIN_ACCOUNT_EMAIL?.trim().toLowerCase() || 'admin@waistlessfoods.com');
     assert.ok(sends[0].subject.startsWith('[PREVIEW]'));
     assert.equal((await detail.POST(request('/test', 'POST', { version: issue.version }), context(issue.id))).status, 429);
     assert.equal((await detail.POST(request('/test', 'POST', { version: 999 }), context(issue.id))).status, 409);
@@ -176,5 +183,20 @@ test('newsletter APIs, authorization, publication and subscriber controls', { sk
     assert.equal((await subscribers.PATCH(request('/subscribers', 'PATCH', { id, action: 'reactivate' }))).status, 400);
     response = await subscribers.GET(request('/api/admin/newsletter-subscribers?format=csv'));
     assert.ok(!(await response.text()).includes('active@example.com'));
+  });
+  await t.test('saved newsletter images survive API publication and member PDF download; broken images cannot publish', async () => {
+    const issue = await create();
+    const media = { header: { url: 'https://www.waistlessfoods.com/logo.png', alt: 'QA header', linkUrl: '' }, footer: null, images: [{ url: 'https://www.waistlessfoods.com/recipes/pasta.png', alt: 'QA photo', linkUrl: 'https://www.waistlessfoods.com/recipes', afterParagraph: 1 }] };
+    imageFailure = true;
+    assert.equal((await patch(issue, { media, status: 'published' })).status, 400);
+    imageFailure = false;
+    const response = await patch(issue, { media, status: 'published' });
+    assert.equal(response.status, 200); assert.deepEqual((await response.json()).issue.media, media);
+    userId = 'qa-member';
+    const pdf = await download.GET(request('/download'), context(issue.id));
+    assert.equal(pdf.status, 200);
+    const document = await PDFDocument.load(await pdf.arrayBuffer());
+    assert.ok(document.getPages().some(page => page.node.Resources().has(PDFName.of('XObject'))), 'Published member PDF must contain embedded image resources');
+    assert.equal(document.getTitle(), issue.title);
   });
 });

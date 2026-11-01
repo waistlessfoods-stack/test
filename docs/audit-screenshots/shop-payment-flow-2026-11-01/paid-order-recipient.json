@@ -1,0 +1,26 @@
+{
+  "verifiedAt": "2026-11-01T06:26:07.283Z",
+  "ownerConfirmedRecipient": "info@waistlessfoods.com",
+  "customerReceipts": "purchaser address unchanged",
+  "tests": [
+    {
+      "name": "order-notifications",
+      "passed": 19,
+      "failed": 0
+    },
+    {
+      "name": "shop-checkout",
+      "passed": 13,
+      "failed": 0
+    }
+  ],
+  "productionBuild": "passed",
+  "typeScript": "passed",
+  "targetedLint": "passed",
+  "smtp": "mocked; no emails sent",
+  "database": "isolated test records removed",
+  "sourceSha256": {
+    "lib/email/notification-recipients.ts": "fb03c463e8e59099d6f43478c27f6906025e6c1dcbbb0b13ce499c6b7b20f066",
+    "lib/email/send-order-confirmation.tsx": "a7dd40ed1746626094394fc4745c77a9db913e7ee8f1f85fad71ca33e91549cc"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "base": "http://localhost:3010",
+  "noPaymentOrEmail": true,
+  "checks": [
+    "Both new/resume checkout APIs reject anonymous customers and cross-origin mutations on the actual production build.",
+    "Checkout verification page requires the administrator session, displays the configured payment environment and class release state, and directs testing through the real Shop instead of an arbitrary charge."
+  ],
+  "passed": true
+}

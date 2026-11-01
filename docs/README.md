@@ -18,12 +18,14 @@ Do not send documents from the internal or archive sections to the client.
 
 ## Website Closeout
 
+- [October 31 Meeting Update Checklist](meeting-notes-website-planning-2026-10-31.md)
 - [Final Website Punch List](final-website-punch-list-2026-08-16.md)
 - [Production QA Report](production-qa-report-2026-08-17.md)
 - [Website Planning Meeting Notes](meeting-notes-website-planning-2026-08-15.md)
 
 ## Client Content and Correspondence
 
+- [Amber's October 31 Written Recap](amber-written-recap-2026-10-31.md)
 - [Amber Email Correspondence Context](amber-email-correspondence-context-2025-09-to-2026-08.md)
 - [Latest WaistLess Table Welcome Email Copy](amber-welcome-email-copy-2026-08-14.md)
 - [Older Welcome Email Copy](amber-welcome-email-copy-2026-08-13.md)
@@ -32,6 +34,9 @@ Do not send documents from the internal or archive sections to the client.
 
 ## Implementation and Technical Reference
 
+- [Shop and Public-Class Payment Readiness](shop-payment-readiness-2026-11-01.md)
+- [Newsletter Images and Recipe Management](newsletter-media-and-recipe-management-2026-11-01.md)
+- [Service Agreements and Linked Invoice Workflow](service-agreements-2026-11-01.md)
 - [Blog and Chef’s Guide to Herbs Tracker](amber-blog-herbs-implementation-tracker.md)
 - [Services Short Audit](amber-services-short-audit-2026-07-05.md)
 - [Contentful Audit](contentful-audit-2026-06-08.md)

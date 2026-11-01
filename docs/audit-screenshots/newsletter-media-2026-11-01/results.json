@@ -1,0 +1,13 @@
+{
+  "browser": "http://localhost:3010",
+  "database": "TEMP tables; transaction rolled back",
+  "smtp": "mocked",
+  "images": "local website fixtures",
+  "checks": [
+    "Saved header/body/footer images, descriptions, links, and placement round-trip through actual handlers/SQL; unsaved changes block tests and campaign preparation.",
+    "Saved email preview renders all three photos and links at desktop/mobile widths in light/dark modes; administrator test uses mocked SMTP only.",
+    "PDF download contains the same saved media; campaign snapshot freezes images/links; explicit archive publication sends no subscriber email."
+  ],
+  "pdfPages": 2,
+  "passed": true
+}

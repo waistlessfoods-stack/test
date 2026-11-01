@@ -1,5 +1,7 @@
 # Newsletter Studio: first-version handoff
 
+November 1 follow-up: [editable newsletter images and current preview-recipient setup](newsletter-media-and-recipe-management-2026-11-01.md) supersede the original image and recipient limitations below. This document retains the original handoff as historical context.
+
 September 8 follow-up: Gmail campaign sending has now been implemented locally;
 see [campaign setup and verification](newsletter-campaigns-2026-09-08.md).
 The original first-version boundaries below are retained as historical context.

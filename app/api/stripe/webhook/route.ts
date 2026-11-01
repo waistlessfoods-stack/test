@@ -3,7 +3,11 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
 import { and, eq, ne, sql } from "drizzle-orm";
+import { checkoutKeyMode } from "@/lib/checkout-content";
 import { sendOrderConfirmationOnce } from "@/lib/email/send-order-confirmation";
+import { ownsServiceInvoice } from "@/lib/service-invoices";
+import { invoiceWorkflow } from "@/lib/service-invoice-workflow-store";
+import { sendServiceInvoicePayment } from "@/lib/email/service-invoice-payment";
 import {
   getStripeSecretKey,
   getStripeWebhookSecret,
@@ -50,6 +54,17 @@ export async function POST(request: Request) {
 
     console.log("[Stripe Webhook] Event received:", event.type);
 
+    if (event.type.startsWith("invoice.")) {
+      const candidate = event.data.object as Stripe.Invoice;
+      if (ownsServiceInvoice(candidate)) {
+        if (event.type === "invoice.deleted") await invoiceWorkflow.deleted(candidate.id);
+        else {
+          const invoice = await invoiceWorkflow.sync(stripe, candidate.id);
+          if (invoice.status === "paid") await invoiceWorkflow.notify(invoice, sendServiceInvoicePayment);
+        }
+      }
+    }
+
     // Delayed payment methods complete checkout before payment settles.
     if (
       event.type === "checkout.session.completed" ||
@@ -60,6 +75,11 @@ export async function POST(request: Request) {
         return NextResponse.json({ received: true });
       }
       const metadataOrderId = Number(session.metadata?.orderId);
+      const mode = checkoutKeyMode(stripeSecretKey!);
+      if (session.livemode !== (mode === "live") || !session.id.startsWith(`cs_${mode}_`) ||
+        !Number.isSafeInteger(session.amount_total) || !session.currency) {
+        return NextResponse.json({ error: "Checkout payment environment or totals did not match." }, { status: 400 });
+      }
 
       let updated: Array<{ id: number }> = [];
 
@@ -83,6 +103,8 @@ export async function POST(request: Request) {
         .where(and(
           eq(orders.stripeSessionId, session.id),
           ne(orders.status, "refunded"),
+          eq(orders.amount, session.amount_total!),
+          eq(orders.currency, session.currency),
         ))
         .returning({ id: orders.id });
 
@@ -107,7 +129,14 @@ export async function POST(request: Request) {
           })
           .where(and(
             eq(orders.id, metadataOrderId),
-            ne(orders.status, "refunded"),
+            eq(orders.status, "pending"),
+            eq(orders.userId, session.metadata?.userId || ""),
+            eq(orders.amount, session.amount_total!),
+            eq(orders.currency, session.currency),
+            sql`left(${orders.stripeSessionId},8) = ${`cs_${mode}_`}`,
+            // Only the current or immediately replaced session belongs to this
+            // pending checkout. Arbitrary metadata cannot attach another sale.
+            sql`${orders.metadata}->>'previousStripeSessionId' = ${session.id}`,
           ))
           .returning({ id: orders.id });
       }
@@ -152,7 +181,7 @@ export async function POST(request: Request) {
           stripePaymentIntentId: paymentIntent.id,
           updatedAt: new Date(),
         })
-        .where(eq(orders.stripePaymentIntentId, paymentIntent.id))
+        .where(and(eq(orders.stripePaymentIntentId, paymentIntent.id), eq(orders.status, "pending")))
         .returning({ id: orders.id });
 
       console.log("[Stripe Webhook] Payment failed", {

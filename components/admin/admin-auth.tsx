@@ -7,13 +7,14 @@ import {
   useEffect,
   useState,
 } from "react";
+import { SignInButton, useUser } from "@clerk/nextjs";
 
 type AdminAuthContextValue = {
   authenticated: boolean;
   isChecking: boolean;
   isSubmitting: boolean;
   error: string;
-  login: (password: string) => Promise<boolean>;
+  login: (password: string, useAccount?: boolean) => Promise<boolean>;
   logout: () => void;
 };
 
@@ -38,11 +39,11 @@ async function getAdminSessionStatus() {
   };
 }
 
-async function createAdminSession(password: string) {
+async function createAdminSession(password: string, useAccount = false) {
   const response = await fetch("/api/admin/verify", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password }),
+    body: JSON.stringify(useAccount ? { useAccount: true } : { password }),
   });
 
   let data: { error?: string } = {};
@@ -89,12 +90,12 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  async function login(nextPassword: string) {
+  async function login(nextPassword: string, useAccount = false) {
     setIsSubmitting(true);
     setError("");
 
     try {
-      const result = await createAdminSession(nextPassword);
+      const result = await createAdminSession(nextPassword, useAccount);
 
       if (!result.ok) {
         setAuthenticated(false);
@@ -155,6 +156,7 @@ export function AdminAccessGate({ children }: { children: ReactNode }) {
   const { authenticated, isChecking, isSubmitting, error, login } =
     useAdminAuth();
   const [passwordInput, setPasswordInput] = useState("");
+  const { isSignedIn } = useUser();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -203,8 +205,20 @@ export function AdminAccessGate({ children }: { children: ReactNode }) {
                 Admin Portal
               </h1>
               <p className="text-center text-sm text-gray-500 mb-8">
-                Enter your admin password to continue
+                Sign in with your administrator account to continue
               </p>
+              <div className="mb-6">
+                {isSignedIn ? (
+                  <button type="button" disabled={isSubmitting} onClick={() => login("", true)} className="w-full rounded-xl bg-[#388082] px-4 py-3 text-sm font-medium text-white disabled:opacity-60">
+                    {isSubmitting ? "Verifying..." : "Continue with signed-in account"}
+                  </button>
+                ) : (
+                  <SignInButton mode="modal" forceRedirectUrl="/admin">
+                    <button type="button" className="w-full rounded-xl bg-[#388082] px-4 py-3 text-sm font-medium text-white">Sign in to your account</button>
+                  </SignInButton>
+                )}
+              </div>
+              <p className="mb-4 text-center text-xs text-gray-500">Or use the administrator password</p>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <input
                   id="password"

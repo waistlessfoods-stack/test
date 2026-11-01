@@ -6,6 +6,7 @@ import {
   setAdminSessionCookie,
 } from '@/lib/admin-session';
 import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit';
+import { isAuthorizedAdminAccount } from '@/lib/admin-identity';
 
 const ADMIN_LOGIN_LIMIT = 5;
 const ADMIN_LOGIN_WINDOW_MS = 15 * 60 * 1000;
@@ -26,7 +27,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { password } = body;
+    const { password, useAccount } = body;
+
+    if (useAccount === true) {
+      if (request.headers.get('origin') !== new URL(request.url).origin) {
+        return NextResponse.json({ error: 'A same-origin request is required.' }, { status: 403 });
+      }
+      const { currentUser } = await import('@clerk/nextjs/server');
+      const user = await currentUser();
+      if (!isAuthorizedAdminAccount(user)) {
+        return NextResponse.json({ error: 'Sign in with your verified administrator email to continue.' }, { status: 403 });
+      }
+    }
 
     // Verify admin password
     const adminPassword = process.env.ADMIN_PASSWORD;
@@ -38,7 +50,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!password || password !== adminPassword) {
+    if (useAccount !== true && (!password || password !== adminPassword)) {
       return NextResponse.json(
         { error: 'Invalid password' },
         { status: 401 }

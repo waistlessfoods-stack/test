@@ -90,6 +90,7 @@ await client.query('BEGIN');
 try {
   await client.query('CREATE TEMP TABLE subscribers(id serial PRIMARY KEY, email text NOT NULL, active boolean DEFAULT true, unsubscribed_at timestamptz)');
   await client.query('CREATE TEMP TABLE newsletter_issues(id serial PRIMARY KEY, version integer DEFAULT 1, title text, subject text, preview_text text, body text, cta_label text, cta_url text)');
+  await client.query(await readFile(new URL('../drizzle/0014_newsletter_media.sql', import.meta.url), 'utf8'));
   const migration = await readFile(new URL('../drizzle/0012_newsletter_campaigns.sql', import.meta.url), 'utf8');
   await client.query(migration.replaceAll('CREATE TABLE IF NOT EXISTS', 'CREATE TEMP TABLE'));
   const query = async (text, values = []) => (await client.query(text, values)).rows;
@@ -123,6 +124,14 @@ try {
     await assert.rejects(() => service.prepare(1, 2, config)); assert.equal((await service.read(1)).campaign, null);
     await service.prepare(1, 1, { ...config, mailingAddress: '' });
     assert.equal((await service.read(1)).campaign.mailing_address, '');
+  });
+  await test('Campaign snapshot freezes images and links even when the issue is edited later', async () => {
+    await reset();
+    const media = { header: { url: 'https://www.waistlessfoods.com/logo.png', alt: 'QA header', linkUrl: 'https://www.waistlessfoods.com/recipes' }, footer: null, images: [{ url: 'https://www.waistlessfoods.com/recipes/pasta.png', alt: 'QA pasta', linkUrl: '', afterParagraph: 1 }] };
+    await query('UPDATE newsletter_issues SET media=$1::jsonb WHERE id=1', [JSON.stringify(media)]);
+    await service.prepare(1, 1, config);
+    await query("UPDATE newsletter_issues SET media='{}'::jsonb,version=2 WHERE id=1");
+    assert.deepEqual((await service.read(1)).campaign.snapshot.media, media);
   });
   await test('Disabled sending never calls SMTP', async () => {
     await service.prepare(1, 1, config);

@@ -11,6 +11,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import type { NewsletterMedia } from "@/lib/newsletter-content";
 
 export const enquiries = pgTable("enquiries", {
   id: serial("id").primaryKey(),
@@ -46,6 +47,7 @@ export const newsletterIssues = pgTable("newsletter_issues", {
   body: text("body").notNull().default(""),
   ctaLabel: text("cta_label").notNull().default(""),
   ctaUrl: text("cta_url").notNull().default(""),
+  media: jsonb("media").$type<NewsletterMedia>().notNull().default({ header: null, footer: null, images: [] }),
   status: text("status").notNull().default("draft"),
   version: integer("version").notNull().default(1),
   publishedAt: timestamp("published_at"),
@@ -229,3 +231,39 @@ export const rateLimitBuckets = pgTable("rate_limit_buckets", {
 
 export type RateLimitBucket = typeof rateLimitBuckets.$inferSelect;
 export type NewRateLimitBucket = typeof rateLimitBuckets.$inferInsert;
+
+export const serviceAgreements = pgTable("service_agreements", {
+  id: text("id").primaryKey(),
+  bookingId: integer("booking_id").references(() => bookings.id),
+  version: integer("version").notNull().default(1),
+  status: text("status").notNull().default("draft"),
+  content: jsonb("content").notNull(),
+  documentHash: text("document_hash"),
+  tokenHash: text("token_hash").unique(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+  viewedAt: timestamp("viewed_at", { withTimezone: true }),
+  signedAt: timestamp("signed_at", { withTimezone: true }),
+  signature: jsonb("signature"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  index("service_agreements_booking_idx").on(table.bookingId, table.createdAt),
+  check("service_agreements_status_check", sql`${table.status} in ('draft','issued','signed','void')`),
+]);
+
+export const serviceInvoiceRecords = pgTable("service_invoice_records", {
+  invoiceId: text("invoice_id").primaryKey(),
+  agreementId: text("agreement_id").references(() => serviceAgreements.id),
+  bookingId: integer("booking_id").references(() => bookings.id),
+  live: boolean("live").notNull(),
+  status: text("status").notNull(),
+  total: integer("total").notNull(),
+  paid: integer("paid").notNull(),
+  remaining: integer("remaining").notNull(),
+  notificationClaimedAt: timestamp("notification_claimed_at", { withTimezone: true }),
+  requestKey: text("request_key").unique(),
+  requestHash: text("request_hash"),
+  notifiedAt: timestamp("notified_at", { withTimezone: true }),
+  notificationError: text("notification_error"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});

@@ -251,11 +251,6 @@ function ServiceDetailContent({ service }: ServiceDetailClientProps) {
             <h1 className="font-sans font-medium text-3xl md:text-4xl leading-tight tracking-tight text-black">
               {service.title}
             </h1>
-            <div className="w-fit flex items-center px-4 py-2.5 gap-2 border border-[#848484] rounded-[100px]">
-              <span className="font-sans font-medium text-lg md:text-xl leading-6 tracking-tight text-black">
-                {service.priceText}
-              </span>
-            </div>
           </header>
 
           <div className="flex flex-col gap-8">

@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { NewsletterContent } from "@/lib/newsletter-content";
+import { emptyNewsletterMedia, newsletterEditableContent, newsletterParagraphs, type NewsletterContent } from "@/lib/newsletter-content";
 import NewsletterArticle from "@/components/newsletter-article";
 import NewsletterCampaign from "@/components/admin/newsletter-campaign";
+import NewsletterMediaEditor from "@/components/admin/newsletter-media-editor";
 
 type Issue = NewsletterContent & { id: number; version: number; status: "draft" | "published"; updatedAt: string };
-const empty: NewsletterContent = { title: "", subject: "", previewText: "", body: "", ctaLabel: "", ctaUrl: "" };
+const empty: NewsletterContent = { title: "", subject: "", previewText: "", body: "", ctaLabel: "", ctaUrl: "", media: emptyNewsletterMedia() };
 const fieldClass = "mt-2 w-full rounded-lg border border-[#cbdcd6] bg-white px-3 py-2.5 text-sm text-[#173d40] outline-none focus:border-[#086b70] focus:ring-2 focus:ring-[#086b70]/15";
 
 export default function NewsletterEditor({ id }: { id: string }) {
@@ -17,13 +18,13 @@ export default function NewsletterEditor({ id }: { id: string }) {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [emailPreview, setEmailPreview] = useState(false);
-  const dirty = !!issue && Object.keys(empty).some(key => content[key as keyof NewsletterContent] !== issue[key as keyof NewsletterContent]);
+  const dirty = !!issue && JSON.stringify(content) !== JSON.stringify(newsletterEditableContent(issue));
   useEffect(() => {
     const controller = new AbortController();
     fetch(`/api/admin/newsletters/${id}`, { signal: controller.signal }).then(async response => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
-      setIssue(data.issue); setContent(data.issue);
+      setIssue(data.issue); setContent(newsletterEditableContent(data.issue));
     }).catch(error => { if (!controller.signal.aborted) setError(error.message); });
     return () => controller.abort();
   }, [id]);
@@ -33,7 +34,10 @@ export default function NewsletterEditor({ id }: { id: string }) {
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
-  function change(key: keyof NewsletterContent, value: string) { setContent(current => ({ ...current, [key]: value })); setMessage(""); }
+  function change(key: Exclude<keyof NewsletterContent, 'media'>, value: string) {
+    setContent(current => ({ ...current, [key]: value, ...(key === 'body' && current.media ? { media: { ...current.media, images: current.media.images.map(image => ({ ...image, afterParagraph: Math.min(image.afterParagraph, newsletterParagraphs(value).length) })) } } : {}) }));
+    setMessage("");
+  }
   async function save(status: "draft" | "published") {
     if (!issue) return;
     if (status !== issue.status && !window.confirm(status === "published" ? "Publish this saved issue to every signed-in member's archive? No email will be sent." : "Remove this issue from the member archive? Your draft will be kept.")) return;
@@ -42,7 +46,7 @@ export default function NewsletterEditor({ id }: { id: string }) {
       const response = await fetch(`/api/admin/newsletters/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...content, version: issue.version, status }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
-      setIssue(data.issue); setContent(data.issue); setEmailPreview(false);
+      setIssue(data.issue); setContent(newsletterEditableContent(data.issue)); setEmailPreview(false);
       setMessage(status === "published" ? "Published to the member archive. No email was sent." : "Draft saved. Only administrators can see it.");
     } catch (error) { setError(error instanceof Error ? error.message : "Could not save."); } finally { setBusy(false); }
   }
@@ -73,6 +77,7 @@ export default function NewsletterEditor({ id }: { id: string }) {
               <label className="block text-sm font-medium text-[#334e4d]">Newsletter body<textarea value={content.body} maxLength={20000} rows={14} placeholder="Write your newsletter here. Leave a blank line between paragraphs." onChange={event => change("body", event.target.value)} className={`${fieldClass} resize-y leading-6`} /><span className="mt-2 block text-xs font-normal leading-5 text-slate-500">Plain text, not HTML. {content.body.length.toLocaleString()} / 20,000 characters. Standard Latin text and punctuation are supported in PDF; unsupported emoji are flagged before publication.</span></label>
               <label className="block text-sm font-medium text-[#334e4d]">Optional button label<input value={content.ctaLabel} maxLength={70} placeholder="Explore seasonal recipes" onChange={event => change("ctaLabel", event.target.value)} className={fieldClass} /></label>
               <label className="block text-sm font-medium text-[#334e4d]">Optional button link<input value={content.ctaUrl} maxLength={1500} placeholder="https://www.waistlessfoods.com/recipes" onChange={event => change("ctaUrl", event.target.value)} className={fieldClass} /></label>
+              <NewsletterMediaEditor value={content.media} paragraphCount={newsletterParagraphs(content.body).length} onChange={media => { setContent(current => ({ ...current, media })); setMessage(""); }} />
             </fieldset>
             {issue.status === "published" && <p className="mt-5 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">Saving changes updates the member-visible issue. Unpublish first if you want to work privately.</p>}
             <div className="mt-6 border-t border-[#dce8e5] pt-5"><h3 className="text-sm font-semibold text-[#173d40]">Review before publishing</h3><p className="mt-2 text-xs leading-5 text-slate-500">Save first. These actions use the saved version, not unsaved edits.</p><div className="mt-4 flex flex-wrap gap-3"><button disabled={busy || dirty} onClick={testSend} className="rounded-lg border border-[#cbdcd6] px-3 py-2 text-sm text-[#086b70] disabled:opacity-40">Send admin test</button><button disabled={dirty || busy} onClick={() => setEmailPreview(value => !value)} className="rounded-lg border border-[#cbdcd6] px-3 py-2 text-sm text-[#086b70] disabled:opacity-40">Email preview</button><a href={`/api/admin/newsletters/${id}?format=pdf`} aria-disabled={dirty || busy} onClick={event => { if (dirty || busy) event.preventDefault(); }} className={`rounded-lg border border-[#cbdcd6] px-3 py-2 text-sm text-[#086b70] ${dirty || busy ? "opacity-40" : ""}`}>Download PDF preview</a></div></div>

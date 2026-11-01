@@ -1,0 +1,70 @@
+WA I S T L E S S F O O D S · S I G N E D
+
+Private Chef Agreement
+Prepared for                                              Service
+QA Test Customer                                          Private Chef
+qa@example.com
+555-0100
+Event date                                                Guests
+2027-01-20                                                8
+Agreed total
+$200.00
+
+
+Event details
+Requested date: January 20th, 2027
+Alternative date: January 21st, 2027
+
+Budget range: $200
+
+Event details:
+QA fixture only; not a real event.
+
+
+Agreement terms
+QA TEST ONLY - Section 1. This fictional paragraph verifies agreement layout and electronic-signing behavior. It is
+not a customer contract and must not be sent for a real service. The approved source text is still required.
+
+QA TEST ONLY - Section 2. This fictional paragraph verifies agreement layout and electronic-signing behavior. It
+is not a customer contract and must not be sent for a real service. The approved source text is still required.
+
+QA TEST ONLY - Section 3. This fictional paragraph verifies agreement layout and electronic-signing behavior. It
+is not a customer contract and must not be sent for a real service. The approved source text is still required.
+
+QA TEST ONLY - Section 4. This fictional paragraph verifies agreement layout and electronic-signing behavior. It
+is not a customer contract and must not be sent for a real service. The approved source text is still required.
+
+QA TEST ONLY - Section 5. This fictional paragraph verifies agreement layout and electronic-signing behavior. It
+is not a customer contract and must not be sent for a real service. The approved source text is still required.
+
+QA TEST ONLY - Section 6. This fictional paragraph verifies agreement layout and electronic-signing behavior. It
+is not a customer contract and must not be sent for a real service. The approved source text is still required.
+
+QA TEST ONLY - Section 7. This fictional paragraph verifies agreement layout and electronic-signing behavior. It is
+not a customer contract and must not be sent for a real service. The approved source text is still required.
+
+QA TEST ONLY - Section 8. This fictional paragraph verifies agreement layout and electronic-signing behavior. It
+is not a customer contract and must not be sent for a real service. The approved source text is still required.
+
+QA TEST ONLY - Section 9. This fictional paragraph verifies agreement layout and electronic-signing behavior. It
+is not a customer contract and must not be sent for a real service. The approved source text is still required.
+
+QA TEST ONLY - Section 10. This fictional paragraph verifies agreement layout and electronic-signing behavior. It
+is not a customer contract and must not be sent for a real service. The approved source text is still required.
+
+QA TEST ONLY - Section 11. This fictional paragraph verifies agreement layout and electronic-signing behavior. It
+is not a customer contract and must not be sent for a real service. The approved source text is still required.
+
+QA TEST ONLY - Section 12. This fictional paragraph verifies agreement layout and electronic-signing behavior. It
+is not a customer contract and must not be sent for a real service. The approved source text is still required.
+
+
+Electronic signature
+QA Test Signer
+Signed 11/1/2026, 5:12:03 AM UTC
+I have read this agreement, agree to its terms, and consent to signing it electronically by typing my full name.
+
+
+Agreement reference: aadf0d53-d5fd-4865-aa20-019c5ccc143e
+Document SHA-256: a4a9206312352b27e82aee4506a5f2ec84a5344f78f02a9d49681136803655da
+

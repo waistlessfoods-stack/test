@@ -5,6 +5,12 @@ import { useAdminAuth } from '@/components/admin/admin-auth';
 
 const NAV_ITEMS = [
   {
+    href: '/admin/service-agreements',
+    label: 'Service Agreements',
+    description: 'Prepare agreements from booking requests, collect signatures, and continue to invoicing',
+    icon: <span aria-hidden="true" className="text-xl">✎</span>,
+  },
+  {
     href: '/admin/walkthrough',
     label: 'Website Walkthrough',
     description: 'Learn the website workflows with direct links, explanations, and a review checklist',
@@ -71,8 +77,8 @@ const NAV_ITEMS = [
   },
   {
     href: '/admin/recipes',
-    label: 'Paid Recipe Previews',
-    description: 'Inspect the complete post-purchase layout for paid recipes',
+    label: 'Paid Recipe Management',
+    description: 'Edit recipes in Contentful and inspect the complete customer layout',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 006.5 22H20V5a2 2 0 00-2-2H6.5A2.5 2.5 0 004 5.5v14z" />

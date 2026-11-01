@@ -11,6 +11,7 @@ import {
 } from "@/lib/contentful-management";
 import { buildMetadata, toAbsoluteUrl } from "@/lib/seo";
 import { arePublicCookingClassesEnabled } from "@/lib/public-cooking-classes";
+import { recipePurchasePreview } from "@/lib/recipe-content-access";
 
 export const revalidate = 300;
 
@@ -93,7 +94,7 @@ export default async function ShopProductPage({ params }: ShopProductPageProps) 
           },
         }}
       />
-      <RecipeDetailClient recipe={product} source="shop" />
+      <RecipeDetailClient recipe={recipePurchasePreview(product)} source="shop" />
     </>
   );
 }

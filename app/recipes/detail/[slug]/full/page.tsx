@@ -18,6 +18,7 @@ import {
 import { redirect } from "next/navigation";
 import { buildMetadata, toAbsoluteUrl } from "@/lib/seo";
 import RecipeFullClient from "./recipe-full-client";
+import { hasAdminPageSession } from "@/lib/admin-page-session";
 
 export const revalidate = 300;
 
@@ -153,7 +154,7 @@ export default async function RecipeFullPage({ params }: RecipeFullPageProps) {
   }
 
   const recipeIsFree = isFreeRecipe(recipe.price);
-  let canAccessFullContent = recipeIsFree;
+  let canAccessFullContent = recipeIsFree || await hasAdminPageSession();
 
   if (!canAccessFullContent && userId) {
     try {

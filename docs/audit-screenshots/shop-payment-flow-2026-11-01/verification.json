@@ -1,0 +1,58 @@
+{
+  "capturedAt": "2026-11-01T06:10:34.257Z",
+  "tests": [
+    {
+      "name": "shop-checkout",
+      "command": "node --env-file=.env scripts/test-shop-checkout.mjs --integration",
+      "tests": 13,
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "name": "order-notifications",
+      "command": "node --env-file=.env scripts/test-order-notifications.mjs --integration",
+      "tests": 19,
+      "passed": 19,
+      "failed": 0
+    },
+    {
+      "name": "class-rosters",
+      "command": "node --env-file=.env scripts/test-class-rosters.mjs --integration",
+      "tests": 17,
+      "passed": 17,
+      "failed": 0
+    },
+    {
+      "name": "service-workflow",
+      "command": "node --env-file=.env scripts/test-service-workflow.mjs --integration",
+      "tests": 14,
+      "passed": 14,
+      "failed": 0
+    }
+  ],
+  "productionBuild": "passed, production compilation and TypeScript and 75 generated pages",
+  "lint": {
+    "errors": 0,
+    "existingWarnings": 25
+  },
+  "additionalNewScriptsLint": "passed",
+  "sourceSha256": {
+    "app/api/stripe/checkout/route.ts": "c6458a3b6026e92696b716df0f99d09b48cbaa8166c01d3f55087eb48109c61a",
+    "app/api/orders/[id]/checkout/route.ts": "7dfd068b1354bc6c8b0e28c10ca45b7dc23b17ef2bc7c1f1294a737dbada5796",
+    "app/api/orders/reconcile/route.ts": "7f5ce80236ff769e831f50633831f31d1a14f65761e60ac7c811ffdb55a286b8",
+    "app/api/stripe/webhook/route.ts": "d030db41d068d7d868bae5caa12e2f4d73e67bb166217d13350d372e8253ba50",
+    "app/orders/page.tsx": "7368e9466975ef57e24b052292c0e3b50418482c737742d2b9f83dc366b9ee0a",
+    "app/stripe-test/page.tsx": "11ae4bbcd8ade570e0664d54a88552c278c6abdf09eb2a651f9710f2550c1142",
+    "app/stripe-test/stripe-test-content.tsx": "fc18e4e0de70cdf9545a99f36c6f61bf98533ced8266c3f170817da6791d04c5",
+    "lib/checkout-content.ts": "5d673740fd04edead2e2e587ae9ff04d457b16cbe87f547cbee476d05cfb1742",
+    "lib/shop-checkout.ts": "6d275001f974e812163674d225a8ae2ea029c7135f1e36ef8b62027fac5a3e5e",
+    "lib/shop-checkout-store.ts": "6efa123363f9d9bd271517f1af87aa550930ff147083e9092b3cdd39072c0370"
+  },
+  "noRealStripeOrSmtpOperations": true,
+  "adapterTransactionLimits": {
+    "lockTimeout": "10s",
+    "statementTimeout": "45s",
+    "verifiedWithActualPostgresJs": true,
+    "tableMutations": false
+  }
+}

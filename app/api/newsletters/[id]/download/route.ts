@@ -1,11 +1,14 @@
 import { auth } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+
 import { db } from "@/lib/db";
 import { newsletterIssues } from "@/lib/db/schema";
 import { parsePositiveInteger } from "@/lib/newsletter-content";
 import { newsletterError, privateHeaders } from "@/lib/newsletter-http";
 import { createNewsletterPdf } from "@/lib/newsletter-pdf";
+
+export const maxDuration = 60;
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await auth()).userId) return NextResponse.json({ error: "Sign in to download newsletters." }, { status: 401, headers: privateHeaders });

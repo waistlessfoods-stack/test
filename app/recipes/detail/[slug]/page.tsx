@@ -11,6 +11,8 @@ import {
 import { redirect } from "next/navigation";
 import { buildMetadata, toAbsoluteUrl } from "@/lib/seo";
 import RecipeDetailClient from "./recipe-detail-client";
+import { hasAdminPageSession } from "@/lib/admin-page-session";
+import { recipePurchasePreview } from "@/lib/recipe-content-access";
 
 export const revalidate = 300;
 
@@ -109,6 +111,7 @@ export default async function RecipeDetailPage({
   if (isFreeRecipe(recipe.price)) {
     redirect(`/recipes/detail/${recipe.slug}/full`);
   }
+  if (await hasAdminPageSession()) redirect(`/admin/recipes/${recipe.slug}`);
 
   const recipeUrl = toAbsoluteUrl(`/recipes/detail/${recipe.slug}`);
   const jsonLd = [
@@ -149,7 +152,7 @@ export default async function RecipeDetailPage({
   return (
     <>
       <JsonLd data={jsonLd} />
-      <RecipeDetailClient recipe={recipe} />
+      <RecipeDetailClient recipe={recipePurchasePreview(recipe)} />
     </>
   );
 }

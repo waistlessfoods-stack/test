@@ -1,0 +1,10 @@
+{
+  "browser": "http://localhost:3010",
+  "mutations": "none",
+  "checks": [
+    "Signed administrator session sees the complete paid recipe in both admin and storefront full views without an order; CMS edit links point to the existing master entry without credentials; mobile layout fits.",
+    "Anonymous full view redirects to the purchase preview; admin preview shows the existing admin sign-in gate; public recipe/shop HTML contains no protected recipe fields. Purchaser authorization remains covered by route tests."
+  ],
+  "paidRecipeSlug": "triple-berry-french-toast",
+  "passed": true
+}

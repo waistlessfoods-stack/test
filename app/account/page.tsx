@@ -53,6 +53,10 @@ export default function AccountPage() {
           </Link>
 
           <div className="space-y-6">
+            <Link href="/account/service-agreements" className="block rounded-xl border border-[#cbdcd6] bg-[#f3f8f6] p-5 text-[#173d40] hover:border-[#086b70]">
+              <span className="block font-semibold">Private Chef & Catering Agreements</span>
+              <span className="mt-2 block text-sm leading-6 text-slate-600">Review your agreements and print or save a signed copy.</span>
+            </Link>
             <div className="rounded-lg border border-slate-200 p-5">
               <p className="text-sm font-medium text-slate-600">Name</p>
               <p className="mt-1 text-lg text-slate-900">{user.name || 'Not set'}</p>

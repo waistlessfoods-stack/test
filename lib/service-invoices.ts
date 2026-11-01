@@ -34,6 +34,8 @@ export function invoiceView(invoice: Stripe.Invoice): ServiceInvoiceView {
     pdfUrl: invoice.invoice_pdf || null, live: invoice.livemode, ready: invoice.metadata?.assembly === "ready",
     overdue: invoice.status === "open" && Boolean(invoice.due_date && invoice.due_date * 1000 < Date.now()),
     items: invoice.lines.data.map(line => ({ description: line.description || "Service", quantity: line.quantity || 1, amount: line.amount })),
+    ...(invoice.metadata?.agreement_id ? { agreementId: invoice.metadata.agreement_id } : {}),
+    ...(invoice.metadata?.booking_id ? { bookingId: Number(invoice.metadata.booking_id) } : {}),
   };
 }
 
@@ -49,7 +51,7 @@ export async function createServiceInvoice(stripe: Stripe, input: ServiceInvoice
     payment_settings: { payment_method_types: ["card"] },
     description: input.notes ? `${input.title}\n\n${input.notes}` : input.title,
     custom_fields: [{ name: "Service", value: input.service === "private_chef" ? "Private Chef" : "Catering" }, ...(input.eventDate ? [{ name: "Event date", value: input.eventDate }] : [])],
-    metadata: { source: SERVICE_INVOICE_SOURCE, service: input.service, title: input.title, event_date: input.eventDate, customer_name: input.name, customer_email: input.email, expected_total: String(invoiceInputTotal(input)), input_hash: createHash("sha256").update(JSON.stringify(input)).digest("hex"), assembly: "building" },
+    metadata: { source: SERVICE_INVOICE_SOURCE, service: input.service, title: input.title, event_date: input.eventDate, customer_name: input.name, customer_email: input.email, expected_total: String(invoiceInputTotal(input)), input_hash: createHash("sha256").update(JSON.stringify(input)).digest("hex"), assembly: "building", ...(input.agreementId ? { agreement_id: input.agreementId } : {}), ...(input.bookingId ? { booking_id: String(input.bookingId) } : {}) },
   }, { idempotencyKey: `service-${key}-invoice` });
   const current = await stripe.invoices.retrieve(invoice.id);
   if (current.status !== "draft" || current.metadata?.assembly === "ready") return invoiceView(current);

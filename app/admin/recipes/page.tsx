@@ -4,6 +4,8 @@ import {
   isCookingClassProduct,
 } from "@/lib/contentful-management";
 import { requireAdminPageSession } from "@/lib/admin-page-session";
+import { contentfulEntryEditorUrl } from "@/lib/contentful-editor-links";
+import RefreshRecipeContent from "@/components/admin/refresh-recipe-content";
 
 function isPaidRecipe(price: string): boolean {
   const normalized = price.trim().toLowerCase();
@@ -36,12 +38,15 @@ export default async function AdminRecipePreviewsPage() {
         </Link>
         <div className="rounded-2xl bg-white p-6 shadow-sm md:p-8">
           <h1 className="text-2xl font-semibold text-gray-900">
-            Paid Recipe Previews
+            Paid Recipe Management
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
-            Preview the complete customer layout for any paid recipe without
-            placing an order. These pages remain protected by the admin session.
+            Edit the recipe&apos;s text and photos in Contentful, publish your changes,
+            then refresh the preview here. You can inspect the complete customer
+            layout without placing an order. Administrator access does not change
+            what ordinary visitors can see.
           </p>
+          <div className="mt-5"><RefreshRecipeContent /></div>
 
           {paidRecipes.length > 0 ? (
             <div className="mt-7 grid gap-4 sm:grid-cols-2">
@@ -66,6 +71,7 @@ export default async function AdminRecipePreviewsPage() {
                       Preview
                     </Link>
                   </div>
+                  {contentfulEntryEditorUrl(recipe.id) && <a href={contentfulEntryEditorUrl(recipe.id)!} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-sm font-medium text-[#086b70] underline">Edit recipe in Contentful ↗</a>}
                 </article>
               ))}
             </div>

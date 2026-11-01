@@ -58,6 +58,9 @@ export default function OrdersPage() {
   const hasReconciledSuccessRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const showSuccess = searchParams.get("success") === "1";
+  const returnedSessionId = searchParams.get("session_id");
+  const returnedOrder = returnedSessionId ? orders.find(order => order.stripeSessionId === returnedSessionId) : undefined;
+  const returnedPaymentConfirmed = returnedOrder?.status === "completed";
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -68,6 +71,18 @@ export default function OrdersPage() {
       setLoading(false);
     }
   }, []);
+
+  const refreshPaymentStatus = useCallback(async () => {
+    setIsReconciling(true); setError(null);
+    try {
+      const response = await fetch("/api/orders/reconcile", { method: "POST" });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Could not confirm payment status. Please retry shortly.");
+      await fetchOrders();
+      if (data.unverified > 0) setError("Some payments could not be checked. Please retry shortly before starting another payment.");
+    } catch (error) { setError(error instanceof Error ? error.message : "Could not confirm payment status."); }
+    finally { setIsReconciling(false); }
+  }, [fetchOrders]);
 
   useEffect(() => {
     let isActive = true;
@@ -114,19 +129,9 @@ export default function OrdersPage() {
       return;
     }
 
-    const reconcile = async () => {
-      try {
-        hasReconciledSuccessRef.current = true;
-        setIsReconciling(true);
-        await fetch("/api/orders/reconcile", { method: "POST" });
-        await fetchOrders();
-      } finally {
-        setIsReconciling(false);
-      }
-    };
-
-    void reconcile();
-  }, [userId, showSuccess, fetchOrders]);
+    hasReconciledSuccessRef.current = true;
+    void refreshPaymentStatus();
+  }, [userId, showSuccess, refreshPaymentStatus]);
 
   const continuePayment = async (orderId: number) => {
     try {
@@ -225,18 +230,18 @@ export default function OrdersPage() {
     <div className="w-full min-h-screen bg-white font-metropolis">
       <Container className="py-20">
         {showSuccess && (
-          <div className="mb-8 p-6 bg-green-50 border border-green-200 rounded-lg">
+          <div role="status" className="mb-8 p-6 bg-teal-50 border border-teal-200 rounded-lg">
             <div className="flex items-center gap-3">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+              {returnedPaymentConfirmed ? <CheckCircle className="w-6 h-6 text-teal-700" /> : <Clock className="w-6 h-6 text-teal-700" />}
               <div>
-                <h3 className="text-lg font-semibold text-green-900">
-                  Payment Successful!
+                <h3 className="text-lg font-semibold text-teal-900">
+                  {returnedPaymentConfirmed ? "Payment confirmed" : "Review your payment status"}
                 </h3>
-                <p className="text-green-700">
-                  Your order has been placed successfully. You&apos;ll receive a confirmation email shortly.
+                <p className="text-teal-800">
+                  {returnedPaymentConfirmed ? `Payment for order #${returnedOrder.id} is confirmed. Your purchased items and class seats are listed below.` : "Your order status below shows whether payment is confirmed. If it is still pending, refresh the status before trying to pay again."}
                 </p>
                 {isReconciling && (
-                  <p className="text-green-700 text-sm mt-1">
+                  <p className="text-teal-800 text-sm mt-1">
                     Confirming payment status...
                   </p>
                 )}
@@ -244,6 +249,8 @@ export default function OrdersPage() {
             </div>
           </div>
         )}
+
+        <div className="mb-6"><Button variant="outline" disabled={isReconciling} onClick={() => void refreshPaymentStatus()}>{isReconciling ? "Checking payments…" : "Refresh payment status"}</Button></div>
 
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-black mb-2">Order History</h1>
