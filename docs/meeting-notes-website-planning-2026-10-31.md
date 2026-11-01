@@ -158,7 +158,10 @@ The browser harness initially used a guessed Private Chef slug, then encountered
 - The newsletter now supports deployed header/footer/body image and link editing alongside text, test sends, manual campaigns, archive, and PDFs. First newsletter content, real received-email inspection, and Amber's independent walkthrough remain pending.
 - Paid-recipe management now links to the existing Contentful editor and refreshes published content; admin full previews and ordinary storefront access boundaries passed local checks. Amber's own CMS permissions and edit/publish walkthrough remain pending. Public purchase previews no longer serialize full ingredients/instructions into client props.
 - The requested Git push triggered a successful automatic production deployment. Verification did not send external email, make live-card payments, confirm real inbox delivery, publish customer content, or change Stripe webhook settings. The site preview restriction and disabled public classes were retained.
-- The [written follow-up](amber-written-recap-2026-10-31.md) also reports a service-gallery/Contentful issue and requests more photos. The user explicitly requested it on November 1; the published-photo audit, multi-photo controls, and admin publish/refresh workflow are now locally verified. See the [separate gallery handoff](service-gallery-2026-11-01.md); production rollout remains to be verified.
+
+## Additional gallery follow-up — completed November 1
+
+- [x] The [written follow-up](amber-written-recap-2026-10-31.md) requested more service photos and reported missing updates. After the user explicitly requested it, current published photos were checked, multi-photo controls and an admin publish/refresh workflow were added, and commit `0a0f812` was pushed/deployed. Production checks passed for Private Chef, Catering, Cooking Classes, and the protected refresh. Nine additional photos were separately fixture-tested without CMS writes. See the [gallery handoff](service-gallery-2026-11-01.md). Amber's older missing-photo state was not reproduced from current published content; her existing photos and thumbnails were retained.
 
 ## Future possibilities, not confirmed launch requirements
 

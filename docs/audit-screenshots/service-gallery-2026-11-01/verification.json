@@ -1,0 +1,43 @@
+{
+  "verifiedAt": "2026-11-01T07:12:42.884Z",
+  "sourceCommit": "0a0f812",
+  "unitAndHandlerTests": 5,
+  "relatedBookingTests": 6,
+  "relatedRecipeTests": 4,
+  "typeScript": "passed",
+  "productionBuild": "passed",
+  "lint": {
+    "errors": 0,
+    "existingWarnings": 25
+  },
+  "browser": "passed; see results.json",
+  "contentful": "Published Sub Images is an Asset array; no CMS changes made",
+  "sourceSha256": {
+    "lib/service-gallery.ts": "11e6c226cfe761febb6688a9a50ef33b79132ea54288192b1bfd3b810d532595",
+    "components/service-gallery.tsx": "cf7b8153ac5a74ca69cb002e369349bb17cba6a48526e243c2242ed4897a6365",
+    "app/api/admin/services/refresh/route.ts": "6b3adf6796f5513021c34a927149c8fa2de8b4500aa01f70ba118305add01d16",
+    "app/api/revalidate/contentful/route.ts": "60922d1618f831ea2ca30919ac4ee90f836a800bff7f0b2f8470fa46d5f635fc",
+    "lib/contentful-management.ts": "607160ccf5da3f270d6aa703f475b129c87b2f7211d3c9d7a26be5556fa21f08"
+  },
+  "production": {
+    "url": "https://www.waistlessfoods.com",
+    "passed": true,
+    "sourceCommit": "0a0f812",
+    "galleryPhotoCounts": [
+      {
+        "slug": "cooking-classes",
+        "count": 3
+      },
+      {
+        "slug": "private",
+        "count": 3
+      },
+      {
+        "slug": "catering",
+        "count": 3
+      }
+    ],
+    "adminRefreshVerified": true,
+    "contentfulMutations": false
+  }
+}

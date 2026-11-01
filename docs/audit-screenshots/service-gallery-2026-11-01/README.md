@@ -8,3 +8,5 @@
 - [Administrator edit/publish/refresh workflow](admin-service-photos.png).
 
 All screenshots were visually inspected. Keyboard controls, restoring the original main photo, selection reset, all published image loads, and four viewport widths passed. Unit/handler tests passed five checks; related booking/recipe regression suites passed ten checks. TypeScript, production build, and full lint passed with 25 existing warnings.
+
+Production rollout of `0a0f812` succeeded and the same harness passed on `www.waistlessfoods.com`. See [production results](production/results.json), [production admin workflow](production/admin-service-photos.png), [Private Chef](production/private-mobile.png), [Catering](production/catering-mobile.png), and the [verification summary](verification.json). The production photos/admin screenshots were visually inspected. The fixture remains separate from the actual CMS content; no customer photo was added or published by verification.
