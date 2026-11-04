@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const denied = await publicAgreementGuard(request); if (denied) return denied;
     const body = await agreementBody(request);
     if (body.action === "review") return agreementJson({ agreement: await agreements.review(body.token) });
-    if (body.action === "sign") return agreementJson({ agreement: await agreements.sign(body.token, body.documentHash, body.name, body.consent) });
+    if (body.action === "sign") return agreementJson({ agreement: await agreements.sign(body.token, body.documentHash, body.name, body.consent, body.mark) });
     return agreementJson({ error: "Unknown agreement action." }, 400);
   } catch (error) { return agreementError(error); }
 }

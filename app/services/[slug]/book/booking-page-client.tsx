@@ -15,6 +15,8 @@ import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { HONEYPOT_FIELD } from "@/lib/honeypot";
+import { useUser } from "@clerk/nextjs";
+import { clerkContactProfile } from "@/lib/clerk-contact-profile";
 
 const MIN_BOOKING_GUESTS = 1;
 const MAX_BOOKING_GUESTS = 50;
@@ -32,10 +34,18 @@ export default function BookingPageClient({
   howToBook,
   bookingImagePath,
 }: BookingPageClientProps) {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const { user } = useUser();
+  const profile = clerkContactProfile(user);
+  const [firstNameInput, setFirstName] = useState<string | null>(null);
+  const [lastNameInput, setLastName] = useState<string | null>(null);
+  const [emailInput, setEmail] = useState<string | null>(null);
+  const [phoneInput, setPhone] = useState<string | null>(null);
+  // Derived defaults handle late profile loading without overwriting any edit,
+  // including a field the customer deliberately clears.
+  const firstName = firstNameInput ?? profile?.firstName ?? "";
+  const lastName = lastNameInput ?? profile?.lastName ?? "";
+  const email = emailInput ?? profile?.email ?? "";
+  const phone = phoneInput ?? profile?.phone ?? "";
   const [guests, setGuests] = useState<number>(0);
   const [notes, setNotes] = useState("");
   const [budgetRange, setBudgetRange] = useState("");
@@ -215,6 +225,7 @@ export default function BookingPageClient({
               <h2 className="text-sm md:text-base font-semibold uppercase tracking-wide text-[#388082]">
                 Contact Details
               </h2>
+              {profile && <p className="mt-2 text-sm leading-6 text-slate-600">Available contact details are filled from your account. You can edit them for this request.</p>}
             </div>
 
             <div className="flex flex-col gap-3 md:gap-3.5">

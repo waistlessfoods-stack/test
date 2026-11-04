@@ -136,6 +136,26 @@ body {
   -webkit-box-shadow: 0 0 0 1000px #f4f4f4 inset;
 }
 
+/* Agreement forms use the shared shadcn components in the WaistLess palette.
+   Apply the same scope to portalled Select and Dialog content. */
+.agreement-theme {
+  --primary: #00676e;
+  --primary-foreground: #ffffff;
+  --secondary: #388082;
+  --secondary-foreground: #ffffff;
+  --background: #ffffff;
+  --foreground: #173d40;
+  --popover: #ffffff;
+  --popover-foreground: #173d40;
+  --accent: #edf5f2;
+  --accent-foreground: #173d40;
+  --muted: #f3f7f5;
+  --muted-foreground: #526967;
+  --border: #d6e4df;
+  --input: #cbdcd6;
+  --ring: #388082;
+}
+
 @media print {
   body:has(.agreement-document) header,
   body:has(.agreement-document) footer:not(.agreement-document footer),
@@ -146,10 +166,10 @@ body {
   .agreement-document { border: 0 !important; border-radius: 0 !important; box-shadow: none !important; padding: 0 !important; }
   .agreement-document section { break-inside: auto; }
   .agreement-document p { line-height: 1.5 !important; }
-  .agreement-document dl,
+  .agreement-document dl > div,
   .agreement-document footer,
   .agreement-document .agreement-signature { break-inside: avoid; }
-  .agreement-document h1, .agreement-document h2 { break-after: avoid; }
+  .agreement-document h1, .agreement-document h2, .agreement-document h3 { break-after: avoid; }
 }
 
 /* Keep Clerk profile visually transparent inside our custom modal shell. */

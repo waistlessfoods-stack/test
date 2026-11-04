@@ -2,6 +2,7 @@
 // tables inside a rolled-back transaction, never permanent customer records.
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -10,11 +11,38 @@ import Stripe from 'stripe';
 import pg from 'pg';
 import { sourceLoader } from './lib/load-typescript.mjs';
 import { NextRequest } from 'next/server.js';
+import { contractValues, intakeValues } from './lib/amber-agreement-fixture.mjs';
+import { signatureImage } from './lib/signature-fixture.mjs';
 
 const load = sourceLoader({ 'server-only': {} });
 const contentModule = load('lib/service-agreement-content.ts');
 const { parseAgreementContent, assertAgreementReady, canonicalAgreement } = contentModule;
+const template = load('lib/service-agreement-template.ts');
 const sample = { name: 'QA Test Customer', email: 'qa@example.com', phone: '555-0100', service: 'private_chef', title: 'QA TEST ONLY — Fictional agreement', eventDate: '2027-01-20', endDate: '', location: 'Fictional test venue', guests: 8, amount: 20000, details: 'QA fixture. Not a real event.', terms: 'QA TEST ONLY. Fictional terms used to test electronic signing. Do not send or use for a real service.', source: 'QA fixture; not Amber\'s contract' };
+const amberSample = { ...sample, terms: template.AMBER_CONTRACT_TERMS, source: template.AMBER_CONTRACT_SOURCE,
+  contract: { version: template.CONTRACT_VERSION, serviceApproved: false, values: contractValues }, intake: intakeValues };
+
+test('Amber source includes all 25 clauses, resolves event fields, and keeps policy blanks explicit', () => {
+  assert.equal((template.AMBER_CONTRACT_TERMS.match(/^\d+\. /gm) || []).length, 25);
+  assert.ok(template.AMBER_CONTRACT_TERMS.includes('reimburse the Chef for the total cost of groceries'));
+  const parsed = parseAgreementContent(amberSample);
+  assertAgreementReady(parsed, true);
+  const terms = template.resolvedAgreementTerms(parsed);
+  assert.ok(!terms.includes('['));
+  for (const text of ['QA Test Customer', 'QA TEST Chef business', '$200.00', '25%', '2027-01-19', '4:00 PM America/Chicago', 'at least 10 days before', 'within 4 days of', '$1.25 per mile']) assert.ok(terms.includes(text), text);
+  assert.ok(template.resolvedAgreementTerms({ ...parsed, name: 'Changed Customer', amount: 30000 }).includes('$300.00'));
+  for (const [key] of template.CONTRACT_FIELDS) assert.throws(() => assertAgreementReady({ ...parsed, contract: { ...parsed.contract, values: { ...parsed.contract.values, [key]: '' } } }, true), /Complete the contract/);
+  for (const key of ['allergies', 'dietaryRestrictions', 'arrivalTime', 'timeZone']) assert.throws(() => assertAgreementReady({ ...parsed, intake: { ...parsed.intake, [key]: '' } }, true), /Complete the contract/);
+  assert.throws(() => assertAgreementReady({ ...parsed, service: 'catering' }, true), /applies to Catering/);
+  assertAgreementReady({ ...parsed, service: 'catering', contract: { ...parsed.contract, serviceApproved: true } }, true);
+  for (const [key, value] of [['Deposit percentage', '101'], ['Dietary notice days', '-1'], ['Menu change notice days', '2.5'], ['Daily late fee', 'NaN'], ['Balance due date', '2027-02-30']]) assert.throws(() => parseAgreementContent({ ...parsed, contract: { ...parsed.contract, values: { ...parsed.contract.values, [key]: value } } }));
+  assert.throws(() => assertAgreementReady({ ...sample, terms: 'Unfilled legacy term [State]' }, true), /State/);
+  assert.equal(canonicalAgreement(sample), JSON.stringify(sample), 'legacy issued hashes retain the exact canonical representation');
+  const legacyHash = createHash('sha256').update(JSON.stringify(sample)).digest('hex');
+  const legacyRow = { id: 'legacy', booking_id: 1, version: 1, status: 'signed', content: sample, document_hash: legacyHash,
+    signature: { name: 'Legacy Customer', documentHash: legacyHash }, created_at: '2026-11-01', updated_at: '2026-11-01' };
+  assert.equal(load('lib/service-agreements.ts').agreementView(legacyRow).documentHash, legacyHash);
+});
 
 test('agreement validation, immutable canonical representation, and explicit owner review', () => {
   assert.deepEqual(parseAgreementContent(sample), sample);
@@ -31,6 +59,9 @@ test('customer agreement document escapes contract/customer text and identifies 
   assert.ok(html.includes('&lt;script&gt;'));
   assert.ok(!html.includes('<script>'));
   for (const text of ['QA Signer', 'Document SHA-256', 'abc123', '$200.00']) assert.ok(html.includes(text), text);
+  const full = renderToStaticMarkup(React.createElement(Component, { agreement: { id: 'qa-reference', content: { ...amberSample, intake: { ...intakeValues, allergies: '<script>allergy</script>' }, chefSignature: { name: '<script>chef</script>', consent: template.CHEF_SIGNATURE_CONSENT, signedAt: '2026-11-04T12:00:00Z' } }, status: 'issued', signature: null } }));
+  for (const text of ['Chef electronic signature', '&lt;script&gt;allergy', '&lt;script&gt;chef', 'Client and event intake', '25. ENTIRE AGREEMEMT']) assert.ok(full.includes(text), text);
+  assert.ok(!full.includes('<script>'));
 });
 
 test('business payment notification uses info, escaped invoice details, and a clear sandbox warning', async () => {
@@ -65,6 +96,13 @@ test('agreement APIs protect admin mutations, customer identities, and same-orig
   const token = modules('lib/admin-session.ts').createAdminSessionToken();
   const request = (url, method = 'GET', admin = false, origin = 'https://qa.example.com', body = {}) => new NextRequest(`https://qa.example.com${url}`, { method, headers: { origin, ...(admin ? { cookie: `wlf_admin_session=${token}` } : {}) }, ...(method !== 'GET' ? { body: JSON.stringify(body) } : {}) });
   const list = modules('app/api/admin/service-agreements/route.ts');
+  const original = modules('app/api/admin/service-agreements/source/route.ts');
+  assert.equal((await original.GET(request('/api/admin/service-agreements/source'))).status, 401);
+  const originalResponse = await original.GET(request('/api/admin/service-agreements/source', 'GET', true));
+  assert.equal(originalResponse.status, 200);
+  assert.equal(originalResponse.headers.get('content-type'), 'application/pdf');
+  assert.equal(originalResponse.headers.get('cache-control'), 'private, no-store');
+  assert.deepEqual(Buffer.from(await originalResponse.arrayBuffer()), await readFile(new URL('../private/contracts/amber-personal-chef-2026-11.pdf', import.meta.url)));
   const detail = modules('app/api/admin/service-agreements/[id]/route.ts');
   const context = { params: Promise.resolve({ id: '00000000-0000-4000-8000-000000000001' }) };
   for (const [handler, method] of [[list.GET, 'GET'], [list.POST, 'POST'], [detail.GET, 'GET'], [detail.PATCH, 'PATCH'], [detail.POST, 'POST']]) assert.equal((await handler(request('/api/admin/service-agreements', method), context)).status, 401);
@@ -127,22 +165,29 @@ test('agreement and invoice workflow with isolated SQL and verified webhook even
   const workflow = load('lib/service-invoice-workflow.ts').createInvoiceWorkflow(database);
   let draft; let issued;
 
-  await t.test('draft reuses inquiry fields and never invents terms; repeated creation reuses the draft', async () => {
+  await t.test('draft reuses inquiry fields and Amber source with empty policies; repeated creation reuses the draft', async () => {
     draft = await agreements.createFromBooking(1);
     assert.equal(draft.content.name, sample.name); assert.equal(draft.content.eventDate, '2027-01-20');
     assert.equal(draft.content.email, sample.email); assert.equal(draft.content.guests, 8);
     assert.ok(draft.content.details.includes('January 21st, 2027')); assert.ok(draft.content.details.includes('Budget range: $200'));
-    assert.equal(draft.content.terms, ''); assert.equal(draft.content.amount, 0);
+    assert.equal(draft.content.terms, template.AMBER_CONTRACT_TERMS); assert.equal(draft.content.amount, 0);
+    assert.equal(draft.content.contract.values['Deposit percentage'], '');
     assert.equal((await agreements.createFromBooking(1)).id, draft.id);
     await assert.rejects(() => agreements.createFromBooking(2), /Private Chef and Catering/);
     await assert.rejects(() => agreements.issue(draft.id, draft.version, true), /approved contract/);
   });
   await t.test('optimistic saves reject stale changes; issuing requires reviewed saved content', async () => {
-    draft = await agreements.save(draft.id, draft.version, sample);
-    await assert.rejects(() => agreements.save(draft.id, draft.version - 1, sample), /changed/);
+    await assert.rejects(() => agreements.save(draft.id, draft.version, { ...amberSample, chefSignature: { name: 'Forged Chef', consent: template.CHEF_SIGNATURE_CONSENT, signedAt: '2027-01-01T00:00:00Z' } }), /only when issuing/);
+    draft = await agreements.save(draft.id, draft.version, amberSample);
+    await assert.rejects(() => agreements.save(draft.id, draft.version - 1, amberSample), /changed/);
     await assert.rejects(() => agreements.issue(draft.id, draft.version, false), /Review/);
-    issued = await agreements.issue(draft.id, draft.version, true);
+    await assert.rejects(() => agreements.issue(draft.id, draft.version, true, 'QA Chef', false), /Chef signer/);
+    issued = await agreements.issue(draft.id, draft.version, true, 'QA Chef', true);
     assert.equal(issued.agreement.status, 'issued'); assert.equal(issued.token.length, 43);
+    assert.equal(issued.agreement.content.chefSignature.name, 'QA Chef');
+    assert.ok(issued.agreement.content.chefSignature.signedAt);
+    assert.ok(!issued.agreement.content.terms.includes('['));
+    assert.equal(issued.agreement.content.terms, template.resolvedAgreementTerms(amberSample));
     const [stored] = await query('SELECT token_hash FROM service_agreements WHERE id=$1', [draft.id]);
     assert.notEqual(stored.token_hash, issued.token); assert.equal(stored.token_hash.length, 64);
     await assert.rejects(() => agreements.save(draft.id, issued.agreement.version, sample), /editable draft/);
@@ -169,16 +214,35 @@ test('agreement and invoice workflow with isolated SQL and verified webhook even
     await query("UPDATE service_agreements SET content=jsonb_set(content,'{details}','\"Altered after signing\"') WHERE id=$1", [first.id]);
     await assert.rejects(() => agreements.read(first.id), /does not match its issued copy/);
     await query('UPDATE service_agreements SET content=$2::jsonb WHERE id=$1', [first.id, JSON.stringify(first.content)]);
+    await query("UPDATE service_agreements SET content=jsonb_set(content,'{chefSignature,name}','\"Forged Chef\"') WHERE id=$1", [first.id]);
+    await assert.rejects(() => agreements.read(first.id), /does not match its issued copy/);
+    await query('UPDATE service_agreements SET content=$2::jsonb WHERE id=$1', [first.id, JSON.stringify(first.content)]);
   });
   await t.test('voiding an unsigned agreement invalidates its token and a new draft can be created', async () => {
     const nextDraft = await agreements.createFromBooking(1);
     const saved = await agreements.save(nextDraft.id, nextDraft.version, sample);
-    const nextIssued = await agreements.issue(saved.id, saved.version, true);
+    const nextIssued = await agreements.issue(saved.id, saved.version, true, 'QA Chef', true);
     await agreements.voidAgreement(saved.id, nextIssued.agreement.version);
     await assert.rejects(() => agreements.review(nextIssued.token), /unavailable/);
     const newDraft = await agreements.createFromBooking(1);
     assert.notEqual(newDraft.id, nextDraft.id);
     assert.equal((await agreements.memberList(sample.email)).length, 1);
+  });
+  await t.test('drawn Chef and uploaded customer signatures persist exact proof and reject replacement or tampering', async () => {
+    await query("INSERT INTO bookings VALUES (3,'private','QA Image','Signer','images@example.com','555-0102',8,'January 20th, 2027',null,'QA image-signing test only.')");
+    const draft = await agreements.createFromBooking(3);
+    const saved = await agreements.save(draft.id, draft.version, { ...amberSample, name: 'QA Image Signer', email: 'images@example.com' });
+    const issued = await agreements.issue(saved.id, saved.version, true, 'QA Image Chef', true, { method: 'drawn', imageData: signatureImage() });
+    assert.equal(issued.agreement.content.chefSignature.mark.method, 'drawn');
+    const input = { method: 'uploaded', imageData: signatureImage() };
+    const signed = await agreements.sign(issued.token, issued.agreement.documentHash, 'QA Image Signer', true, input);
+    assert.equal(signed.signature.mark.method, 'uploaded'); assert.equal(signed.signature.proofHash.length, 64);
+    assert.deepEqual((await agreements.sign(issued.token, issued.agreement.documentHash, 'QA Image Signer', true, input)).signature, signed.signature);
+    await assert.rejects(() => agreements.sign(issued.token, issued.agreement.documentHash, 'QA Image Signer', true, { method: 'typed' }), /already been signed/);
+    await query("UPDATE service_agreements SET signature=jsonb_set(signature,'{mark,method}','\"drawn\"') WHERE id=$1", [signed.id]);
+    await assert.rejects(() => agreements.read(signed.id), /does not match/);
+    await query('UPDATE service_agreements SET signature=$2::jsonb WHERE id=$1', [signed.id, JSON.stringify(signed.signature)]);
+    assert.equal((await agreements.read(signed.id)).signature.mark.method, 'uploaded');
   });
   const mock = stripeFixture();
   const invoiceInput = { name: sample.name, email: sample.email, service: sample.service, title: 'QA TEST invoice', eventDate: sample.eventDate, notes: '', daysUntilDue: 14, agreementId: draft.id, items: [{ description: 'QA TEST deposit', quantity: 1, unitAmount: 5000 }] };

@@ -14,6 +14,7 @@ const allowedDevOrigins = process.env.ALLOWED_DEV_ORIGINS?.split(",")
 
 const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
+    "/api/admin/service-agreements/source": ["./private/contracts/amber-personal-chef-2026-11.pdf"],
     "/api/admin/walkthrough-images/*": ["./docs/walkthrough-evidence/2026-10-30/*"],
   },
   turbopack: {

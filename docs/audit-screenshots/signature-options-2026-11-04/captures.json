@@ -1,0 +1,90 @@
+[
+  {
+    "file": "01-admin-overview.png",
+    "title": "Agreement admin and original PDF link"
+  },
+  {
+    "file": "02-draft-1.png",
+    "title": "Booking details and prefilled contract source"
+  },
+  {
+    "file": "03-intake-1.png",
+    "title": "Client, event, contact, dietary, and allergy intake - part 1"
+  },
+  {
+    "file": "03-intake-2.png",
+    "title": "Client, event, contact, dietary, and allergy intake - part 2"
+  },
+  {
+    "file": "04-policy-blanks-1.png",
+    "title": "Policy settings and business phone confirmation - part 1"
+  },
+  {
+    "file": "04-policy-blanks-2.png",
+    "title": "Policy settings and business phone confirmation - part 2"
+  },
+  {
+    "file": "05-original-terms.png",
+    "title": "Original contract with automatic field placeholders"
+  },
+  {
+    "file": "06-required-details-1.png",
+    "title": "Missing details prevent creating a signing link"
+  },
+  {
+    "file": "07-catering-confirmation-1.png",
+    "title": "Catering requires confirmation that this contract applies"
+  },
+  {
+    "file": "chef-drawn-signature.png",
+    "title": "Chef drawing option"
+  },
+  {
+    "file": "08-filled-settings-1.png",
+    "title": "Completed policy settings with fictional example values - part 1"
+  },
+  {
+    "file": "08-filled-settings-2.png",
+    "title": "Completed policy settings with fictional example values - part 2"
+  },
+  {
+    "file": "09-chef-signing-1.png",
+    "title": "Saved review and explicit Chef signature consent"
+  },
+  {
+    "file": "10-share-link-1.png",
+    "title": "Issued agreement and customer signing link"
+  },
+  {
+    "file": "customer-typed-option.png",
+    "title": "Prefilled name and three signature styles"
+  },
+  {
+    "file": "customer-upload-option.png",
+    "title": "Uploaded customer signature preview"
+  },
+  {
+    "file": "11-customer-review.png",
+    "title": "Customer agreement review"
+  },
+  {
+    "file": "12-customer-signing.png",
+    "title": "Customer name and electronic signing consent"
+  },
+  {
+    "file": "13-both-signatures-1.png",
+    "title": "Chef and Client signatures, timestamps, and document reference"
+  },
+  {
+    "file": "14-signing-confirmation.png",
+    "title": "Customer signing confirmation"
+  },
+  {
+    "file": "15-mobile-signatures-1.png",
+    "title": "Both signatures on mobile"
+  },
+  {
+    "file": "print-signatures-1.png",
+    "title": "Both image signatures in print layout"
+  }
+]

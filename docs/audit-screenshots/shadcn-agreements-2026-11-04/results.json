@@ -1,0 +1,14 @@
+{
+  "browser": "http://localhost:3010",
+  "database": "TEMP tables, rolled-back transaction",
+  "stripe": "in-memory fixture",
+  "smtp": "mocked",
+  "checks": [
+    "Real admin UI loads all 25 Amber source sections, requires policy/intake values, resolves saved preview fields, and requires explicit Chef signing consent before issuing. Policy values are fictional QA data. SMTP is mocked.",
+    "Booking name prefills customer signing. Chef drawing and customer image upload are persisted; blank uploads are rejected and all three style controls are available.",
+    "Both image signatures remain visible in print styles; navigation and action controls are hidden. Desktop and mobile copies were captured.",
+    "Signed agreement prefills the invoice; a $50 deposit is issued/sent through the Stripe fixture and payment refresh shows paid status plus a deduplicated mocked business notification.",
+    "shadcn inputs, textareas, Select, Checkbox, and Button controls passed. Exact primary teal, hover, keyboard focus, portalled menus/dialogs, and cancel/continue actions were verified."
+  ],
+  "passed": true
+}

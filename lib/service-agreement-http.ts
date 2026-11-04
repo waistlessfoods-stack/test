@@ -6,7 +6,7 @@ export const agreementHeaders = { "Cache-Control": "private, no-store", "X-Robot
 export function agreementJson(data: unknown, status = 200) { return NextResponse.json(data, { status, headers: agreementHeaders }); }
 export async function agreementBody(request: NextRequest): Promise<Record<string, unknown>> {
   const raw = await request.text();
-  if (raw.length > 60000) throw new ServiceInvoiceError("Agreement request is too large.");
+  if (raw.length > 350000) throw new ServiceInvoiceError("Agreement request is too large.");
   try {
     const body = JSON.parse(raw);
     if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error();

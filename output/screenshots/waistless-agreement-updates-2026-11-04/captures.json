@@ -1,0 +1,122 @@
+[
+  {
+    "file": "01-admin-overview.png",
+    "title": "Agreement admin and original PDF link"
+  },
+  {
+    "file": "02-draft-1.png",
+    "title": "Booking details and prefilled contract source"
+  },
+  {
+    "file": "03-intake-1.png",
+    "title": "Client, event, contact, dietary, and allergy intake - part 1"
+  },
+  {
+    "file": "03-intake-2.png",
+    "title": "Client, event, contact, dietary, and allergy intake - part 2"
+  },
+  {
+    "file": "04-policy-blanks-1.png",
+    "title": "Policy settings and business phone confirmation - part 1"
+  },
+  {
+    "file": "04-policy-blanks-2.png",
+    "title": "Policy settings and business phone confirmation - part 2"
+  },
+  {
+    "file": "05-original-terms.png",
+    "title": "Original contract with automatic field placeholders"
+  },
+  {
+    "file": "06-required-details-1.png",
+    "title": "Missing details prevent creating a signing link"
+  },
+  {
+    "file": "07-catering-confirmation-1.png",
+    "title": "Catering requires confirmation that this contract applies"
+  },
+  {
+    "file": "08-filled-settings-1.png",
+    "title": "Completed policy settings with fictional example values - part 1"
+  },
+  {
+    "file": "08-filled-settings-2.png",
+    "title": "Completed policy settings with fictional example values - part 2"
+  },
+  {
+    "file": "09-chef-signing-1.png",
+    "title": "Saved review and explicit Chef signature consent"
+  },
+  {
+    "file": "10-share-link-1.png",
+    "title": "Issued agreement and customer signing link"
+  },
+  {
+    "file": "11-customer-review.png",
+    "title": "Customer agreement review"
+  },
+  {
+    "file": "12-customer-signing.png",
+    "title": "Customer name and electronic signing consent"
+  },
+  {
+    "file": "13-both-signatures-1.png",
+    "title": "Chef and Client signatures, timestamps, and document reference"
+  },
+  {
+    "file": "14-signing-confirmation.png",
+    "title": "Customer signing confirmation"
+  },
+  {
+    "file": "15-mobile-signatures-1.png",
+    "title": "Both signatures on mobile"
+  },
+  {
+    "file": "16-print-page-1.png",
+    "title": "Printable agreement - page 1 of 6"
+  },
+  {
+    "file": "16-print-page-2.png",
+    "title": "Printable agreement - page 2 of 6"
+  },
+  {
+    "file": "16-print-page-3.png",
+    "title": "Printable agreement - page 3 of 6"
+  },
+  {
+    "file": "16-print-page-4.png",
+    "title": "Printable agreement - page 4 of 6"
+  },
+  {
+    "file": "16-print-page-5.png",
+    "title": "Printable agreement - page 5 of 6"
+  },
+  {
+    "file": "16-print-page-6.png",
+    "title": "Printable agreement - page 6 of 6"
+  },
+  {
+    "file": "admin-agreement-desktop.png",
+    "title": "Full admin agreement - desktop"
+  },
+  {
+    "file": "admin-agreement-mobile.png",
+    "title": "Full admin draft - mobile"
+  },
+  {
+    "file": "signed-agreement-desktop.png",
+    "title": "Full signed customer agreement - desktop"
+  },
+  {
+    "file": "signed-agreement-mobile.png",
+    "title": "Full signed customer agreement - mobile"
+  },
+  {
+    "file": "linked-paid-invoice-desktop.png",
+    "title": "Linked invoice and payment status - desktop"
+  },
+  {
+    "file": "linked-paid-invoice-mobile.png",
+    "title": "Linked invoice and payment status - mobile"
+  }
+]

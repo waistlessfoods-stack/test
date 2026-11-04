@@ -1,0 +1,12 @@
+{
+  "browser": "http://localhost:3010",
+  "database": "TEMP tables, rolled-back transaction",
+  "stripe": "in-memory fixture",
+  "smtp": "mocked",
+  "checks": [
+    "Real admin UI loads all 25 Amber source sections, requires policy/intake values, resolves saved preview fields, and requires explicit Chef signing consent before issuing. Policy values are fictional QA data. SMTP is mocked.",
+    "Anonymous private-link review/signing and mobile layouts captured; the gallery includes the previously verified six-page print copy.",
+    "Signed agreement prefills the invoice; a $50 deposit is issued/sent through the Stripe fixture and payment refresh shows paid status plus a deduplicated mocked business notification."
+  ],
+  "passed": true
+}

@@ -39,6 +39,7 @@ Do not send documents from the internal or archive sections to the client.
 - [Shop and Public-Class Payment Readiness](shop-payment-readiness-2026-11-01.md)
 - [Newsletter Images and Recipe Management](newsletter-media-and-recipe-management-2026-11-01.md)
 - [Service Agreements and Linked Invoice Workflow](service-agreements-2026-11-01.md)
+- [Amber's Original Contract Integration](service-agreement-source-2026-11-04.md)
 - [Blog and Chef’s Guide to Herbs Tracker](amber-blog-herbs-implementation-tracker.md)
 - [Services Short Audit](amber-services-short-audit-2026-07-05.md)
 - [Contentful Audit](contentful-audit-2026-06-08.md)

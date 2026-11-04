@@ -2,6 +2,8 @@
 
 The application now supports booking request → reviewed agreement → private-link signature → linked invoice → Stripe payment-status synchronization and a business payment notification. The code was pushed and automatically deployed on November 1; production protected API reads passed. Amber's actual contract PDF, webhook-event setup, and live customer/payment walkthroughs are still pending. See the [post-push audit](post-push-meeting-audit-2026-11-01.md).
 
+**November 4 update:** Amber's original PDF has now been received. Source-template, intake, and signature changes are documented in [Original contract integration](service-agreement-source-2026-11-04.md). The November 1 deployment description and checklist below are historical; verify current production status against the November 4 push.
+
 ## Administrator workflow
 
 1. Open **Admin → Booking requests**, expand a Private Chef or Catering request, and choose **Prepare service agreement**. Alternatively, open **Admin → Service agreements** and enter the request ID.

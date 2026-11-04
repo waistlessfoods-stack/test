@@ -36,7 +36,7 @@ export async function POST(request: NextRequest, context: Context) {
       return agreementJson({ message: "The mail server accepted the signing email. Inbox delivery is not confirmed." });
     }
     if (body.action !== "issue" && body.action !== "renew_link") return agreementJson({ error: "Unknown agreement action." }, 400);
-    const result = body.action === "issue" ? await agreements.issue(id, body.version, body.reviewed) : await agreements.renewLink(id, body.version);
+    const result = body.action === "issue" ? await agreements.issue(id, body.version, body.reviewed, body.chefName, body.chefConsent, body.chefMark) : await agreements.renewLink(id, body.version);
     return agreementJson({ agreement: result.agreement, signingUrl: `${new URL(request.url).origin}/agreements/sign#${result.token}` });
   } catch (error) { return agreementError(error); }
 }
